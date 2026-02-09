@@ -1,12 +1,19 @@
-﻿import {Box, Button, Container, Paper, TextField, Typography} from "@mui/material";
+﻿import {Box, Button, Container, Paper, TextField, Typography, Tabs, Tab} from "@mui/material";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import {useNavigate} from "react-router-dom";
 import {useAuth} from "../auth/AuthContext.tsx";
+import { useState } from "react";
 
 const LoginForm = () => {
     const navigate = useNavigate();
     const {login} = useAuth();
+    const [userType, setUserType] = useState<'proprietar' | 'chirias'>('proprietar');
     
+    const handleTabChange = (e: React.SyntheticEvent,newValue: 'proprietar' | 'chirias') => {
+        e.preventDefault();
+        setUserType(newValue);
+    };
+
     return (
         <Container maxWidth="sm">
             <Paper
@@ -15,7 +22,6 @@ const LoginForm = () => {
                     p: 5,
                     borderRadius: 10,
                 }}
-
             >
                 {/* Logo Rentora */}
                 <Box display="flex" alignItems="center" justifyContent={"center"}  gap={1} mb={4}>
@@ -43,8 +49,34 @@ const LoginForm = () => {
                     </Typography>
                 </Box>
 
+                {/* Tabs pentru selectare tip utilizator */}
+                <Tabs
+                    value={userType}
+                    onChange={handleTabChange}
+                    variant="fullWidth"
+                    sx={{
+                        mb: 3,
+                        borderBottom: "2px solid #e5e7eb",
+                        "& .MuiTab-root": {
+                            textTransform: "none",
+                            fontWeight: 600,
+                            fontSize: 15,
+                            color: "#9ca3af",
+                            "&.Mui-selected": {
+                                color: "#2563eb",
+                            },
+                        },
+                        "& .MuiTabs-indicator": {
+                            background: "linear-gradient(90deg, #2563eb, #4f46e5)",
+                        },
+                    }}
+                >
+                    <Tab label="Proprietari" value="proprietar" />
+                    <Tab label="Chiriași" value="chirias" />
+                </Tabs>
+
                 <Typography display={"flex"} justifyContent={"center"} variant="h6" fontWeight={600} mb={3}>
-                    Autentificare
+                    {userType === 'proprietar' ? 'Bun venit, Proprietar!' : 'Bun venit, Chirias!'}
                 </Typography>
 
                 <TextField
@@ -76,9 +108,8 @@ const LoginForm = () => {
                         login()
                         navigate("/home")
                     }}
-
                 >
-                    Login
+                    Conectare {userType === 'proprietar' ? 'Proprietar' : 'Chirias'}
                 </Button>
 
                 <Typography
@@ -87,7 +118,10 @@ const LoginForm = () => {
                     fontSize={14}
                     color="text.secondary"
                 >
-                    Nu ai cont? <span style={{ color: "#2563eb" }}>Înregistrează-te</span>
+                    Nu ai cont? <span 
+                    style={{ color: "#2563eb", cursor: "pointer" }}
+                    onClick={()=>navigate("/register")}
+                >Înregistrează-te</span>
                 </Typography>
             </Paper>
         </Container>
