@@ -8,7 +8,7 @@
 } from "@mui/material";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import {useAuth} from "../auth/AuthContext";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, Link} from "react-router-dom";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -106,7 +106,17 @@ const Login = () => {
                         fontSize={14}
                         color="text.secondary"
                     >
-                        Nu ai cont? <span style={{ color: "#2563eb" }}>Înregistrează-te</span>
+                        Nu ai cont?{" "}
+                        <Link 
+                            to="/register" 
+                            style={{ 
+                                color: "#2563eb", 
+                                textDecoration: "none",
+                                fontWeight: 500 
+                            }}
+                        >
+                            Înregistrează-te
+                        </Link>
                     </Typography>
                 </Paper>
             </Container>
