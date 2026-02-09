@@ -1,4 +1,4 @@
-﻿import {Box} from "@mui/material";
+import {Box} from "@mui/material";
 import LoginForm from "../components/LoginForm.tsx";
 
 const Login = () => {
