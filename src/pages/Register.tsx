@@ -18,6 +18,7 @@ const Register = () => {
     return (
         <Box
             sx={{
+                pt:10.5,
                 minHeight: "100vh",
                 background: "linear-gradient(135deg, #2563eb, #4f46e5, #7c3aed)",
                 display: "flex",
@@ -117,7 +118,6 @@ const Register = () => {
                         <MenuItem value="">Prefer să nu specific</MenuItem>
                         <MenuItem value="M">Masculin</MenuItem>
                         <MenuItem value="F">Feminin</MenuItem>
-                        <MenuItem value="Other">Altul</MenuItem>
                     </TextField>
 
                     <TextField
