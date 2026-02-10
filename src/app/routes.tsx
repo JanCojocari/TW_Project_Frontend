@@ -2,17 +2,18 @@
 import Home from "../pages/Home"
 import Login from "../pages/Login";
 import Register from "../pages/Register.tsx";
+import {paths} from "./paths.ts"
 export const publicRoutes = [
     {path: "/*", element: <Login />},
-    {path: "/home", element: <Home/>},
-    {path: "/login", element: <Login/>},
-    {path: "/register", element: <Register/>}
+    {path: paths.home, element: <Home/>},
+    {path: paths.login, element: <Login/>},
+    {path: paths.register, element: <Register/>}
     
 ];
 
 export const privateRoutes = [
     {
-        path: "/home",
+        path: paths.home,
         element: <Home/>, // <component_name/>
         role: "role",
     },

@@ -18,7 +18,7 @@ const Register = () => {
     return (
         <Box
             sx={{
-                pt:10.5,
+                pt:12.5,
                 minHeight: "100vh",
                 background: "linear-gradient(135deg, #2563eb, #4f46e5, #7c3aed)",
                 display: "flex",
