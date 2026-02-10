@@ -2,4 +2,5 @@
     login : "/login",
     home : "/home",
     register: "/register",
+    listings: "/listings",
 }
