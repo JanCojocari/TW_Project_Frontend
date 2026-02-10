@@ -3,13 +3,16 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Dashboard from "../pages/Dashboard";
 import { paths } from "./paths";
+import Listings from "../pages/Listings.tsx";
 
 export const publicRoutes = [
     { path: paths.home, element: <Home /> },
     { path: paths.login, element: <Login /> },
     { path: paths.register, element: <Register /> },
     { path: paths.dashboard, element: <Dashboard /> },
-    
+    { path: paths.listings, element: <Listings /> },
+
+
     { path: "*", element: <Home /> },
 ];
 
