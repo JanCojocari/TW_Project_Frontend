@@ -35,7 +35,7 @@ const Register = () => {
                     }}
                 >
                     {/* Logo Rentora */}
-                    <Box display="flex" alignItems="center" justifyContent={"center"} gap={1} mb={4}>
+                    <Box display="flex" alignItems="center" justifyContent={"center"} gap={1} mb={2}>
                         <Box
                             sx={{
                                 background:
@@ -85,10 +85,11 @@ const Register = () => {
                     </Grid>
 
                     <TextField
-                        label="Email (opțional)"
+                        label="Email"
                         type="email"
                         fullWidth
                         margin="normal"
+                        required
                     />
 
                     <TextField
@@ -104,16 +105,19 @@ const Register = () => {
                         type="date"
                         fullWidth
                         margin="normal"
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
                         required
-                       
                     />
 
                     <TextField
                         select
-                        label="Gen (opțional)"
+                        label="Gen"
                         fullWidth
                         margin="normal"
                         defaultValue=""
+                        required
                     >
                         <MenuItem value="">Prefer să nu specific</MenuItem>
                         <MenuItem value="M">Masculin</MenuItem>
