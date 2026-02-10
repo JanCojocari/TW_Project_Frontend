@@ -17,6 +17,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { paths } from "../app/paths";
 
 const Header = () => {
     const navigate = useNavigate();
@@ -27,9 +28,10 @@ const Header = () => {
     };
 
     const menuItems = [
-        { label: "Acasă", path: "/home" },
-        { label: "Anunțuri", path: "/listings" },
-        { label: "Despre", path: "/about" },
+        { label: "Acasă", path: paths.home },
+        { label: "Anunțuri", path: paths.listings },
+        { label: "Dashboard", path: paths.dashboard },
+        { label: "Despre", path: paths.about }, 
     ];
 
     const handleNavigation = (path: string) => {
@@ -89,7 +91,7 @@ const Header = () => {
                                 background: "rgba(37, 99, 235, 0.08)",
                             },
                         }}
-                        onClick={() => handleNavigation("/login")}
+                        onClick={() => handleNavigation(paths.login)}
                     >
                         Conectare
                     </Button>
@@ -109,7 +111,7 @@ const Header = () => {
                                 transform: "translateY(-2px)",
                             },
                         }}
-                        onClick={() => handleNavigation("/register")}
+                        onClick={() => handleNavigation(paths.register)}
                     >
                         Înregistrare
                     </Button>
@@ -143,7 +145,7 @@ const Header = () => {
                                     transform: "scale(1.05)",
                                 },
                             }}
-                            onClick={() => navigate("/")}
+                            onClick={() => navigate(paths.home)}
                         >
                             <Box
                                 sx={{
@@ -225,7 +227,7 @@ const Header = () => {
                                         borderRadius: 1.5,
                                     },
                                 }}
-                                onClick={() => navigate("/login")}
+                                onClick={() => navigate(paths.login)}
                             >
                                 Conectare
                             </Button>
@@ -249,7 +251,7 @@ const Header = () => {
                                         transform: "translateY(-2px)",
                                     },
                                 }}
-                                onClick={() => navigate("/register")}
+                                onClick={() => navigate(paths.register)}
                             >
                                 Înregistrare
                             </Button>
