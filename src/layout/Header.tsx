@@ -42,11 +42,12 @@ const Header = () => {
             sx={{
                 width: 250,
                 p: 2,
+                background: "linear-gradient(180deg, #f8f9fa, #ffffff)",
             }}
         >
             <Box display="flex" justifyContent="flex-end" px={2} mb={2}>
                 <IconButton onClick={handleDrawerToggle}>
-                    <CloseIcon />
+                    <CloseIcon sx={{ color: "#4f46e5" }} />
                 </IconButton>
             </Box>
             <List>
@@ -55,8 +56,11 @@ const Header = () => {
                         <ListItemButton
                             onClick={() => handleNavigation(item.path)}
                             sx={{
+                                borderRadius: 1.5,
+                                mb: 1,
+                                transition: "all 0.3s ease",
                                 "&:hover": {
-                                    background: "rgba(37, 99, 235, 0.1)",
+                                    background: "linear-gradient(90deg, rgba(37, 99, 235, 0.08), rgba(79, 70, 229, 0.08))",
                                 },
                             }}
                         >
@@ -64,21 +68,26 @@ const Header = () => {
                                 primary={item.label}
                                 primaryTypographyProps={{
                                     fontWeight: 600,
-                                    color: "#1e40af",
+                                    color: "#2563eb",
+                                    fontSize: 15,
                                 }}
                             />
                         </ListItemButton>
                     </ListItem>
                 ))}
-                <ListItem disablePadding sx={{ mt: 2, flexDirection: "column", gap: 1 }}>
+                <ListItem disablePadding sx={{ mt: 3, flexDirection: "column", gap: 1.5 }}>
                     <Button
                         fullWidth
                         variant="text"
                         sx={{
-                            color: "#1e40af",
+                            color: "#2563eb",
                             fontWeight: 600,
                             textTransform: "none",
                             fontSize: 15,
+                            transition: "all 0.3s ease",
+                            "&:hover": {
+                                background: "rgba(37, 99, 235, 0.08)",
+                            },
                         }}
                         onClick={() => handleNavigation("/login")}
                     >
@@ -88,11 +97,17 @@ const Header = () => {
                         fullWidth
                         variant="contained"
                         sx={{
-                            background: "linear-gradient(90deg, #2563eb, #4f46e5)",
+                            background: "linear-gradient(90deg, #2563eb, #4f46e5, #7c3aed)",
                             color: "white",
                             fontWeight: 600,
-                            textTransform: "none",
+                            textTransform: "capitalize",
                             fontSize: 15,
+                            borderRadius: 1.5,
+                            transition: "all 0.3s ease",
+                            "&:hover": {
+                                boxShadow: "0 8px 16px rgba(37, 99, 235, 0.3)",
+                                transform: "translateY(-2px)",
+                            },
                         }}
                         onClick={() => handleNavigation("/register")}
                     >
@@ -106,11 +121,12 @@ const Header = () => {
     return (
         <>
             <AppBar
-                elevation={0}
+                elevation={2}
                 sx={{
-                    background: "#1e40af",
-                    py: 1,
-                    mb: 2,
+                    background: "linear-gradient(135deg, #2563eb, #4f46e5, #7c3aed)",
+                    py: 1.5,
+                    mb: 0,
+                    boxShadow: "0 4px 20px rgba(37, 99, 235, 0.15)",
                 }}
             >
                 <Container maxWidth="lg">
@@ -120,15 +136,27 @@ const Header = () => {
                             display="flex"
                             alignItems="center"
                             gap={1.5}
-                            sx={{ cursor: "pointer" }}
+                            sx={{
+                                cursor: "pointer",
+                                transition: "transform 0.3s ease",
+                                "&:hover": {
+                                    transform: "scale(1.05)",
+                                },
+                            }}
                             onClick={() => navigate("/")}
                         >
                             <Box
                                 sx={{
-                                    background:
-                                        "linear-gradient(135deg, #2563eb, #4f46e5, #7c3aed)",
+                                    background: "rgba(255, 255, 255, 0.2)",
+                                    backdropFilter: "blur(10px)",
                                     p: 1.5,
                                     borderRadius: 2,
+                                    border: "1.5px solid rgba(255, 255, 255, 0.3)",
+                                    transition: "all 0.3s ease",
+                                    "&:hover": {
+                                        background: "rgba(255, 255, 255, 0.3)",
+                                        border: "1.5px solid rgba(255, 255, 255, 0.5)",
+                                    },
                                 }}
                             >
                                 <ApartmentIcon sx={{ color: "white", fontSize: 28 }} />
@@ -141,6 +169,7 @@ const Header = () => {
                                     color: "white",
                                     letterSpacing: 0.5,
                                     display: { xs: "none", sm: "block" },
+                                    fontSize: { sm: "20px", md: "24px" },
                                 }}
                             >
                                 Rentora
@@ -150,7 +179,7 @@ const Header = () => {
                         {/* Desktop Navigation */}
                         <Box
                             display="flex"
-                            gap={2}
+                            gap={1}
                             sx={{ display: { xs: "none", md: "flex" } }}
                         >
                             {menuItems.map((item) => (
@@ -161,9 +190,12 @@ const Header = () => {
                                         fontSize: 15,
                                         fontWeight: 600,
                                         textTransform: "none",
+                                        px: 2,
+                                        py: 1,
+                                        transition: "all 0.3s ease",
                                         "&:hover": {
-                                            background: "rgba(255, 255, 255, 0.1)",
-                                            borderRadius: 1,
+                                            background: "rgba(255, 255, 255, 0.15)",
+                                            borderRadius: 1.5,
                                         },
                                     }}
                                     onClick={() => navigate(item.path)}
@@ -186,8 +218,11 @@ const Header = () => {
                                     fontSize: 15,
                                     fontWeight: 600,
                                     textTransform: "none",
+                                    px: 2.5,
+                                    transition: "all 0.3s ease",
                                     "&:hover": {
-                                        background: "rgba(255, 255, 255, 0.1)",
+                                        background: "rgba(255, 255, 255, 0.15)",
+                                        borderRadius: 1.5,
                                     },
                                 }}
                                 onClick={() => navigate("/login")}
@@ -197,15 +232,21 @@ const Header = () => {
                             <Button
                                 variant="contained"
                                 sx={{
-                                    background: "rgba(255, 255, 255, 0.2)",
+                                    background: "rgba(255, 255, 255, 0.25)",
                                     color: "white",
                                     fontSize: 15,
                                     fontWeight: 600,
                                     textTransform: "none",
-                                    border: "2px solid rgba(255, 255, 255, 0.3)",
+                                    px: 2.5,
+                                    border: "1.5px solid rgba(255, 255, 255, 0.4)",
+                                    borderRadius: 1.5,
+                                    transition: "all 0.3s ease",
+                                    backdropFilter: "blur(10px)",
                                     "&:hover": {
-                                        background: "rgba(255, 255, 255, 0.3)",
-                                        border: "2px solid rgba(255, 255, 255, 0.5)",
+                                        background: "rgba(255, 255, 255, 0.35)",
+                                        border: "1.5px solid rgba(255, 255, 255, 0.6)",
+                                        boxShadow: "0 8px 16px rgba(255, 255, 255, 0.2)",
+                                        transform: "translateY(-2px)",
                                     },
                                 }}
                                 onClick={() => navigate("/register")}
@@ -220,7 +261,12 @@ const Header = () => {
                             aria-label="open drawer"
                             edge="end"
                             onClick={handleDrawerToggle}
-                            sx={{ display: { xs: "block", md: "none" } }}
+                            sx={{
+                                display: { xs: "block", md: "none" },
+                                "&:hover": {
+                                    background: "rgba(255, 255, 255, 0.15)",
+                                },
+                            }}
                         >
                             <MenuIcon />
                         </IconButton>
