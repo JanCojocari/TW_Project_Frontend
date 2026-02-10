@@ -8,10 +8,42 @@ const LoginForm = () => {
     const navigate = useNavigate();
     const {login} = useAuth();
     const [userType, setUserType] = useState<'proprietar' | 'chirias'>('proprietar');
-    
-    const handleTabChange = (e: React.SyntheticEvent,newValue: 'proprietar' | 'chirias') => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [errors, setErrors] = useState<{email?: string, password?: string}>({});
+
+    const handleTabChange = (e: React.SyntheticEvent, newValue: 'proprietar' | 'chirias') => {
         e.preventDefault();
         setUserType(newValue);
+    };
+
+    const validateForm = () => {
+        const newErrors: {email?: string, password?: string} = {};
+
+        // Validare email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email.trim()) {
+            newErrors.email = 'Email-ul este obligatoriu';
+        } else if (!emailRegex.test(email)) {
+            newErrors.email = 'Email invalid';
+        }
+
+        // Validare parolă
+        if (!password.trim()) {
+            newErrors.password = 'Parola este obligatorie';
+        } else if (password.length < 6) {
+            newErrors.password = 'Parola trebuie să aibă minimum 6 caractere';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSubmit = () => {
+        if (validateForm()) {
+            login();
+            navigate("/home");
+        }
     };
 
     return (
@@ -84,6 +116,13 @@ const LoginForm = () => {
                     type="email"
                     fullWidth
                     margin="normal"
+                    value={email}
+                    onChange={(e) => {
+                        setEmail(e.target.value);
+                        if (errors.email) setErrors({...errors, email: undefined});
+                    }}
+                    error={!!errors.email}
+                    helperText={errors.email}
                 />
 
                 <TextField
@@ -91,12 +130,20 @@ const LoginForm = () => {
                     type="password"
                     fullWidth
                     margin="normal"
+                    value={password}
+                    onChange={(e) => {
+                        setPassword(e.target.value);
+                        if (errors.password) setErrors({...errors, password: undefined});
+                    }}
+                    error={!!errors.password}
+                    helperText={errors.password}
                 />
 
                 <Button
                     fullWidth
                     size="large"
                     variant="contained"
+                    type={"submit"}
                     sx={{
                         mt: 3,
                         py: 1.3,
@@ -104,10 +151,7 @@ const LoginForm = () => {
                         background:
                             "linear-gradient(90deg, #2563eb, #4f46e5, #7c3aed)",
                     }}
-                    onClick={() => {
-                        login()
-                        navigate("/home")
-                    }}
+                    onClick={handleSubmit}
                 >
                     Conectare {userType === 'proprietar' ? 'Proprietar' : 'Chirias'}
                 </Button>
@@ -118,7 +162,7 @@ const LoginForm = () => {
                     fontSize={14}
                     color="text.secondary"
                 >
-                    Nu ai cont? <span 
+                    Nu ai cont? <span
                     style={{ color: "#2563eb", cursor: "pointer" }}
                     onClick={()=>navigate("/register")}
                 >Înregistrează-te</span>
