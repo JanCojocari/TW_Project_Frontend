@@ -16,11 +16,9 @@ import {
 } from "@mui/icons-material";
 import { useState } from "react";
 import LoginForm from "../components/LoginForm.tsx";
-import {useNavigate} from "react-router-dom";
 
 const Home = () => {
     const [showLoginModal, setShowLoginModal] = useState(false);
-    const navigate = useNavigate()
     const features = [
         {
             icon: <HomeIcon sx={{ fontSize: 40 }} />,
@@ -80,7 +78,7 @@ const Home = () => {
                 <Container maxWidth="lg">
                     <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 4, alignItems: "center" }}>
                         {/* Text Content */}
-                        <Box sx={{ position: "relative", zIndex: 2 }}>
+                        <Box  sx={{ position: "relative", zIndex: 2 }}>
                             <Typography
                                 variant="h2"
                                 sx={{
@@ -131,27 +129,7 @@ const Home = () => {
                                         },
                                     }}
                                 >
-                                    Conectare
-                                </Button>
-                                <Button
-                                    size="large"
-                                    variant="outlined"
-                                    sx={{
-                                        color: "white",
-                                        borderColor: "rgba(255, 255, 255, 0.5)",
-                                        fontWeight: 600,
-                                        fontSize: 15,
-                                        px: 4,
-                                        py: 1.5,
-                                        transition: "all 0.3s ease",
-                                        "&:hover": {
-                                            borderColor: "white",
-                                            background: "rgba(255, 255, 255, 0.1)",
-                                        },
-                                    }}
-                                    onClick={()=>{navigate("/register")}}
-                                >
-                                    Înregistrare
+                                    începe căutarea
                                 </Button>
                             </Box>
                         </Box>
@@ -242,7 +220,7 @@ const Home = () => {
                     >
                         Beneficiază de cea mai avansată platformă de imobiliare din Moldova
                     </Typography>
-
+            
                     <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr 1fr" }, gap: 3 }}>
                         {features.map((feature, index) => (
                             <Box key={index}>
@@ -358,7 +336,7 @@ const Home = () => {
                                 },
                             }}
                         >
-                            Conectare Acum
+                            Începe acum
                         </Button>
                     </Box>
                 </Container>
