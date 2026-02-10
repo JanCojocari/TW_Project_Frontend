@@ -6,6 +6,7 @@ export type Apartment = {
     Id_Owner: number;
     Id_Renter: number | null;
     Address: string;
+    image_url: string;
     Cost_per_interval: number;
     Currency: Currency;
     Interval: RentInterval;
