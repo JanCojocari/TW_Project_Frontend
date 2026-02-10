@@ -404,23 +404,6 @@ const Home = () => {
                         }}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <Button
-                            onClick={() => setShowLoginModal(false)}
-                            sx={{
-                                position: "absolute",
-                                top: { xs: "-40px", md: "-50px" },
-                                right: 0,
-                                color: "white",
-                                fontWeight: 600,
-                                zIndex: 1001,
-                                transition: "all 0.3s ease",
-                                "&:hover": {
-                                    transform: "rotate(90deg)",
-                                },
-                            }}
-                        >
-                            ✕ Inchide
-                        </Button>
                         <Box
                             sx={{
                                 mt:5,
