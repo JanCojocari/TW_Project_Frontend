@@ -4,7 +4,7 @@ import Login from "../pages/Login";
 import Register from "../pages/Register.tsx";
 import {paths} from "./paths.ts"
 export const publicRoutes = [
-    {path: "/*", element: <Login />},
+    {path: "/*", element: <Home />},
     {path: paths.home, element: <Home/>},
     {path: paths.login, element: <Login/>},
     {path: paths.register, element: <Register/>}
