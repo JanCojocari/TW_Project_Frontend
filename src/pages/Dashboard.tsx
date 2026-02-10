@@ -13,10 +13,8 @@ import {
     Grid,
 } from "@mui/material";
 
-import ListingCard from "../components/ListingCard";
 import { apartments } from "../mockdata/apartments";
 import { users } from "../mockdata/users";
-import { paths } from "../app/paths";
 
 type DashboardTab = 0 | 1 | 2 | 3;
 
@@ -205,7 +203,10 @@ function MyListingsTab({
     }
 
     return (
-        <Grid container spacing={2}>
+        <>
+        
+        </>
+       /* <Grid container spacing={2}>
             {myListings.map((a) => (
                 <Grid item xs={12} sm={6} md={4} key={a.Id_Apartment}>
                     <Box>
@@ -221,7 +222,7 @@ function MyListingsTab({
                     </Box>
                 </Grid>
             ))}
-        </Grid>
+        </Grid>*/
     );
 }
 
@@ -268,7 +269,6 @@ function PaymentRow({ label, meta }: { label: string; meta: string }) {
 
 function FavoritesTab({
                           favoriteApartments,
-                          favoriteIds,
                           onToggleFavorite,
                       }: {
     favoriteApartments: any[];
@@ -284,7 +284,8 @@ function FavoritesTab({
     }
 
     return (
-        <Grid container spacing={2}>
+        <></>
+        /*<Grid container spacing={2}>
             {favoriteApartments.map((a) => (
                 <Grid item xs={12} sm={6} md={4} key={a.Id_Apartment}>
                     <Box>
@@ -301,6 +302,6 @@ function FavoritesTab({
                     </Box>
                 </Grid>
             ))}
-        </Grid>
+        </Grid>*/
     );
 }
