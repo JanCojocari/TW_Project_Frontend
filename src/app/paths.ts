@@ -3,5 +3,6 @@
     login: "/login",
     register: "/register",
     dashboard: "/dashboard",
-    about: "/about", 
+    about: "/about",
+    listings: "/listings",
 } as const;
