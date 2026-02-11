@@ -5,4 +5,5 @@
     dashboard: "/dashboard",
     about: "/about",
     listings: "/listings",
+    general:"*"
 } as const;
