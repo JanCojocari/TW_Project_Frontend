@@ -6,14 +6,9 @@ import { paths } from "./paths";
 import Listings from "../pages/Listings.tsx";
 
 export const publicRoutes = [
-    { path: paths.home, element: <Home /> },
-    { path: paths.login, element: <Login /> },
-    { path: paths.register, element: <Register /> },
     { path: paths.dashboard, element: <Dashboard /> },
     { path: paths.listings, element: <Listings /> },
-
-
-    { path: "*", element: <Home /> },
+    { path: paths.general, element: <Listings /> },
 ];
 
 export const privateRoutes = [
@@ -22,4 +17,10 @@ export const privateRoutes = [
         element: <Dashboard />,
         role: "role",
     },
+];
+
+export const notAuthRoutes = [
+    { path: paths.home, element: <Home /> },
+    { path: paths.login, element: <Login /> },
+    { path: paths.register, element: <Register /> },
 ];
