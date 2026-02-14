@@ -33,7 +33,7 @@ const Header = () => {
         !isAuthenticated ? {label: "Acasă", path: paths.home} : {},
         {label: "Anunțuri", path: paths.listings},
         isAuthenticated ? {label: "Dashboard", path: paths.dashboard} : {},
-        {label: "Despre", path: paths.about},
+        !isAuthenticated?{label: "Despre", path: paths.about}:{},
     ];
 
     const handleNavigation = (path: string) => {

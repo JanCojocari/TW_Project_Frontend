@@ -5,8 +5,9 @@ import Dashboard from "../pages/Dashboard";
 import { paths } from "./paths";
 import Listings from "../pages/Listings.tsx";
 
+// Trebuie de introdus rolul de chirias si de proprietar asa incat path-s sa se afiseze in dependenta de rol
 export const publicRoutes = [
-    { path: paths.dashboard, element: <Dashboard /> },
+    { path: paths.dashboard, element: <Dashboard />},
     { path: paths.listings, element: <Listings /> },
     { path: paths.general, element: <Listings /> },
 ];
