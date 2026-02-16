@@ -2,6 +2,7 @@
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Dashboard from "../pages/Dashboard";
+import About from "../pages/About";
 import { paths } from "./paths";
 import Listings from "../pages/Listings.tsx";
 import ApartmentDetail from "../pages/ApartmentDetail.tsx"
@@ -28,4 +29,5 @@ export const notAuthRoutes = [
     { path: paths.home, element: <Home /> },
     { path: paths.login, element: <Login /> },
     { path: paths.register, element: <Register /> },
+    { path: paths.about, element: <About /> },
 ];
