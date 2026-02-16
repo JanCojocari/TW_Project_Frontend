@@ -12,6 +12,8 @@ import {
 } from "@mui/icons-material";
 import { memo } from "react";
 import type { Apartment } from "../types/apartment.types";
+import { useNavigate } from "react-router-dom";
+import { paths } from "../app/paths.ts";
 
 interface Props {
     apartment: Apartment;
@@ -24,6 +26,12 @@ interface Props {
 
 const ApartmentCard= ({apartment,favorites,toggleFavorite,getUserName,getIntervalLabel,getStatus}: Props) => {
 
+    const navigate = useNavigate();
+
+    const handleViewDetails = () => {
+        navigate(paths.apartmentDetail(apartment.Id_Apartment));
+    };
+    
     return (
         <Card
             sx={{
@@ -294,6 +302,7 @@ const ApartmentCard= ({apartment,favorites,toggleFavorite,getUserName,getInterva
                     <Button
                         variant="contained"
                         disabled={apartment.Id_Renter !== null}
+                        onClick={handleViewDetails}
                         sx={{
                             background:
                                 apartment.Id_Renter !== null

@@ -5,5 +5,8 @@
     dashboard: "/dashboard",
     about: "/about",
     listings: "/listings",
-    general:"*"
+    general:"*",
+    apartmentDetailRoute: "/apartments/:id",
+    apartmentDetail: (id: number) => `/apartments/${id}`,
+
 } as const;

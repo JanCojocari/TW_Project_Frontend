@@ -8,4 +8,5 @@
     Birthday: string;
     Gender: "male" | "female" | null;
     Account_sold: number;
+    Role?: 'admin' | 'owner' | 'renter';
 };
