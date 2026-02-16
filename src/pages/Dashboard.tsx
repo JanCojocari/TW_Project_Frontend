@@ -202,11 +202,10 @@ function MyListingsTab({
         );
     }
 
+    
     return (
-        <>
-        
-        </>
-       /* <Grid container spacing={2}>
+        <></>
+        /*<Grid container spacing={2}>
             {myListings.map((a) => (
                 <Grid item xs={12} sm={6} md={4} key={a.Id_Apartment}>
                     <Box>
