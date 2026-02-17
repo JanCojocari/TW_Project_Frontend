@@ -1,4 +1,5 @@
 ﻿import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     Box,
     Button,
@@ -15,6 +16,7 @@ import {
 
 import { apartments } from "../mockdata/apartments";
 import { users } from "../mockdata/users";
+import { paths } from "../app/paths";
 
 type DashboardTab = 0 | 1 | 2 | 3;
 
@@ -37,6 +39,7 @@ function setFavorites(ids: number[]) {
 }
 
 export default function Dashboard() {
+    const navigate = useNavigate();
     const [tab, setTab] = useState<DashboardTab>(0);
 
     // TODO: replace with AuthContext later
@@ -97,7 +100,10 @@ export default function Dashboard() {
 
                 <Box sx={{ pt: 2 }}>
                     {tab === 0 && (
-                        <ProfileTab currentUser={currentUser} />
+                        <ProfileTab
+                            currentUser={currentUser}
+                            onEditProfile={() => navigate(paths.editProfile)}
+                        />
                     )}
 
                     {tab === 1 && (
@@ -127,7 +133,7 @@ export default function Dashboard() {
 
 /* ---------------- Tabs ---------------- */
 
-function ProfileTab({ currentUser }: { currentUser: any }) {
+function ProfileTab({ currentUser, onEditProfile }: { currentUser: any; onEditProfile: () => void }) {
     if (!currentUser) {
         return (
             <Typography color="text.secondary">
@@ -172,12 +178,15 @@ function ProfileTab({ currentUser }: { currentUser: any }) {
                 </Stack>
             </Paper>
 
-            {/* optional later: edit form */}
             <Stack direction="row" gap={1}>
-                <Button variant="contained" sx={{ borderRadius: 2 }}>
-                    Editează profil (soon)
+                <Button
+                    variant="contained"
+                    onClick={onEditProfile}
+                    sx={{ borderRadius: 2, textTransform: "none", fontWeight: 700 }}
+                >
+                    Editează profil
                 </Button>
-                <Button variant="outlined" sx={{ borderRadius: 2 }}>
+                <Button variant="outlined" sx={{ borderRadius: 2, textTransform: "none", fontWeight: 700 }}>
                     Schimbă parola (soon)
                 </Button>
             </Stack>

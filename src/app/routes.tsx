@@ -5,7 +5,8 @@ import Dashboard from "../pages/Dashboard";
 import About from "../pages/About";
 import { paths } from "./paths";
 import Listings from "../pages/Listings.tsx";
-import ApartmentDetail from "../pages/ApartmentDetail.tsx"
+import ApartmentDetail from "../pages/ApartmentDetail.tsx";
+import EditProfile from "../pages/EditProfile.tsx";
 
 // Trebuie de introdus rolul de chirias si de proprietar asa incat path-s sa se afiseze in dependenta de rol
 export const publicRoutes = [
@@ -22,6 +23,7 @@ export const privateRoutes = [
         role: "role",
     },
     { path: paths.apartmentDetailRoute, element: <ApartmentDetail /> },
+    { path: paths.editProfile, element: <EditProfile /> },
 
 ];
 
