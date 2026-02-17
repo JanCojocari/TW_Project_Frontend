@@ -27,6 +27,7 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { apartments } from "../mockdata/apartments";
 import { users } from "../mockdata/users";
 import { paths } from "../app/paths";
+import ApartmentCard from "../components/ApartmentCard";
 
 type DashboardTab = 0 | 1 | 2 | 3;
 
@@ -448,40 +449,61 @@ function PaymentRow({ label, meta }: { label: string; meta: string }) {
 }
 
 function FavoritesTab({
-                          favoriteApartments,
-                          onToggleFavorite,
-                      }: {
+    favoriteApartments,
+    favoriteIds,
+    onToggleFavorite,
+}: {
     favoriteApartments: any[];
     favoriteIds: number[];
     onToggleFavorite: (id: number) => void;
 }) {
+    const getUserName = (id: number) => {
+        const u = users.find((u) => u.Id_User === id);
+        return u ? `${u.Name} ${u.Surname}` : "Necunoscut";
+    };
+
+    const getIntervalLabel = (interval: string) => {
+        if (interval === "hour") return "oră";
+        if (interval === "day") return "zi";
+        if (interval === "month") return "lună";
+        return interval;
+    };
+
+    const getStatus = (apartment: any) =>
+        apartment.Id_Renter !== null ? "Ocupat" : "Disponibil";
+
     if (favoriteApartments.length === 0) {
         return (
-            <Typography color="text.secondary">
-                Nu ai favorite încă. Adaugă din pagina “Anunțuri”.
-            </Typography>
+            <Box sx={{ py: 6, textAlign: "center" }}>
+                <Typography color="text.secondary" variant="h6" fontWeight={700}>
+                    Nu ai favorite încă.
+                </Typography>
+                <Typography color="text.secondary" variant="body2" sx={{ mt: 0.5 }}>
+                    Adaugă anunțuri la favorite din pagina "Anunțuri".
+                </Typography>
+            </Box>
         );
     }
 
     return (
-        <></>
-        /*<Grid container spacing={2}>
-            {favoriteApartments.map((a) => (
-                <Grid item xs={12} sm={6} md={4} key={a.Id_Apartment}>
-                    <Box>
-                        <ListingCard apartment={a} />
-                        <Button
-                            onClick={() => onToggleFavorite(a.Id_Apartment)}
-                            variant="contained"
-                            color="error"
-                            fullWidth
-                            sx={{ mt: 1, borderRadius: 2, textTransform: "none", fontWeight: 700 }}
-                        >
-                            Scoate din favorite
-                        </Button>
-                    </Box>
-                </Grid>
-            ))}
-        </Grid>*/
+        <Box>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {favoriteApartments.length} {favoriteApartments.length === 1 ? "anunț salvat" : "anunțuri salvate"}
+            </Typography>
+            <Grid container spacing={3}>
+                {favoriteApartments.map((a) => (
+                    <Grid item xs={12} sm={6} md={4} key={a.Id_Apartment}>
+                        <ApartmentCard
+                            apartment={a}
+                            favorites={favoriteIds}
+                            toggleFavorite={onToggleFavorite}
+                            getUserName={getUserName}
+                            getIntervalLabel={getIntervalLabel}
+                            getStatus={getStatus}
+                        />
+                    </Grid>
+                ))}
+            </Grid>
+        </Box>
     );
 }
