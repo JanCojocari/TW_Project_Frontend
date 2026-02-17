@@ -1,22 +1,33 @@
 ﻿import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+    Alert,
     Box,
     Button,
     Chip,
     Container,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
     Divider,
+    IconButton,
+    InputAdornment,
     Paper,
     Stack,
     Tab,
     Tabs,
+    TextField,
     Typography,
     Grid,
 } from "@mui/material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 import { apartments } from "../mockdata/apartments";
 import { users } from "../mockdata/users";
 import { paths } from "../app/paths";
+import ApartmentCard from "../components/ApartmentCard";
 
 type DashboardTab = 0 | 1 | 2 | 3;
 
@@ -134,6 +145,8 @@ export default function Dashboard() {
 /* ---------------- Tabs ---------------- */
 
 function ProfileTab({ currentUser, onEditProfile }: { currentUser: any; onEditProfile: () => void }) {
+    const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+
     if (!currentUser) {
         return (
             <Typography color="text.secondary">
@@ -186,11 +199,171 @@ function ProfileTab({ currentUser, onEditProfile }: { currentUser: any; onEditPr
                 >
                     Editează profil
                 </Button>
-                <Button variant="outlined" sx={{ borderRadius: 2, textTransform: "none", fontWeight: 700 }}>
-                    Schimbă parola (soon)
+                <Button
+                    variant="outlined"
+                    onClick={() => setChangePasswordOpen(true)}
+                    sx={{ borderRadius: 2, textTransform: "none", fontWeight: 700 }}
+                >
+                    Schimbă parola
                 </Button>
             </Stack>
+
+            <ChangePasswordDialog
+                open={changePasswordOpen}
+                onClose={() => setChangePasswordOpen(false)}
+                currentPassword={currentUser.Password}
+            />
         </Stack>
+    );
+}
+
+/* ─── Change Password Dialog ─────────────────────────────── */
+
+type PwdForm = { current: string; next: string; confirm: string };
+type PwdErrors = Partial<Record<keyof PwdForm, string>>;
+
+function validatePwd(form: PwdForm, realCurrent: string): PwdErrors {
+    const errors: PwdErrors = {};
+    if (!form.current) {
+        errors.current = "Parola curentă este obligatorie.";
+    } else if (form.current !== realCurrent) {
+        errors.current = "Parola curentă este incorectă.";
+    }
+    if (!form.next) {
+        errors.next = "Parola nouă este obligatorie.";
+    } else if (form.next.length < 6) {
+        errors.next = "Parola nouă trebuie să aibă cel puțin 6 caractere.";
+    } else if (form.next === form.current) {
+        errors.next = "Parola nouă trebuie să fie diferită de cea curentă.";
+    }
+    if (!form.confirm) {
+        errors.confirm = "Confirmarea parolei este obligatorie.";
+    } else if (form.confirm !== form.next) {
+        errors.confirm = "Parolele nu se potrivesc.";
+    }
+    return errors;
+}
+
+function ChangePasswordDialog({
+    open,
+    onClose,
+    currentPassword,
+}: {
+    open: boolean;
+    onClose: () => void;
+    currentPassword: string;
+}) {
+    const empty: PwdForm = { current: "", next: "", confirm: "" };
+    const [form, setForm] = useState<PwdForm>(empty);
+    const [errors, setErrors] = useState<PwdErrors>({});
+    const [touched, setTouched] = useState<Partial<Record<keyof PwdForm, boolean>>>({});
+    const [showPwd, setShowPwd] = useState<Record<keyof PwdForm, boolean>>({
+        current: false, next: false, confirm: false,
+    });
+    const [success, setSuccess] = useState(false);
+
+    const reset = () => {
+        setForm(empty);
+        setErrors({});
+        setTouched({});
+        setShowPwd({ current: false, next: false, confirm: false });
+        setSuccess(false);
+    };
+
+    const handleClose = () => { reset(); onClose(); };
+
+    const handleChange = (field: keyof PwdForm) => (e: React.ChangeEvent<HTMLInputElement>) => {
+        const updated = { ...form, [field]: e.target.value };
+        setForm(updated);
+        setSuccess(false);
+        if (touched[field]) setErrors(validatePwd(updated, currentPassword));
+    };
+
+    const handleBlur = (field: keyof PwdForm) => () => {
+        setTouched((prev) => ({ ...prev, [field]: true }));
+        setErrors(validatePwd(form, currentPassword));
+    };
+
+    const toggleShow = (field: keyof PwdForm) =>
+        setShowPwd((prev) => ({ ...prev, [field]: !prev[field] }));
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        setTouched({ current: true, next: true, confirm: true });
+        const errs = validatePwd(form, currentPassword);
+        setErrors(errs);
+        if (Object.keys(errs).length > 0) return;
+        // TODO: call API when backend is ready
+        setSuccess(true);
+        setForm(empty);
+        setTouched({});
+    };
+
+    const showErr = (f: keyof PwdForm) => touched[f] && !!errors[f];
+    const errMsg = (f: keyof PwdForm) => (touched[f] ? errors[f] : undefined);
+
+    const pwdField = (
+        field: keyof PwdForm,
+        label: string,
+    ) => (
+        <TextField
+            label={label}
+            type={showPwd[field] ? "text" : "password"}
+            value={form[field]}
+            onChange={handleChange(field)}
+            onBlur={handleBlur(field)}
+            error={showErr(field)}
+            helperText={errMsg(field)}
+            fullWidth
+            required
+            autoComplete="off"
+            InputProps={{
+                endAdornment: (
+                    <InputAdornment position="end">
+                        <IconButton onClick={() => toggleShow(field)} edge="end" size="small">
+                            {showPwd[field] ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
+                        </IconButton>
+                    </InputAdornment>
+                ),
+            }}
+        />
+    );
+
+    return (
+        <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs">
+            <DialogTitle sx={{ fontWeight: 900 }}>Schimbă parola</DialogTitle>
+            <Box component="form" onSubmit={handleSubmit} noValidate>
+                <DialogContent>
+                    <Stack spacing={2.5} sx={{ pt: 0.5 }}>
+                        {pwdField("current", "Parola curentă")}
+                        <Divider />
+                        {pwdField("next", "Parola nouă")}
+                        {pwdField("confirm", "Confirmă parola nouă")}
+                        {success && (
+                            <Alert severity="success" sx={{ borderRadius: 2 }}>
+                                Parola a fost schimbată cu succes! (mock)
+                            </Alert>
+                        )}
+                    </Stack>
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
+                    <Button
+                        onClick={handleClose}
+                        variant="outlined"
+                        sx={{ textTransform: "none", fontWeight: 700, borderRadius: 2 }}
+                    >
+                        Anulează
+                    </Button>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        sx={{ textTransform: "none", fontWeight: 700, borderRadius: 2 }}
+                    >
+                        Salvează
+                    </Button>
+                </DialogActions>
+            </Box>
+        </Dialog>
     );
 }
 
@@ -276,40 +449,61 @@ function PaymentRow({ label, meta }: { label: string; meta: string }) {
 }
 
 function FavoritesTab({
-                          favoriteApartments,
-                          onToggleFavorite,
-                      }: {
+    favoriteApartments,
+    favoriteIds,
+    onToggleFavorite,
+}: {
     favoriteApartments: any[];
     favoriteIds: number[];
     onToggleFavorite: (id: number) => void;
 }) {
+    const getUserName = (id: number) => {
+        const u = users.find((u) => u.Id_User === id);
+        return u ? `${u.Name} ${u.Surname}` : "Necunoscut";
+    };
+
+    const getIntervalLabel = (interval: string) => {
+        if (interval === "hour") return "oră";
+        if (interval === "day") return "zi";
+        if (interval === "month") return "lună";
+        return interval;
+    };
+
+    const getStatus = (apartment: any) =>
+        apartment.Id_Renter !== null ? "Ocupat" : "Disponibil";
+
     if (favoriteApartments.length === 0) {
         return (
-            <Typography color="text.secondary">
-                Nu ai favorite încă. Adaugă din pagina “Anunțuri”.
-            </Typography>
+            <Box sx={{ py: 6, textAlign: "center" }}>
+                <Typography color="text.secondary" variant="h6" fontWeight={700}>
+                    Nu ai favorite încă.
+                </Typography>
+                <Typography color="text.secondary" variant="body2" sx={{ mt: 0.5 }}>
+                    Adaugă anunțuri la favorite din pagina "Anunțuri".
+                </Typography>
+            </Box>
         );
     }
 
     return (
-        <></>
-        /*<Grid container spacing={2}>
-            {favoriteApartments.map((a) => (
-                <Grid item xs={12} sm={6} md={4} key={a.Id_Apartment}>
-                    <Box>
-                        <ListingCard apartment={a} />
-                        <Button
-                            onClick={() => onToggleFavorite(a.Id_Apartment)}
-                            variant="contained"
-                            color="error"
-                            fullWidth
-                            sx={{ mt: 1, borderRadius: 2, textTransform: "none", fontWeight: 700 }}
-                        >
-                            Scoate din favorite
-                        </Button>
-                    </Box>
-                </Grid>
-            ))}
-        </Grid>*/
+        <Box>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {favoriteApartments.length} {favoriteApartments.length === 1 ? "anunț salvat" : "anunțuri salvate"}
+            </Typography>
+            <Grid container spacing={3}>
+                {favoriteApartments.map((a) => (
+                    <Grid item xs={12} sm={6} md={4} key={a.Id_Apartment}>
+                        <ApartmentCard
+                            apartment={a}
+                            favorites={favoriteIds}
+                            toggleFavorite={onToggleFavorite}
+                            getUserName={getUserName}
+                            getIntervalLabel={getIntervalLabel}
+                            getStatus={getStatus}
+                        />
+                    </Grid>
+                ))}
+            </Grid>
+        </Box>
     );
 }
