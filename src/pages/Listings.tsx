@@ -8,10 +8,10 @@ import {
     Home as HomeIcon,
     TrendingUp as TrendingUpIcon,
 } from "@mui/icons-material";
-import {useCallback, useMemo, useState} from "react";
-import {apartments} from "../mockdata/apartments.ts";
-import type {Apartment} from "../types/apartment.types.ts";
-import {users} from "../mockdata/users.ts";
+import { useCallback, useMemo, useState } from "react";
+import { apartments } from "../mockdata/apartments.ts";
+import type { Apartment } from "../types/apartment.types.ts";
+import { users } from "../mockdata/users.ts";
 import ApartmentCard from "../components/ApartmentCard.tsx";
 import SearchBar from "../components/SearchBar.tsx";
 
@@ -37,17 +37,7 @@ const Listings = () => {
         );
     };
 
-    // Helper function pentru interval name în română
-    const getIntervalLabel = (interval: string): string => {
-        const intervals: { [key: string]: string } = {
-            hour: "ora",
-            day: "zi",
-            month: "lună",
-        };
-        return intervals[interval] || interval;
-    };
 
-    // Helper function pentru status
     const getStatus = (apartment: Apartment): string => {
         return apartment.Id_Renter !== null ? "Ocupat" : "Disponibil";
     };
@@ -58,31 +48,18 @@ const Listings = () => {
         );
     }, []);
 
-
     const getUserName = useCallback((owner_id: number): string => {
         return usersMap[owner_id] ?? "Proprietar necunoscut";
     }, [usersMap]);
-
 
     return (
         <Box
             sx={{
                 minHeight: "100vh",
-                background: "linear-gradient(135deg, #f8f9fa 0%, #f0f4ff 100%)",
-                py: { xs: 3, md: 5 },
-                mt: 10,
+                background: "#071A1D",
+                py: { xs: 4, md: 8 },
+                pt:10,
                 position: "relative",
-                "&::before": {
-                    content: '""',
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: "300px",
-                    background: "linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%)",
-                    opacity: 0.05,
-                    zIndex: 0,
-                }
             }}
         >
             <Container
@@ -95,25 +72,28 @@ const Listings = () => {
                     display: "flex",
                     alignItems: "center",
                     flexDirection: "column",
+                    mt:10,
                 }}
-
             >
                 {/* Hero Header */}
-                <Box sx={{ mb: 8, textAlign: "center" }}>
-                    <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+                <Box sx={{ mb: 10, textAlign: "center" }}>
+                    <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
                         <Box
                             sx={{
-                                background: "linear-gradient(135deg, #2563eb, #4f46e5, #7c3aed)",
-                                p: 2,
-                                borderRadius: 2,
+                                background: "rgba(0, 224, 198, 0.08)",
+                                p: 1.5,
+                                px: 3,
+                                borderRadius: "100px",
                                 display: "flex",
                                 alignItems: "center",
-                                gap: 1,
+                                gap: 2,
+                                border: "1px solid rgba(0, 224, 198, 0.2)",
+                                boxShadow: "0 0 20px rgba(0, 224, 198, 0.1)",
                             }}
                         >
-                            <TrendingUpIcon sx={{ color: "white", fontSize: 28 }} />
-                            <Typography sx={{ color: "white", fontWeight: 600 }}>
-                                {filteredApartments.length} apartamente disponibile
+                            <TrendingUpIcon sx={{ color: "#00E0C6", fontSize: 24 }} />
+                            <Typography sx={{ color: "#E6F7F5", fontWeight: 700, fontSize: "14px" }}>
+                                {filteredApartments.length} Proprietăți Active
                             </Typography>
                         </Box>
                     </Box>
@@ -122,73 +102,81 @@ const Listings = () => {
                         sx={{
                             fontWeight: 900,
                             mb: 2,
-                            background: "linear-gradient(90deg, #2563eb, #4f46e5, #7c3aed)",
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                            fontSize: { xs: "32px", md: "48px" },
+                            color: "#E6F7F5",
+                            fontSize: { xs: "36px", md: "56px" },
+                            letterSpacing: "-1.5px",
                         }}
                     >
-                        Descoperă apartamentele tale
+                        Colecția de <Box component="span" sx={{ color: "#00E0C6" }}>Imobiliare</Box>
                     </Typography>
                     <Typography
                         variant="h6"
                         sx={{
-                            color: "#6b7280",
+                            color: "#8FB5B1",
                             fontWeight: 400,
                             maxWidth: "600px",
                             mx: "auto",
                         }}
                     >
-                        Găsește locuința perfectă din cea mai mare colecție de proprietăți
+                        Descoperă spații care inspiră, atent selecționate pentru standardele tale de viață.
                     </Typography>
                 </Box>
 
-                {/* Search Bar - Premium Style */}
-                <SearchBar onSearch={setSearchQuery} />
-
-
+                {/* Search Bar Wrapper */}
+                <Box sx={{ width: "100%", mb: 8 }}>
+                    <SearchBar onSearch={setSearchQuery} />
+                </Box>
 
                 {/* No Results Message */}
                 {filteredApartments.length === 0 && (
-                    <Box sx={{ textAlign: "center", py: 12 }}>
+                    <Box sx={{ textAlign: "center", py: 15 }}>
                         <Box
                             sx={{
-                                width: "100px",
-                                height: "100px",
-                                margin: "0 auto 2rem",
-                                background: "linear-gradient(135deg, #2563eb, #4f46e5)",
-                                borderRadius: "50%",
+                                width: "120px",
+                                height: "120px",
+                                margin: "0 auto 2.5rem",
+                                background: "rgba(0, 224, 198, 0.05)",
+                                borderRadius: "40px",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
+                                border: "1px solid rgba(0, 224, 198, 0.1)",
+                                color: "#00E0C6",
                             }}
                         >
-                            <HomeIcon sx={{ fontSize: 50, color: "white" }} />
+                            <HomeIcon sx={{ fontSize: 60 }} />
                         </Box>
                         <Typography
                             variant="h4"
-                            sx={{ color: "#1f2937", mb: 1, fontWeight: 700 }}
+                            sx={{ color: "#E6F7F5", mb: 2, fontWeight: 800 }}
                         >
-                            Nu am găsit apartamente
+                            Niciun rezultat găsit
                         </Typography>
                         <Typography
                             variant="body1"
-                            sx={{ color: "#6b7280", mb: 3 }}
+                            sx={{ color: "#8FB5B1", mb: 5, maxWidth: "400px", mx: "auto" }}
                         >
-                            Încearcă să modifici criteriile de căutare
+                            Nu am găsit nicio proprietate care să corespundă criteriilor tale de căutare.
                         </Typography>
                         <Button
                             variant="contained"
                             onClick={() => setSearchQuery("")}
                             sx={{
-                                background: "linear-gradient(90deg, #2563eb, #4f46e5)",
+                                background: "linear-gradient(90deg, #00E0C6, #00BFA6)",
+                                color: "#071A1D",
                                 textTransform: "none",
-                                fontWeight: 600,
-                                px: 4,
-                                py: 1.5,
+                                fontWeight: 800,
+                                px: 6,
+                                py: 2,
+                                borderRadius: 2,
+                                boxShadow: "0 0 15px rgba(0, 224, 198, 0.3)",
+                                "&:hover": {
+                                    background: "linear-gradient(90deg, #00FFF0, #00E0C6)",
+                                    boxShadow: "0 0 25px rgba(0, 224, 198, 0.4)",
+                                },
                             }}
                         >
-                            Resetare căutare
+                            Resetează Căutarea
                         </Button>
                     </Box>
                 )}
@@ -203,14 +191,19 @@ const Listings = () => {
                                 sm: "1fr 1fr",
                                 lg: "1fr 1fr 1fr",
                             },
-                            gap: 4,
+                            gap: 5,
+                            width: "100%",
                         }}
                     >
                         {filteredApartments.map((apartment, index) => (
                             <Box
                                 key={apartment.Id_Apartment}
                                 sx={{
-                                    animation: `fadeInUp 0.5s ease ${index * 0.1}s both`,
+                                    animation: `fadeInUp 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) ${index * 0.1}s both`,
+                                    "@keyframes fadeInUp": {
+                                        from: { opacity: 0, transform: "translateY(30px)" },
+                                        to: { opacity: 1, transform: "translateY(0)" },
+                                    },
                                 }}
                             >
                                 <ApartmentCard
@@ -219,7 +212,6 @@ const Listings = () => {
                                     favorites={favorites}
                                     getStatus={getStatus}
                                     getUserName={getUserName}
-                                    getIntervalLabel={getIntervalLabel}
                                 />
                             </Box>
                         ))}
@@ -228,16 +220,19 @@ const Listings = () => {
 
                 {/* Pagination */}
                 {filteredApartments.length > 0 && (
-                    <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 10 }}>
+                    <Box sx={{ display: "flex", justifyContent: "center", gap: 3, mt: 12 }}>
                         <Button
                             variant="outlined"
                             sx={{
-                                borderColor: "#2563eb",
-                                color: "#2563eb",
-                                fontWeight: 600,
-                                transition: "all 0.3s ease",
+                                borderColor: "#12383D",
+                                color: "#8FB5B1",
+                                fontWeight: 700,
+                                px: 3,
+                                borderRadius: 1.5,
                                 "&:hover": {
-                                    background: "rgba(37, 99, 235, 0.08)",
+                                    borderColor: "#00E0C6",
+                                    background: "rgba(0, 224, 198, 0.05)",
+                                    color: "#E6F7F5",
                                 },
                             }}
                         >
@@ -246,10 +241,17 @@ const Listings = () => {
                         <Button
                             variant="contained"
                             sx={{
-                                background: "linear-gradient(135deg, #2563eb, #4f46e5, #7c3aed)",
-                                color: "white",
-                                fontWeight: 700,
+                                background: "#00E0C6",
+                                color: "#071A1D",
+                                fontWeight: 900,
                                 minWidth: "50px",
+                                height: "50px",
+                                borderRadius: 1.5,
+                                boxShadow: "0 0 15px rgba(0, 224, 198, 0.3)",
+                                "&:hover": {
+                                    background: "#00FFF0",
+                                    boxShadow: "0 0 25px rgba(0, 224, 198, 0.5)",
+                                },
                             }}
                         >
                             1
@@ -257,12 +259,15 @@ const Listings = () => {
                         <Button
                             variant="outlined"
                             sx={{
-                                borderColor: "#2563eb",
-                                color: "#2563eb",
-                                fontWeight: 600,
-                                transition: "all 0.3s ease",
+                                borderColor: "#12383D",
+                                color: "#8FB5B1",
+                                fontWeight: 700,
+                                px: 3,
+                                borderRadius: 1.5,
                                 "&:hover": {
-                                    background: "rgba(37, 99, 235, 0.08)",
+                                    borderColor: "#00E0C6",
+                                    background: "rgba(0, 224, 198, 0.05)",
+                                    color: "#E6F7F5",
                                 },
                             }}
                         >

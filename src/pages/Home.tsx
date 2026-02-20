@@ -6,6 +6,7 @@
     CardContent,
     Button,
     Paper,
+    Divider,
 } from "@mui/material";
 import {
     Home as HomeIcon,
@@ -43,14 +44,15 @@ const Home = () => {
     ];
 
     return (
-        <Box sx={{pt:5, minHeight: "100vh", background: "#ffffff" }}>
+        <Box sx={{ pt: 5, minHeight: "100vh", background: "#071A1D" }}>
             {/* Hero Section */}
             <Box
                 sx={{
-                    background: "linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%)",
-                    py: { xs: 6, md: 10 },
+                    background: "radial-gradient(circle at 70% 30%, rgba(0, 224, 198, 0.08), transparent 50%), linear-gradient(135deg, #071A1D 0%, #0C2529 100%)",
+                    py: { xs: 8, md: 15 },
                     position: "relative",
                     overflow: "hidden",
+                    borderBottom: "1px solid #12383D",
                     "&::before": {
                         content: '""',
                         position: "absolute",
@@ -58,133 +60,132 @@ const Home = () => {
                         right: "-10%",
                         width: "600px",
                         height: "600px",
-                        background: "rgba(255, 255, 255, 0.1)",
+                        background: "rgba(0, 224, 198, 0.03)",
                         borderRadius: "50%",
-                        filter: "blur(80px)",
-                    },
-                    "&::after": {
-                        content: '""',
-                        position: "absolute",
-                        bottom: "-40%",
-                        left: "-5%",
-                        width: "500px",
-                        height: "500px",
-                        background: "rgba(255, 255, 255, 0.08)",
-                        borderRadius: "50%",
-                        filter: "blur(60px)",
+                        filter: "blur(100px)",
                     },
                 }}
             >
                 <Container maxWidth="lg">
-                    <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 4, alignItems: "center" }}>
+                    <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 8, alignItems: "center" }}>
                         {/* Text Content */}
-                        <Box  sx={{ position: "relative", zIndex: 2 }}>
+                        <Box sx={{ position: "relative", zIndex: 2 }}>
                             <Typography
                                 variant="h2"
                                 sx={{
-                                    color: "white",
+                                    color: "#E6F7F5",
                                     fontWeight: 900,
-                                    fontSize: { xs: "32px", md: "52px" },
-                                    mb: 2,
-                                    lineHeight: 1.2,
-                                    textShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+                                    fontSize: { xs: "40px", md: "64px" },
+                                    mb: 3,
+                                    lineHeight: 1.1,
+                                    letterSpacing: "-2px",
                                 }}
                             >
-                                Găsește Casa Perfectă
+                                Găsește Casa <Box component="span" sx={{ color: "#00E0C6", textShadow: "0 0 20px rgba(0, 224, 198, 0.4)" }}>Perfectă</Box>
                             </Typography>
                             <Typography
                                 variant="h5"
                                 sx={{
-                                    color: "rgba(255, 255, 255, 0.9)",
-                                    mb: 4,
-                                    fontSize: { xs: "16px", md: "20px" },
-                                    fontWeight: 300,
+                                    color: "#8FB5B1",
+                                    mb: 5,
+                                    fontSize: { xs: "18px", md: "22px" },
+                                    fontWeight: 400,
                                     lineHeight: 1.6,
+                                    maxWidth: "500px",
                                 }}
                             >
-                                Rentora este platforma ta de încredere pentru găsirea apartamentelor și caselor perfecte. Connectează proprietari cu chiriași în mod simplu și transparent.
+                                Rentora este platforma ta de încredere pentru imobiliare. Conectăm proprietari și chiriași printr-o experiență digitală premium, securizată și transparentă.
                             </Typography>
 
-                            <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+                            <Box sx={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
                                 <Button
                                     size="large"
                                     variant="contained"
                                     endIcon={<ArrowForwardIcon />}
                                     onClick={() => setShowLoginModal(true)}
                                     sx={{
-                                        background: "rgba(255, 255, 255, 0.25)",
-                                        color: "white",
-                                        fontWeight: 600,
-                                        fontSize: 15,
-                                        px: 4,
-                                        py: 1.5,
-                                        border: "1.5px solid rgba(255, 255, 255, 0.4)",
-                                        backdropFilter: "blur(10px)",
+                                        background: "linear-gradient(90deg, #00E0C6, #00BFA6)",
+                                        color: "#071A1D",
+                                        fontWeight: 800,
+                                        fontSize: 16,
+                                        px: 5,
+                                        py: 2,
+                                        borderRadius: 2,
+                                        boxShadow: "0 0 25px rgba(0, 224, 198, 0.4)",
                                         transition: "all 0.3s ease",
                                         "&:hover": {
-                                            background: "rgba(255, 255, 255, 0.35)",
-                                            border: "1.5px solid rgba(255, 255, 255, 0.6)",
-                                            boxShadow: "0 8px 32px rgba(255, 255, 255, 0.2)",
-                                            transform: "translateY(-2px)",
+                                            background: "linear-gradient(90deg, #00FFF0, #00E0C6)",
+                                            boxShadow: "0 0 35px rgba(0, 224, 198, 0.6)",
+                                            transform: "translateY(-3px)",
                                         },
                                     }}
                                 >
-                                    începe căutarea
+                                    Începe Căutarea
                                 </Button>
                             </Box>
                         </Box>
 
-                        {/* Illustration/Visual Element */}
+                        {/* Visual Element */}
                         <Box
                             sx={{
                                 position: "relative",
-                                height: { xs: "300px", md: "400px" },
+                                height: { xs: "350px", md: "500px" },
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
                             }}
                         >
+                            <Box
+                                sx={{
+                                    position: "absolute",
+                                    width: "100%",
+                                    height: "100%",
+                                    background: "radial-gradient(circle, rgba(0, 224, 198, 0.1) 0%, transparent 70%)",
+                                    animation: "pulse 4s infinite",
+                                    "@keyframes pulse": {
+                                        "0%": { transform: "scale(0.8)", opacity: 0.5 },
+                                        "50%": { transform: "scale(1.2)", opacity: 0.8 },
+                                        "100%": { transform: "scale(0.8)", opacity: 0.5 },
+                                    },
+                                }}
+                            />
                             <Paper
                                 elevation={0}
                                 sx={{
-                                    background: "linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%)",
-                                    backdropFilter: "blur(20px)",
-                                    border: "1.5px solid rgba(255, 255, 255, 0.3)",
-                                    borderRadius: 4,
-                                    p: 4,
-                                    width: "100%",
-                                    height: "100%",
+                                    background: "rgba(15, 47, 52, 0.4)",
+                                    backdropFilter: "blur(40px)",
+                                    border: "1px solid rgba(0, 224, 198, 0.15)",
+                                    borderRadius: 6,
+                                    p: 6,
+                                    width: "80%",
+                                    height: "80%",
                                     display: "flex",
                                     flexDirection: "column",
                                     justifyContent: "center",
                                     alignItems: "center",
-                                    gap: 3,
+                                    gap: 4,
+                                    boxShadow: "0 40px 100px rgba(0, 0, 0, 0.5)",
                                 }}
                             >
                                 <Box
                                     sx={{
-                                        width: "100px",
-                                        height: "100px",
-                                        background: "linear-gradient(135deg, #2563eb, #4f46e5, #7c3aed)",
-                                        borderRadius: "20px",
+                                        width: "120px",
+                                        height: "120px",
+                                        background: "linear-gradient(135deg, #00E0C6, #00BFA6)",
+                                        borderRadius: "30px",
                                         display: "flex",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        fontSize: "50px",
+                                        fontSize: "60px",
+                                        boxShadow: "0 0 30px rgba(0, 224, 198, 0.4)",
                                     }}
                                 >
-                                    🏠
+                                    🏘️
                                 </Box>
-                                <Typography
-                                    variant="h6"
-                                    sx={{
-                                        color: "white",
-                                        fontWeight: 600,
-                                        textAlign: "center",
-                                    }}
-                                >
-                                    Peste 10,000 proprietăți disponibile
-                                </Typography>
+                                <Box sx={{ textAlign: "center" }}>
+                                    <Typography variant="h4" sx={{ color: "#E6F7F5", fontWeight: 900, mb: 1 }}>10K+</Typography>
+                                    <Typography variant="body1" sx={{ color: "#8FB5B1", fontWeight: 600 }}>Proprietăți Verificate</Typography>
+                                </Box>
                             </Paper>
                         </Box>
                     </Box>
@@ -192,87 +193,88 @@ const Home = () => {
             </Box>
 
             {/* Features Section */}
-            <Box sx={{ py: { xs: 6, md: 10 }, background: "#f8f9fa" }}>
+            <Box sx={{ py: { xs: 10, md: 15 }, background: "#0C2529" }}>
                 <Container maxWidth="lg">
-                    <Typography
-                        variant="h3"
-                        sx={{
-                            textAlign: "center",
-                            mb: 2,
-                            fontWeight: 900,
-                            background: "linear-gradient(90deg, #2563eb, #4f46e5, #7c3aed)",
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                        }}
-                    >
-                        De ce Rentora?
-                    </Typography>
-                    <Typography
-                        variant="h6"
-                        sx={{
-                            textAlign: "center",
-                            color: "#6b7280",
-                            mb: 6,
-                            fontWeight: 400,
-                            maxWidth: "600px",
-                            mx: "auto",
-                        }}
-                    >
-                        Beneficiază de cea mai avansată platformă de imobiliare din Moldova
-                    </Typography>
-            
-                    <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr 1fr" }, gap: 3 }}>
+                    <Box sx={{ textAlign: "center", mb: 8 }}>
+                        <Typography
+                            variant="h3"
+                            sx={{
+                                color: "#E6F7F5",
+                                fontWeight: 900,
+                                mb: 2,
+                                letterSpacing: "-1px",
+                            }}
+                        >
+                            De ce <Box component="span" sx={{ color: "#00E0C6" }}>Rentora?</Box>
+                        </Typography>
+                        <Divider sx={{ width: 60, height: 4, background: "#00E0C6", mx: "auto", borderRadius: 2, mb: 3, border: "none", boxShadow: "0 0 10px #00FFF0" }} />
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                color: "#8FB5B1",
+                                fontWeight: 500,
+                                maxWidth: "600px",
+                                mx: "auto",
+                            }}
+                        >
+                            Beneficiază de cea mai avansată platformă de imobiliare cu standarde enterprise de securitate și performanță.
+                        </Typography>
+                    </Box>
+
+                    <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr 1fr" }, gap: 4 }}>
                         {features.map((feature, index) => (
-                            <Box key={index}>
-                                <Card
-                                    sx={{
-                                        background: "white",
-                                        border: "1px solid #e5e7eb",
-                                        borderRadius: 3,
-                                        height: "100%",
-                                        transition: "all 0.3s ease",
-                                        "&:hover": {
-                                            transform: "translateY(-8px)",
-                                            boxShadow: "0 20px 40px rgba(37, 99, 235, 0.1)",
-                                            borderColor: "#2563eb",
-                                        },
-                                    }}
-                                >
-                                    <CardContent sx={{ textAlign: "center", pt: 4 }}>
-                                        <Box
-                                            sx={{
-                                                background: "linear-gradient(135deg, #2563eb, #4f46e5)",
-                                                borderRadius: "12px",
-                                                p: 2,
-                                                display: "inline-flex",
-                                                mb: 2,
-                                                color: "white",
-                                            }}
-                                        >
-                                            {feature.icon}
-                                        </Box>
-                                        <Typography
-                                            variant="h6"
-                                            sx={{
-                                                fontWeight: 700,
-                                                mb: 1,
-                                                color: "#1f2937",
-                                            }}
-                                        >
-                                            {feature.title}
-                                        </Typography>
-                                        <Typography
-                                            variant="body2"
-                                            sx={{
-                                                color: "#6b7280",
-                                                lineHeight: 1.6,
-                                            }}
-                                        >
-                                            {feature.description}
-                                        </Typography>
-                                    </CardContent>
-                                </Card>
-                            </Box>
+                            <Card
+                                key={index}
+                                sx={{
+                                    background: "#0F2F34",
+                                    border: "1px solid #12383D",
+                                    borderRadius: 4,
+                                    height: "100%",
+                                    transition: "all 0.3s ease",
+                                    "&:hover": {
+                                        transform: "translateY(-10px)",
+                                        borderColor: "#00E0C6",
+                                        boxShadow: "0 20px 40px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 224, 198, 0.1)",
+                                    },
+                                }}
+                            >
+                                <CardContent sx={{ textAlign: "center", p: 4 }}>
+                                    <Box
+                                        sx={{
+                                            background: "rgba(0, 224, 198, 0.08)",
+                                            borderRadius: "16px",
+                                            p: 2.5,
+                                            display: "inline-flex",
+                                            mb: 3,
+                                            color: "#00E0C6",
+                                            border: "1px solid rgba(0, 224, 198, 0.2)",
+                                        }}
+                                    >
+                                        {feature.icon}
+                                    </Box>
+                                    <Typography
+                                        variant="h6"
+                                        sx={{
+                                            fontWeight: 800,
+                                            mb: 2,
+                                            color: "#E6F7F5",
+                                            letterSpacing: "-0.5px",
+                                        }}
+                                    >
+                                        {feature.title}
+                                    </Typography>
+                                    <Typography
+                                        variant="body2"
+                                        sx={{
+                                            color: "#8FB5B1",
+                                            lineHeight: 1.7,
+                                            fontWeight: 500,
+                                        }}
+                                    >
+                                        {feature.description}
+                                    </Typography>
+                                </CardContent>
+                            </Card>
                         ))}
                     </Box>
                 </Container>
@@ -281,62 +283,68 @@ const Home = () => {
             {/* CTA Section */}
             <Box
                 sx={{
-                    py: { xs: 6, md: 8 },
-                    background: "linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%)",
+                    py: { xs: 10, md: 12 },
+                    background: "linear-gradient(135deg, #071A1D 0%, #0F2F34 100%)",
                     position: "relative",
                     overflow: "hidden",
+                    borderTop: "1px solid #12383D",
                 }}
             >
-                <Container maxWidth="lg">
-                    <Box
-                        sx={{
-                            textAlign: "center",
-                            position: "relative",
-                            zIndex: 2,
-                        }}
-                    >
+                <Box
+                    sx={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: "radial-gradient(circle at 50% 50%, rgba(0, 224, 198, 0.05) 0%, transparent 70%)",
+                    }}
+                />
+                <Container maxWidth="md">
+                    <Box sx={{ textAlign: "center", position: "relative", zIndex: 2 }}>
                         <Typography
                             variant="h3"
                             sx={{
-                                color: "white",
+                                color: "#E6F7F5",
                                 fontWeight: 900,
-                                mb: 2,
-                                fontSize: { xs: "28px", md: "44px" },
+                                mb: 3,
+                                letterSpacing: "-1.5px",
                             }}
                         >
-                            Gata să începi?
+                            Ești Gata să Transformi <Box component="span" sx={{ color: "#00E0C6" }}>Viitorul?</Box>
                         </Typography>
                         <Typography
                             variant="h6"
                             sx={{
-                                color: "rgba(255, 255, 255, 0.9)",
-                                mb: 4,
-                                fontWeight: 300,
+                                color: "#8FB5B1",
+                                mb: 6,
+                                fontWeight: 400,
+                                lineHeight: 1.6,
                             }}
                         >
-                            Alătură-te miilor de utilizatori mulțumiți și găsește casa ta ideală astazi
+                            Alătură-te comunității noastre și descoperă o modalitate mai inteligentă, mai rapidă și mai sigură de a gestiona imobiliarele.
                         </Typography>
                         <Button
                             size="large"
                             variant="contained"
                             onClick={() => setShowLoginModal(true)}
                             sx={{
-                                background: "white",
-                                color: "#2563eb",
-                                fontWeight: 700,
-                                fontSize: 16,
-                                px: 5,
-                                py: 1.7,
+                                background: "#E6F7F5",
+                                color: "#071A1D",
+                                fontWeight: 800,
+                                fontSize: 18,
+                                px: 6,
+                                py: 2,
                                 borderRadius: 2,
                                 transition: "all 0.3s ease",
                                 "&:hover": {
-                                    background: "rgba(255, 255, 255, 0.95)",
-                                    transform: "translateY(-2px)",
-                                    boxShadow: "0 12px 32px rgba(0, 0, 0, 0.15)",
+                                    background: "#00E0C6",
+                                    boxShadow: "0 0 30px rgba(0, 224, 198, 0.5)",
+                                    transform: "scale(1.05)",
                                 },
                             }}
                         >
-                            Începe acum
+                            Începe Acum
                         </Button>
                     </Box>
                 </Container>
@@ -351,47 +359,26 @@ const Home = () => {
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        background: "rgba(0, 0, 0, 0.5)",
+                        background: "rgba(7, 26, 29, 0.9)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         zIndex: 1000,
-                        backdropFilter: "blur(5px)",
-                        animation: "fadeIn 0.3s ease",
-                        "@keyframes fadeIn": {
-                            from: { opacity: 0 },
-                            to: { opacity: 1 },
-                        },
+                        backdropFilter: "blur(20px)",
                     }}
                     onClick={() => setShowLoginModal(false)}
                 >
                     <Box
                         sx={{
-                            position: "relative",
-                            animation: "slideUp 0.3s ease",
-                            "@keyframes slideUp": {
-                                from: {
-                                    opacity: 0,
-                                    transform: "translateY(20px)",
-                                },
-                                to: {
-                                    opacity: 1,
-                                    transform: "translateY(0)",
-                                },
-                            },
+                            maxWidth: { xs: "95%", md: "500px" },
+                            width: "100%",
+                            maxHeight: "90vh",
+                            overflow: "auto",
+                            p: 1,
                         }}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <Box
-                            sx={{
-                                mt:5,
-                                maxWidth: { xs: "90%", md: "500px" },
-                                maxHeight: "90vh",
-                                overflow: "auto",
-                            }}
-                        >
-                            <LoginForm />
-                        </Box>
+                        <LoginForm />
                     </Box>
                 </Box>
             )}

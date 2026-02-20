@@ -20,40 +20,35 @@ interface Props {
     favorites: number[];
     toggleFavorite: (id: number) => void;
     getUserName: (id: number) => string;
-    getIntervalLabel: (interval: string) => string;
-    getStatus: (apartment:Apartment) => string;
+    getStatus: (apartment: Apartment) => string;
 }
 
-const ApartmentCard= ({apartment,favorites,toggleFavorite,getUserName,getIntervalLabel,getStatus}: Props) => {
+const ApartmentCard = ({ apartment, favorites, toggleFavorite, getUserName, getStatus }: Props) => {
 
     const navigate = useNavigate();
 
     const handleViewDetails = () => {
         navigate(paths.apartmentDetail(apartment.Id_Apartment));
     };
-    
+
     return (
         <Card
             sx={{
-                background: "white",
+                background: "#0F2F34",
                 borderRadius: 4,
                 overflow: "hidden",
-                border: "1px solid #e5e7eb",
+                border: "1px solid #12383D",
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
-                transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                transition: "all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1)",
                 position: "relative",
                 "&:hover": {
-                    transform: "translateY(-16px)",
-                    boxShadow: "0 30px 60px rgba(37, 99, 235, 0.2)",
-                    borderColor: "#2563eb",
-                    "& .image-overlay": {
-                        opacity: 1,
-                    },
-                    "& img": {
-                        transform: "scale(1.05)",
-                    },
+                    transform: "translateY(-12px)",
+                    boxShadow: "0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 224, 198, 0.1)",
+                    borderColor: "#00E0C6",
+                    "& .image-overlay": { opacity: 1 },
+                    "& img": { transform: "scale(1.08)" },
                 },
             }}
         >
@@ -63,7 +58,7 @@ const ApartmentCard= ({apartment,favorites,toggleFavorite,getUserName,getInterva
                     position: "relative",
                     height: "260px",
                     overflow: "hidden",
-                    background: "#f0f0f0",
+                    background: "#071A1D",
                 }}
             >
                 <img
@@ -73,7 +68,7 @@ const ApartmentCard= ({apartment,favorites,toggleFavorite,getUserName,getInterva
                         width: "100%",
                         height: "100%",
                         objectFit: "cover",
-                        transition: "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                        transition: "transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1)",
                     }}
                 />
 
@@ -86,7 +81,7 @@ const ApartmentCard= ({apartment,favorites,toggleFavorite,getUserName,getInterva
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        background: "linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(124, 58, 237, 0.2))",
+                        background: "linear-gradient(to top, rgba(7, 26, 29, 0.8), transparent)",
                         opacity: 0,
                         transition: "opacity 0.3s ease",
                     }}
@@ -99,29 +94,29 @@ const ApartmentCard= ({apartment,favorites,toggleFavorite,getUserName,getInterva
                         position: "absolute",
                         top: 16,
                         right: 16,
-                        background: "rgba(255, 255, 255, 0.95)",
+                        background: "rgba(12, 37, 41, 0.8)",
                         minWidth: "auto",
-                        width: 48,
-                        height: 48,
+                        width: 44,
+                        height: 44,
                         borderRadius: "50%",
-                        p: 0,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        transition: "all 0.3s ease",
-                        backdropFilter: "blur(10px)",
-                        border: "1px solid rgba(255, 255, 255, 0.5)",
+                        backdropFilter: "blur(8px)",
+                        border: "1px solid #12383D",
+                        color: favorites.includes(apartment.Id_Apartment) ? "#FF4D6D" : "#8FB5B1",
                         "&:hover": {
-                            transform: "scale(1.15)",
-                            background: "white",
-                            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
+                            background: "#0F2F34",
+                            borderColor: "#00E0C6",
+                            color: "#FF4D6D",
+                            transform: "scale(1.1)",
                         },
                     }}
                 >
                     {favorites.includes(apartment.Id_Apartment) ? (
-                        <FavoriteIcon sx={{ color: "#ef4444", fontSize: 26 }} />
+                        <FavoriteIcon sx={{ fontSize: 24 }} />
                     ) : (
-                        <FavoriteBorderIcon sx={{ color: "#6b7280", fontSize: 26 }} />
+                        <FavoriteBorderIcon sx={{ fontSize: 24 }} />
                     )}
                 </Button>
 
@@ -131,9 +126,6 @@ const ApartmentCard= ({apartment,favorites,toggleFavorite,getUserName,getInterva
                         position: "absolute",
                         bottom: 16,
                         left: 16,
-                        display: "flex",
-                        gap: 1,
-                        flexWrap: "wrap",
                     }}
                 >
                     <Chip
@@ -141,114 +133,93 @@ const ApartmentCard= ({apartment,favorites,toggleFavorite,getUserName,getInterva
                         sx={{
                             background:
                                 apartment.Id_Renter !== null
-                                    ? "linear-gradient(135deg, #ef4444, #dc2626)"
-                                    : "linear-gradient(135deg, #10b981, #059669)",
-                            color: "white",
-                            fontWeight: 700,
-                            fontSize: "12px",
-                            backdropFilter: "blur(10px)",
-                            border: "1px solid rgba(255, 255, 255, 0.3)",
+                                    ? "rgba(255, 77, 109, 0.2)"
+                                    : "rgba(34, 227, 164, 0.2)",
+                            color: apartment.Id_Renter !== null ? "#FF4D6D" : "#22E3A4",
+                            backdropFilter: "blur(8px)",
+                            border: `1px solid ${apartment.Id_Renter !== null ? "rgba(255, 77, 109, 0.3)" : "rgba(34, 227, 164, 0.3)"}`,
+                            fontWeight: 800,
+                            letterSpacing: "0.5px",
+                            fontSize: "11px",
+                            textTransform: "uppercase",
                         }}
                     />
                 </Box>
             </Box>
 
             {/* Content */}
-            <Box sx={{ p: 4, flex: 1, display: "flex", flexDirection: "column", gap: 3}}>
+            <Box sx={{ p: 3, flex: 1, display: "flex", flexDirection: "column", gap: 2.5 }}>
                 {/* Address */}
                 <Box sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}>
                     <Box
                         sx={{
-                            background: "linear-gradient(135deg, #2563eb, #4f46e5)",
-                            p: 1.5,
-                            borderRadius: 2,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
+                            background: "rgba(0, 224, 198, 0.1)",
+                            p: 1.2,
+                            borderRadius: 1.5,
+                            border: "1px solid rgba(0, 224, 198, 0.2)",
                         }}
                     >
-                        <LocationOnIcon
-                            sx={{
-                                color: "white",
-                                fontSize: 20,
-                            }}
-                        />
+                        <LocationOnIcon sx={{ color: "#00E0C6", fontSize: 20 }} />
                     </Box>
-                    <Box>
-                        <Typography
-                            sx={{
-                                fontWeight: 700,
-                                color: "#1f2937",
-                                fontSize: 15,
-                                lineHeight: 1.4,
-                            }}
-                        >
-                            {apartment.Address}
-                        </Typography>
-                    </Box>
+                    <Typography
+                        sx={{
+                            fontWeight: 700,
+                            color: "#E6F7F5",
+                            fontSize: "15px",
+                            lineHeight: 1.4,
+                        }}
+                    >
+                        {apartment.Address}
+                    </Typography>
                 </Box>
-                {/*Aici punem rating*/}
-                {/* Owner and Renter Info */}
+
+                {/* Owner Info */}
                 <Box
                     sx={{
                         display: "flex",
+                        flexDirection: "column",
                         gap: 1.5,
-                        padding: "12px",
-                        background: "#f3f4f6",
+                        p: 2,
+                        background: "#0C2529",
                         borderRadius: 2,
-                        fontSize: "13px",
+                        border: "1px solid #12383D",
                     }}
                 >
                     <Box>
                         <Typography
-                            variant="body2"
                             sx={{
-                                color: "#6b7280",
-                                fontSize: "11px",
+                                color: "#5C7A77",
+                                fontSize: "10px",
                                 textTransform: "uppercase",
-                                letterSpacing: "0.5px",
-                                fontWeight: 600,
+                                fontWeight: 800,
+                                letterSpacing: "1px",
+                                mb: 0.5,
                             }}
                         >
                             Proprietar
                         </Typography>
-                        <Typography
-                            sx={{
-                                color: "#1f2937",
-                                fontWeight: 700,
-                                fontSize: "14px",
-                            }}
-                        >
-                            Nume: {getUserName(apartment.Id_Owner)}
+                        <Typography sx={{ color: "#E6F7F5", fontWeight: 700, fontSize: "14px" }}>
+                            {getUserName(apartment.Id_Owner)}
                         </Typography>
                     </Box>
                     {apartment.Id_Renter && (
-                        <>
-                            <Box sx={{ width: "1px", background: "#d1d5db" }} />
-                            <Box>
-                                <Typography
-                                    variant="body2"
-                                    sx={{
-                                        color: "#6b7280",
-                                        fontSize: "11px",
-                                        textTransform: "uppercase",
-                                        letterSpacing: "0.5px",
-                                        fontWeight: 600,
-                                    }}
-                                >
-                                    Chiriaș
-                                </Typography>
-                                <Typography
-                                    sx={{
-                                        color: "#1f2937",
-                                        fontWeight: 700,
-                                        fontSize: "14px",
-                                    }}
-                                >
-                                    Nume: {getUserName(apartment.Id_Owner)}
-                                </Typography>
-                            </Box>
-                        </>
+                        <Box sx={{ pt: 1, borderTop: "1px solid #12383D" }}>
+                            <Typography
+                                sx={{
+                                    color: "#5C7A77",
+                                    fontSize: "10px",
+                                    textTransform: "uppercase",
+                                    fontWeight: 800,
+                                    letterSpacing: "1px",
+                                    mb: 0.5,
+                                }}
+                            >
+                                Chiriaș
+                            </Typography>
+                            <Typography sx={{ color: "#E6F7F5", fontWeight: 700, fontSize: "14px" }}>
+                                {getUserName(apartment.Id_Renter)}
+                            </Typography>
+                        </Box>
                     )}
                 </Box>
 
@@ -257,45 +228,29 @@ const ApartmentCard= ({apartment,favorites,toggleFavorite,getUserName,getInterva
                     sx={{
                         mt: "auto",
                         pt: 2,
-                        borderTop: "1px solid #e5e7eb",
                         display: "flex",
                         justifyContent: "space-between",
-                        alignItems: "flex-end",
-                        gap: 2,
+                        alignItems: "center",
                     }}
                 >
                     <Box>
                         <Typography
-                            variant="body2"
                             sx={{
-                                color: "#6b7280",
-                                fontSize: "12px",
+                                color: "#5C7A77",
+                                fontSize: "10px",
                                 textTransform: "uppercase",
-                                letterSpacing: "0.5px",
-                                fontWeight: 600,
-                                mb: 0.5,
+                                fontWeight: 800,
+                                letterSpacing: "1px",
                             }}
                         >
-                            Preț
+                            Cost lunar
                         </Typography>
-                        <Box sx={{ display: "flex", gap: 0.5, alignItems: "baseline" }}>
-                            <Typography
-                                sx={{
-                                    fontWeight: 900,
-                                    color: "#2563eb",
-                                    fontSize: 24,
-                                }}
-                            >
+                        <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.5 }}>
+                            <Typography sx={{ color: "#00E0C6", fontWeight: 900, fontSize: "24px" }}>
                                 {apartment.Cost_per_interval}
                             </Typography>
-                            <Typography
-                                variant="body2"
-                                sx={{
-                                    color: "#6b7280",
-                                    fontWeight: 600,
-                                }}
-                            >
-                                {apartment.Currency}/{getIntervalLabel(apartment.Interval)}
+                            <Typography sx={{ color: "#8FB5B1", fontWeight: 700, fontSize: "14px" }}>
+                                {apartment.Currency}
                             </Typography>
                         </Box>
                     </Box>
@@ -304,27 +259,20 @@ const ApartmentCard= ({apartment,favorites,toggleFavorite,getUserName,getInterva
                         disabled={apartment.Id_Renter !== null}
                         onClick={handleViewDetails}
                         sx={{
-                            background:
-                                apartment.Id_Renter !== null
-                                    ? "#d1d5db"
-                                    : "linear-gradient(135deg, #2563eb, #4f46e5, #7c3aed)",
-                            fontWeight: 700,
+                            background: apartment.Id_Renter !== null ? "rgba(255, 255, 255, 0.05)" : "linear-gradient(90deg, #00E0C6, #00BFA6)",
+                            color: apartment.Id_Renter !== null ? "#5C7A77" : "#071A1D",
+                            fontWeight: 800,
                             textTransform: "none",
-                            fontSize: 14,
-                            px: 3,
-                            py: 1.2,
                             borderRadius: 2,
-                            transition: "all 0.3s ease",
+                            px: 3,
+                            boxShadow: apartment.Id_Renter !== null ? "none" : "0 0 12px rgba(0, 224, 198, 0.3)",
                             "&:hover": {
-                                transform: apartment.Id_Renter === null ? "translateY(-2px)" : "none",
-                                boxShadow:
-                                    apartment.Id_Renter === null
-                                        ? "0 12px 24px rgba(37, 99, 235, 0.4)"
-                                        : "none",
+                                background: "linear-gradient(90deg, #00FFF0, #00E0C6)",
+                                boxShadow: "0 0 20px rgba(0, 224, 198, 0.4)",
                             },
                         }}
                     >
-                        {apartment.Id_Renter !== null ? "Ocupat" : "Vezi detalii"}
+                        {apartment.Id_Renter !== null ? "Ocupat" : "Detalii"}
                     </Button>
                 </Box>
             </Box>
