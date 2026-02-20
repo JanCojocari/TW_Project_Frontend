@@ -11,6 +11,7 @@ import {
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import {paths} from "../app/paths.ts";
 
 const Register = () => {
     const navigate = useNavigate();
@@ -153,7 +154,7 @@ const Register = () => {
                         }}
                         onClick={() => {
                             // Logica de înregistrare
-                            navigate("/login");
+                            navigate(paths.login);
                         }}
                     >
                         Înregistrează-te
@@ -167,7 +168,7 @@ const Register = () => {
                     >
                         Ai deja cont?{" "}
                         <Link 
-                            to="/login" 
+                            to={paths.login}
                             style={{ 
                                 color: "#2563eb", 
                                 textDecoration: "none",
