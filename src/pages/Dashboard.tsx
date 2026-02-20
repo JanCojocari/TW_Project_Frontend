@@ -28,6 +28,7 @@ import { apartments } from "../mockdata/apartments";
 import { users } from "../mockdata/users";
 import { paths } from "../app/paths";
 import ApartmentCard from "../components/ApartmentCard";
+import type { Apartment } from "../types/apartment.types.ts";
 
 type DashboardTab = 0 | 1 | 2 | 3;
 
@@ -81,35 +82,78 @@ export default function Dashboard() {
     };
 
     return (
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-            <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 3 }}>
-                <Typography variant="h4" fontWeight={900}>
-                    Dashboard
-                </Typography>
-                <Typography color="text.secondary" sx={{ mt: 0.5 }}>
-                    Gestionează contul, anunțurile și activitatea ta.
-                </Typography>
+        <Container
+            maxWidth="lg"
+            sx={{
+                py: { xs: 4, md: 8 },
+                minHeight: "100vh",
+                mt: 10,
+            }}
+        >
+            <Paper
+                elevation={0}
+                sx={{
+                    p: 6,
+                    borderRadius: 4,
+                    background: "#0F2F34",
+                    border: "1px solid #12383D",
+                    boxShadow: "0 40px 100px rgba(0, 0, 0, 0.4)",
+                }}
+            >
+                {/* Header */}
+                <Box sx={{ mb: 6 }}>
+                    <Typography
+                        variant="h3"
+                        fontWeight={900}
+                        sx={{
+                            color: "#E6F7F5",
+                            letterSpacing: "-1.5px",
+                            mb: 1,
+                        }}
+                    >
+                        Control <Box component="span" sx={{ color: "#00E0C6" }}>Panel</Box>
+                    </Typography>
+                    <Typography sx={{ color: "#8FB5B1", fontSize: "16px" }}>
+                        Monitorizează activitatea, gestionează portofoliul și plățile tale.
+                    </Typography>
+                </Box>
 
-                <Divider sx={{ my: 2 }} />
-
+                {/* Tabs */}
                 <Tabs
                     value={tab}
                     onChange={(_, v) => setTab(v)}
                     variant="scrollable"
                     scrollButtons="auto"
                     sx={{
-                        "& .MuiTab-root": { textTransform: "none", fontWeight: 700 },
+                        mb: 2,
+                        borderBottom: "1px solid #12383D",
+                        "& .MuiTab-root": {
+                            textTransform: "none",
+                            fontWeight: 800,
+                            fontSize: "15px",
+                            color: "#5C7A77",
+                            px: 4,
+                            pb: 2.5,
+                            "&.Mui-selected": {
+                                color: "#00E0C6",
+                            },
+                        },
+                        "& .MuiTabs-indicator": {
+                            backgroundColor: "#00E0C6",
+                            height: 3,
+                            borderRadius: "3px 3px 0 0",
+                            boxShadow: "0 0 10px rgba(0, 224, 198, 0.5)",
+                        },
                     }}
                 >
-                    <Tab label="Profil" />
-                    <Tab label="Anunțurile mele" />
-                    <Tab label="Plăți" />
+                    <Tab label="Profil Utilizator" />
+                    <Tab label="Proprietățile Mele" />
+                    <Tab label="Istoric Financiar" />
                     <Tab label="Favorite" />
                 </Tabs>
 
-                <Divider sx={{ mt: 1 }} />
-
-                <Box sx={{ pt: 2 }}>
+                {/* Tab Content */}
+                <Box sx={{ pt: 6 }}>
                     {tab === 0 && (
                         <ProfileTab
                             currentUser={currentUser}
@@ -125,9 +169,7 @@ export default function Dashboard() {
                         />
                     )}
 
-                    {tab === 2 && (
-                        <PaymentsTab />
-                    )}
+                    {tab === 2 && <PaymentsTab />}
 
                     {tab === 3 && (
                         <FavoritesTab
@@ -142,69 +184,229 @@ export default function Dashboard() {
     );
 }
 
-/* ---------------- Tabs ---------------- */
+/* ─────────── Profil Tab ─────────── */
 
-function ProfileTab({ currentUser, onEditProfile }: { currentUser: any; onEditProfile: () => void }) {
+function ProfileTab({
+                        currentUser,
+                        onEditProfile,
+                    }: {
+    currentUser: any;
+    onEditProfile: () => void;
+}) {
     const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
     if (!currentUser) {
         return (
-            <Typography color="text.secondary">
-                Nu ești autentificat.
+            <Typography sx={{ color: "#5C7A77", textAlign: "center", py: 10 }}>
+                Eroare: Sesiune utilizator invalidă.
             </Typography>
         );
     }
 
     return (
-        <Stack spacing={2}>
-            <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
-                <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" gap={2}>
+        <Stack spacing={4}>
+            {/* User Info Card */}
+            <Paper
+                elevation={0}
+                sx={{
+                    p: 4,
+                    borderRadius: 4,
+                    background: "#0C2529",
+                    border: "1px solid #12383D",
+                }}
+            >
+                <Stack
+                    direction={{ xs: "column", sm: "row" }}
+                    justifyContent="space-between"
+                    alignItems={{ xs: "flex-start", sm: "center" }}
+                    gap={3}
+                >
                     <Box>
-                        <Typography variant="h6" fontWeight={900}>
+                        <Typography
+                            variant="h5"
+                            fontWeight={900}
+                            sx={{ color: "#E6F7F5", mb: 2 }}
+                        >
                             {currentUser.Name} {currentUser.Surname}
                         </Typography>
-                        <Typography color="text.secondary">
-                            Email: {currentUser.Email ?? "—"}
-                        </Typography>
-                        <Typography color="text.secondary">
-                            Telefon: {currentUser.Phone}
-                        </Typography>
+                        <Stack spacing={1}>
+                            <Box sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
+                                <Typography
+                                    sx={{
+                                        color: "#5C7A77",
+                                        fontSize: "12px",
+                                        textTransform: "uppercase",
+                                        fontWeight: 800,
+                                        minWidth: "50px",
+                                    }}
+                                >
+                                    Email
+                                </Typography>
+                                <Typography
+                                    sx={{
+                                        color: "#8FB5B1",
+                                        fontSize: "14px",
+                                        fontWeight: 600,
+                                    }}
+                                >
+                                    {currentUser.Email ?? "—"}
+                                </Typography>
+                            </Box>
+                            <Box sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
+                                <Typography
+                                    sx={{
+                                        color: "#5C7A77",
+                                        fontSize: "12px",
+                                        textTransform: "uppercase",
+                                        fontWeight: 800,
+                                        minWidth: "50px",
+                                    }}
+                                >
+                                    Telefon
+                                </Typography>
+                                <Typography
+                                    sx={{
+                                        color: "#8FB5B1",
+                                        fontSize: "14px",
+                                        fontWeight: 600,
+                                    }}
+                                >
+                                    {currentUser.Phone}
+                                </Typography>
+                            </Box>
+                        </Stack>
                     </Box>
 
-                    <Box textAlign={{ xs: "left", sm: "right" }}>
-                        <Typography color="text.secondary">Sold cont</Typography>
-                        <Typography variant="h6" fontWeight={900}>
-                            {currentUser.Account_sold}
+                    <Box
+                        sx={{
+                            background: "#0F2F34",
+                            p: 3,
+                            borderRadius: 3,
+                            border: "1px solid #12383D",
+                            minWidth: { xs: "100%", sm: "200px" },
+                            textAlign: "center",
+                        }}
+                    >
+                        <Typography
+                            sx={{
+                                color: "#5C7A77",
+                                fontSize: "11px",
+                                textTransform: "uppercase",
+                                fontWeight: 800,
+                                letterSpacing: "1px",
+                                mb: 1,
+                            }}
+                        >
+                            Sold Disponibil
+                        </Typography>
+                        <Typography
+                            variant="h4"
+                            fontWeight={900}
+                            sx={{
+                                color: "#00E0C6",
+                                textShadow: "0 0 15px rgba(0, 224, 198, 0.3)",
+                            }}
+                        >
+                            {currentUser.Account_sold} EUR
                         </Typography>
                     </Box>
                 </Stack>
             </Paper>
 
-            <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
-                <Typography fontWeight={800} sx={{ mb: 1 }}>
-                    Detalii
+            {/* Technical Info */}
+            <Box>
+                <Typography
+                    variant="overline"
+                    sx={{
+                        color: "#5C7A77",
+                        fontWeight: 800,
+                        letterSpacing: "2px",
+                        mb: 2,
+                        display: "block",
+                    }}
+                >
+                    Informații Tehnice
                 </Typography>
-                <Stack direction="row" flexWrap="wrap" gap={1}>
-                    <Chip label={`ID: ${currentUser.Id_User}`} />
-                    <Chip label={`Zi naștere: ${currentUser.Birthday ?? "—"}`} />
-                    <Chip label={`Gen: ${currentUser.Gender ?? "—"}`} />
+                <Stack direction="row" flexWrap="wrap" gap={2}>
+                    <Chip
+                        label={`UID: ${currentUser.Id_User}`}
+                        sx={{
+                            background: "rgba(0, 224, 198, 0.05)",
+                            color: "#00E0C6",
+                            fontWeight: 800,
+                            border: "1px solid rgba(0, 224, 198, 0.1)",
+                            borderRadius: "8px",
+                        }}
+                    />
+                    <Chip
+                        label={`Născut: ${currentUser.Birthday ?? "—"}`}
+                        sx={{
+                            background: "#0C2529",
+                            color: "#8FB5B1",
+                            fontWeight: 700,
+                            border: "1px solid #12383D",
+                            borderRadius: "8px",
+                        }}
+                    />
+                    <Chip
+                        label={`Gen: ${
+                            currentUser.Gender === "M" ? "Masculin" : "Feminin"
+                        }`}
+                        sx={{
+                            background: "#0C2529",
+                            color: "#8FB5B1",
+                            fontWeight: 700,
+                            border: "1px solid #12383D",
+                            borderRadius: "8px",
+                        }}
+                    />
                 </Stack>
-            </Paper>
+            </Box>
 
-            <Stack direction="row" gap={1}>
+            <Divider sx={{ borderColor: "#12383D" }} />
+
+            {/* Action Buttons */}
+            <Stack direction={{ xs: "column", sm: "row" }} gap={3}>
                 <Button
                     variant="contained"
                     onClick={onEditProfile}
-                    sx={{ borderRadius: 2, textTransform: "none", fontWeight: 700 }}
+                    sx={{
+                        background: "linear-gradient(90deg, #00E0C6, #00BFA6)",
+                        color: "#071A1D",
+                        borderRadius: 2.5,
+                        textTransform: "none",
+                        fontWeight: 900,
+                        px: 4,
+                        py: 1.5,
+                        boxShadow: "0 0 15px rgba(0, 224, 198, 0.2)",
+                        "&:hover": {
+                            background: "linear-gradient(90deg, #00FFF0, #00E0C6)",
+                            boxShadow: "0 0 25px rgba(0, 224, 198, 0.4)",
+                            transform: "translateY(-2px)",
+                        },
+                    }}
                 >
-                    Editează profil
+                    Actualizează Datele
                 </Button>
                 <Button
                     variant="outlined"
                     onClick={() => setChangePasswordOpen(true)}
-                    sx={{ borderRadius: 2, textTransform: "none", fontWeight: 700 }}
+                    sx={{
+                        borderColor: "#12383D",
+                        color: "#8FB5B1",
+                        borderRadius: 2.5,
+                        textTransform: "none",
+                        fontWeight: 700,
+                        px: 4,
+                        py: 1.5,
+                        "&:hover": {
+                            borderColor: "#00E0C6",
+                            background: "rgba(0, 224, 198, 0.05)",
+                            color: "#E6F7F5",
+                        },
+                    }}
                 >
-                    Schimbă parola
+                    Schimbă Parola
                 </Button>
             </Stack>
 
@@ -217,7 +419,7 @@ function ProfileTab({ currentUser, onEditProfile }: { currentUser: any; onEditPr
     );
 }
 
-/* ─── Change Password Dialog ─────────────────────────────── */
+/* ─────────── Change Password Dialog ─────────── */
 
 type PwdForm = { current: string; next: string; confirm: string };
 type PwdErrors = Partial<Record<keyof PwdForm, string>>;
@@ -245,10 +447,10 @@ function validatePwd(form: PwdForm, realCurrent: string): PwdErrors {
 }
 
 function ChangePasswordDialog({
-    open,
-    onClose,
-    currentPassword,
-}: {
+                                  open,
+                                  onClose,
+                                  currentPassword,
+                              }: {
     open: boolean;
     onClose: () => void;
     currentPassword: string;
@@ -258,7 +460,9 @@ function ChangePasswordDialog({
     const [errors, setErrors] = useState<PwdErrors>({});
     const [touched, setTouched] = useState<Partial<Record<keyof PwdForm, boolean>>>({});
     const [showPwd, setShowPwd] = useState<Record<keyof PwdForm, boolean>>({
-        current: false, next: false, confirm: false,
+        current: false,
+        next: false,
+        confirm: false,
     });
     const [success, setSuccess] = useState(false);
 
@@ -270,9 +474,14 @@ function ChangePasswordDialog({
         setSuccess(false);
     };
 
-    const handleClose = () => { reset(); onClose(); };
+    const handleClose = () => {
+        reset();
+        onClose();
+    };
 
-    const handleChange = (field: keyof PwdForm) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (field: keyof PwdForm) => (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
         const updated = { ...form, [field]: e.target.value };
         setForm(updated);
         setSuccess(false);
@@ -302,10 +511,7 @@ function ChangePasswordDialog({
     const showErr = (f: keyof PwdForm) => touched[f] && !!errors[f];
     const errMsg = (f: keyof PwdForm) => (touched[f] ? errors[f] : undefined);
 
-    const pwdField = (
-        field: keyof PwdForm,
-        label: string,
-    ) => (
+    const pwdField = (field: keyof PwdForm, label: string) => (
         <TextField
             label={label}
             type={showPwd[field] ? "text" : "password"}
@@ -317,11 +523,35 @@ function ChangePasswordDialog({
             fullWidth
             required
             autoComplete="off"
+            sx={{
+                "& .MuiOutlinedInput-root": {
+                    color: "#E6F7F5",
+                    "& fieldset": { borderColor: "#12383D" },
+                    "&:hover fieldset": { borderColor: "#00E0C6" },
+                    "&.Mui-focused fieldset": { borderColor: "#00E0C6" },
+                },
+                "& .MuiInputBase-input::placeholder": {
+                    color: "#5C7A77",
+                    opacity: 1,
+                },
+                "& .MuiFormHelperText-root": {
+                    color: "#FF4D6D",
+                },
+            }}
             InputProps={{
                 endAdornment: (
                     <InputAdornment position="end">
-                        <IconButton onClick={() => toggleShow(field)} edge="end" size="small">
-                            {showPwd[field] ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
+                        <IconButton
+                            onClick={() => toggleShow(field)}
+                            edge="end"
+                            size="small"
+                            sx={{ color: "#00E0C6" }}
+                        >
+                            {showPwd[field] ? (
+                                <VisibilityOffIcon fontSize="small" />
+                            ) : (
+                                <VisibilityIcon fontSize="small" />
+                            )}
                         </IconButton>
                     </InputAdornment>
                 ),
@@ -330,34 +560,89 @@ function ChangePasswordDialog({
     );
 
     return (
-        <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs">
-            <DialogTitle sx={{ fontWeight: 900 }}>Schimbă parola</DialogTitle>
+        <Dialog
+            open={open}
+            onClose={handleClose}
+            fullWidth
+            maxWidth="xs"
+            PaperProps={{
+                sx: {
+                    background: "#0F2F34",
+                    border: "1px solid #12383D",
+                },
+            }}
+        >
+            <DialogTitle
+                sx={{
+                    fontWeight: 900,
+                    color: "#E6F7F5",
+                    borderBottom: "1px solid #12383D",
+                }}
+            >
+                Schimbă Parola
+            </DialogTitle>
             <Box component="form" onSubmit={handleSubmit} noValidate>
-                <DialogContent>
-                    <Stack spacing={2.5} sx={{ pt: 0.5 }}>
+                <DialogContent sx={{ backgroundColor: "#0F2F34" }}>
+                    <Stack spacing={2.5} sx={{ pt: 2 }}>
                         {pwdField("current", "Parola curentă")}
-                        <Divider />
+                        <Divider sx={{ borderColor: "#12383D" }} />
                         {pwdField("next", "Parola nouă")}
                         {pwdField("confirm", "Confirmă parola nouă")}
                         {success && (
-                            <Alert severity="success" sx={{ borderRadius: 2 }}>
-                                Parola a fost schimbată cu succes! (mock)
+                            <Alert
+                                severity="success"
+                                sx={{
+                                    borderRadius: 2,
+                                    background: "rgba(34, 227, 164, 0.1)",
+                                    color: "#22E3A4",
+                                    "& .MuiAlert-icon": { color: "#22E3A4" },
+                                }}
+                            >
+                                Parola a fost schimbată cu succes!
                             </Alert>
                         )}
                     </Stack>
                 </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
+                <DialogActions
+                    sx={{
+                        px: 3,
+                        pb: 2.5,
+                        gap: 1,
+                        borderTop: "1px solid #12383D",
+                    }}
+                >
                     <Button
                         onClick={handleClose}
                         variant="outlined"
-                        sx={{ textTransform: "none", fontWeight: 700, borderRadius: 2 }}
+                        sx={{
+                            textTransform: "none",
+                            fontWeight: 700,
+                            borderRadius: 2,
+                            borderColor: "#12383D",
+                            color: "#8FB5B1",
+                            "&:hover": {
+                                borderColor: "#00E0C6",
+                                background: "rgba(0, 224, 198, 0.05)",
+                                color: "#E6F7F5",
+                            },
+                        }}
                     >
                         Anulează
                     </Button>
                     <Button
                         type="submit"
                         variant="contained"
-                        sx={{ textTransform: "none", fontWeight: 700, borderRadius: 2 }}
+                        sx={{
+                            textTransform: "none",
+                            fontWeight: 700,
+                            borderRadius: 2,
+                            background: "linear-gradient(90deg, #00E0C6, #00BFA6)",
+                            color: "#071A1D",
+                            "&:hover": {
+                                background: "linear-gradient(90deg, #00FFF0, #00E0C6)",
+                                boxShadow: "0 0 20px rgba(0, 224, 198, 0.4)",
+                            },
+                        }}
                     >
                         Salvează
                     </Button>
@@ -366,6 +651,8 @@ function ChangePasswordDialog({
         </Dialog>
     );
 }
+
+/* ─────────── My Listings Tab ─────────── */
 
 function MyListingsTab({
                            myListings,
@@ -378,132 +665,224 @@ function MyListingsTab({
 }) {
     if (myListings.length === 0) {
         return (
-            <Typography color="text.secondary">
-                Nu ai anunțuri încă.
-            </Typography>
+            <Box sx={{ textAlign: "center", py: 10 }}>
+                <Typography
+                    sx={{
+                        color: "#5C7A77",
+                        fontSize: "18px",
+                        fontStyle: "italic",
+                    }}
+                >
+                    Nu ai publicat niciun anunț până în prezent.
+                </Typography>
+            </Box>
         );
     }
 
-    
     return (
-        <></>
-        /*<Grid container spacing={2}>
-            {myListings.map((a) => (
-                <Grid item xs={12} sm={6} md={4} key={a.Id_Apartment}>
-                    <Box>
-                        <ListingCard apartment={a} />
-                        <Button
-                            onClick={() => onToggleFavorite(a.Id_Apartment)}
-                            variant={favoriteIds.includes(a.Id_Apartment) ? "contained" : "outlined"}
-                            fullWidth
-                            sx={{ mt: 1, borderRadius: 2, textTransform: "none", fontWeight: 700 }}
-                        >
-                            {favoriteIds.includes(a.Id_Apartment) ? "În favorite" : "Adaugă la favorite"}
-                        </Button>
-                    </Box>
-                </Grid>
+        <Box
+            sx={{
+                display: "grid",
+                gap: 4,
+                gridTemplateColumns: {
+                    xs: "1fr",
+                    sm: "repeat(2, 1fr)",
+                    md: "repeat(3, 1fr)",
+                },
+            }}
+        >
+            {myListings.map((apt) => (
+                <ApartmentCard
+                    key={apt.Id_Apartment}
+                    apartment={apt}
+                    favorites={favoriteIds}
+                    toggleFavorite={onToggleFavorite}
+                    getUserName={(id: number) =>
+                        users.find((u) => u.Id_User === id)?.Name || "User"
+                    }
+                    getStatus={(a: any) =>
+                        a.Id_Renter ? "Ocupat" : "Disponibil"
+                    }
+                    getIntervalLabel={(interval: string) => {
+                        if (interval === "hour") return "oră";
+                        if (interval === "day") return "zi";
+                        if (interval === "month") return "lună";
+                        return interval;
+                    }}
+                />
             ))}
-        </Grid>*/
+        </Box>
     );
 }
 
-function PaymentsTab() {
-    // Skeleton only (until you have mockdata/payment or backend)
-    return (
-        <Stack spacing={2}>
-            <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
-                <Typography fontWeight={900} sx={{ mb: 0.5 }}>
-                    Istoric plăți
-                </Typography>
-                <Typography color="text.secondary">
-                    Aici vor apărea plățile tale (note de plată / link-uri către chitanțe).
-                </Typography>
-            </Paper>
+/* ─────────── Payments Tab ─────────── */
 
-            <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
-                <Typography fontWeight={800}>Exemplu (mock)</Typography>
-                <Divider sx={{ my: 1.5 }} />
-                <Stack spacing={1}>
-                    <PaymentRow label="Plată #1001" meta="45 EUR • 2026-02-10 • Bd. Dacia 10" />
-                    <PaymentRow label="Plată #1002" meta="35 EUR • 2026-02-01 • Str. Testemitanu 14" />
+function PaymentsTab() {
+    return (
+        <Stack spacing={4}>
+            <Box>
+                <Typography
+                    variant="h5"
+                    fontWeight={900}
+                    sx={{ color: "#E6F7F5", mb: 4 }}
+                >
+                    Arhivă Plăți & Facturi
+                </Typography>
+                <Stack spacing={2.5}>
+                    <PaymentRow
+                        label="Chirie Apartament #442"
+                        meta="850 EUR • Februarie 2026 • Mun. Chișinău"
+                        status="Succes"
+                    />
+                    <PaymentRow
+                        label="Chirie Apartament #119"
+                        meta="420 EUR • Ianuarie 2026 • Str. Pușkin 12"
+                        status="Succes"
+                    />
                 </Stack>
-            </Paper>
+            </Box>
         </Stack>
     );
 }
 
-function PaymentRow({ label, meta }: { label: string; meta: string }) {
+function PaymentRow({
+                        label,
+                        meta,
+                        status,
+                    }: {
+    label: string;
+    meta: string;
+    status: string;
+}) {
     return (
-        <Stack direction="row" justifyContent="space-between" alignItems="center" gap={2}>
+        <Paper
+            elevation={0}
+            sx={{
+                p: 3,
+                borderRadius: 4,
+                background: "#0C2529",
+                border: "1px solid #12383D",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                    borderColor: "#00E0C6",
+                    background: "#0F2F34",
+                },
+            }}
+        >
             <Box>
-                <Typography fontWeight={800}>{label}</Typography>
-                <Typography color="text.secondary" variant="body2">
+                <Box
+                    sx={{
+                        display: "flex",
+                        gap: 2,
+                        alignItems: "center",
+                        mb: 0.5,
+                    }}
+                >
+                    <Typography
+                        fontWeight={800}
+                        sx={{ color: "#E6F7F5", fontSize: "16px" }}
+                    >
+                        {label}
+                    </Typography>
+                    <Chip
+                        label={status}
+                        size="small"
+                        sx={{
+                            background: "rgba(34, 227, 164, 0.1)",
+                            color: "#22E3A4",
+                            fontWeight: 800,
+                            fontSize: "10px",
+                            height: "20px",
+                        }}
+                    />
+                </Box>
+                <Typography sx={{ color: "#5C7A77", fontSize: "14px" }}>
                     {meta}
                 </Typography>
             </Box>
-            <Button variant="outlined" sx={{ borderRadius: 2, textTransform: "none", fontWeight: 700 }}>
-                Vezi nota (soon)
+            <Button
+                variant="outlined"
+                sx={{
+                    borderColor: "#12383D",
+                    color: "#00E0C6",
+                    borderRadius: 2,
+                    textTransform: "none",
+                    fontWeight: 800,
+                    px: 3,
+                    "&:hover": {
+                        borderColor: "#00E0C6",
+                        background: "rgba(0, 224, 198, 0.05)",
+                    },
+                }}
+            >
+                Descarcă PDF
             </Button>
-        </Stack>
+        </Paper>
     );
 }
 
+/* ─────────── Favorites Tab ─────────── */
+
 function FavoritesTab({
-    favoriteApartments,
-    favoriteIds,
-    onToggleFavorite,
-}: {
-    favoriteApartments: any[];
+                          favoriteApartments,
+                          favoriteIds,
+                          onToggleFavorite,
+                      }: {
+    favoriteApartments: Apartment[];
     favoriteIds: number[];
     onToggleFavorite: (id: number) => void;
 }) {
-    const getUserName = (id: number) => {
-        const u = users.find((u) => u.Id_User === id);
-        return u ? `${u.Name} ${u.Surname}` : "Necunoscut";
-    };
-
-    const getIntervalLabel = (interval: string) => {
-        if (interval === "hour") return "oră";
-        if (interval === "day") return "zi";
-        if (interval === "month") return "lună";
-        return interval;
-    };
-
-    const getStatus = (apartment: any) =>
-        apartment.Id_Renter !== null ? "Ocupat" : "Disponibil";
-
     if (favoriteApartments.length === 0) {
         return (
-            <Box sx={{ py: 6, textAlign: "center" }}>
-                <Typography color="text.secondary" variant="h6" fontWeight={700}>
-                    Nu ai favorite încă.
-                </Typography>
-                <Typography color="text.secondary" variant="body2" sx={{ mt: 0.5 }}>
-                    Adaugă anunțuri la favorite din pagina "Anunțuri".
+            <Box sx={{ textAlign: "center", py: 10 }}>
+                <Typography
+                    sx={{
+                        color: "#5C7A77",
+                        fontSize: "18px",
+                        fontStyle: "italic",
+                    }}
+                >
+                    Lista ta de favorite este goală.
                 </Typography>
             </Box>
         );
     }
 
     return (
-        <Box>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {favoriteApartments.length} {favoriteApartments.length === 1 ? "anunț salvat" : "anunțuri salvate"}
-            </Typography>
-            <Grid container spacing={3}>
-                {favoriteApartments.map((a) => (
-                    <Grid item xs={12} sm={6} md={4} key={a.Id_Apartment}>
-                        <ApartmentCard
-                            apartment={a}
-                            favorites={favoriteIds}
-                            toggleFavorite={onToggleFavorite}
-                            getUserName={getUserName}
-                            getIntervalLabel={getIntervalLabel}
-                            getStatus={getStatus}
-                        />
-                    </Grid>
-                ))}
-            </Grid>
+        <Box
+            sx={{
+                display: "grid",
+                gap: 4,
+                gridTemplateColumns: {
+                    xs: "1fr",
+                    sm: "repeat(2, 1fr)",
+                    md: "repeat(3, 1fr)",
+                },
+            }}
+        >
+            {favoriteApartments.map((apt) => (
+                <ApartmentCard
+                    key={apt.Id_Apartment}
+                    apartment={apt}
+                    favorites={favoriteIds}
+                    toggleFavorite={onToggleFavorite}
+                    getUserName={(id: number) =>
+                        users.find((u) => u.Id_User === id)?.Name || "User"
+                    }
+                    getStatus={(a: any) =>
+                        a.Id_Renter ? "Ocupat" : "Disponibil"
+                    }
+                    getIntervalLabel={(interval: string) => {
+                        if (interval === "hour") return "oră";
+                        if (interval === "day") return "zi";
+                        if (interval === "month") return "lună";
+                        return interval;
+                    }}
+                />
+            ))}
         </Box>
     );
 }

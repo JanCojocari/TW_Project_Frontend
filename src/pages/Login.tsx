@@ -1,20 +1,20 @@
-import {Box} from "@mui/material";
+import { Box } from "@mui/material";
 import LoginForm from "../components/LoginForm.tsx";
 
 const Login = () => {
     return (
         <Box
             sx={{
-                pt:5,
+                pt: 5,
                 minHeight: "100vh",
-                background: "linear-gradient(135deg, #2563eb, #4f46e5, #7c3aed)",
-                display:"flex",
+                background: "#071A1D",
+                display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
             }}
         >
-            <LoginForm/> 
+            <LoginForm />
         </Box>
     );
 };

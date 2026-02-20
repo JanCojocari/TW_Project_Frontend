@@ -70,7 +70,6 @@ const ImageCarousel = ({ images, altBase, statusChip }: CarouselProps) => {
     );
 
     return (
-        // Același Paper ca în originalul tău — fără minHeight forțat
         <Paper
             sx={{
                 borderRadius: 4,
@@ -154,11 +153,11 @@ const ImageCarousel = ({ images, altBase, statusChip }: CarouselProps) => {
                     "&:hover": {
                         background: "white",
                         transform: "translateY(-50%) scale(1.08)",
-                        boxShadow: "0 4px 16px rgba(37,99,235,0.28)",
+                        boxShadow: "0 4px 16px rgba(0, 224, 198, 0.28)",
                     },
                 }}
             >
-                <ChevronLeftIcon sx={{ color: "#2563eb", fontSize: 24 }} />
+                <ChevronLeftIcon sx={{ color: "#00E0C6", fontSize: 24 }} />
             </IconButton>
 
             {/* Next */}
@@ -180,11 +179,11 @@ const ImageCarousel = ({ images, altBase, statusChip }: CarouselProps) => {
                     "&:hover": {
                         background: "white",
                         transform: "translateY(-50%) scale(1.08)",
-                        boxShadow: "0 4px 16px rgba(37,99,235,0.28)",
+                        boxShadow: "0 4px 16px rgba(0, 224, 198, 0.28)",
                     },
                 }}
             >
-                <ChevronRightIcon sx={{ color: "#2563eb", fontSize: 24 }} />
+                <ChevronRightIcon sx={{ color: "#00E0C6", fontSize: 24 }} />
             </IconButton>
 
             {/* Thumbnail strip + dots — suprapuse la baza imaginii */}
@@ -300,9 +299,12 @@ const ApartmentDetail = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    background: "#071A1D",
                 }}
             >
-                <Typography variant="h5">Apartamentul nu a fost găsit</Typography>
+                <Typography variant="h5" sx={{ color: "#E6F7F5" }}>
+                    Apartamentul nu a fost găsit
+                </Typography>
             </Box>
         );
     }
@@ -328,9 +330,9 @@ const ApartmentDetail = () => {
             label={isAvailable ? "Disponibil" : "Ocupat"}
             sx={{
                 background: isAvailable
-                    ? "linear-gradient(135deg, #10b981, #059669)"
-                    : "linear-gradient(135deg, #ef4444, #dc2626)",
-                color: "white",
+                    ? "linear-gradient(135deg, #00E0C6, #00BFA6)"
+                    : "linear-gradient(135deg, #FF4D6D, #FF3B4A)",
+                color: isAvailable ? "#071A1D" : "white",
                 fontWeight: 700,
                 fontSize: "14px",
                 px: 2,
@@ -343,7 +345,7 @@ const ApartmentDetail = () => {
         <Box
             sx={{
                 minHeight: "100vh",
-                background: "linear-gradient(135deg, #f8f9fa 0%, #f0f4ff 100%)",
+                background: "#071A1D",
                 py: { xs: 3, md: 5 },
                 mt: 10,
             }}
@@ -355,10 +357,10 @@ const ApartmentDetail = () => {
                     onClick={() => navigate(-1)}
                     sx={{
                         mb: 3,
-                        color: "#2563eb",
+                        color: "#00E0C6",
                         fontWeight: 600,
                         "&:hover": {
-                            background: "rgba(37, 99, 235, 0.08)",
+                            background: "rgba(0, 224, 198, 0.1)",
                         },
                     }}
                 >
@@ -383,7 +385,7 @@ const ApartmentDetail = () => {
                         gap: 4,
                     }}
                 >
-                    {/* Carousel — stânga, aceeași proporție ca originalul */}
+                    {/* Carousel — stânga */}
                     <Box sx={{ flex: { xs: "1", md: "1 1 58%" } }}>
                         <ImageCarousel
                             images={images}
@@ -394,7 +396,15 @@ const ApartmentDetail = () => {
 
                     {/* Detalii — dreapta */}
                     <Box sx={{ flex: { xs: "1", md: "1 1 42%" } }}>
-                        <Paper sx={{ p: 4, borderRadius: 4, height: "100%" }}>
+                        <Paper
+                            sx={{
+                                p: 4,
+                                borderRadius: 4,
+                                height: "100%",
+                                background: "#0F2F34",
+                                border: "1px solid #12383D",
+                            }}
+                        >
                             {/* Adresă */}
                             <Box
                                 sx={{
@@ -407,31 +417,35 @@ const ApartmentDetail = () => {
                                 <Box
                                     sx={{
                                         background:
-                                            "linear-gradient(135deg, #2563eb, #4f46e5)",
+                                            "linear-gradient(135deg, #00E0C6, #00BFA6)",
                                         p: 1.5,
                                         borderRadius: 2,
                                         display: "flex",
                                     }}
                                 >
                                     <LocationOnIcon
-                                        sx={{ color: "white", fontSize: 28 }}
+                                        sx={{ color: "#071A1D", fontSize: 28 }}
                                     />
                                 </Box>
                                 <Box>
                                     <Typography
                                         variant="body2"
-                                        color="text.secondary"
+                                        sx={{ color: "#8FB5B1" }}
                                         gutterBottom
                                     >
                                         Adresă
                                     </Typography>
-                                    <Typography variant="h5" fontWeight={700}>
+                                    <Typography
+                                        variant="h5"
+                                        fontWeight={700}
+                                        sx={{ color: "#E6F7F5" }}
+                                    >
                                         {apartment.Address}
                                     </Typography>
                                 </Box>
                             </Box>
 
-                            <Divider sx={{ my: 3 }} />
+                            <Divider sx={{ my: 3, borderColor: "#12383D" }} />
 
                             {/* Preț */}
                             <Box
@@ -445,20 +459,20 @@ const ApartmentDetail = () => {
                                 <Box
                                     sx={{
                                         background:
-                                            "linear-gradient(135deg, #10b981, #059669)",
+                                            "linear-gradient(135deg, #00E0C6, #00BFA6)",
                                         p: 1.5,
                                         borderRadius: 2,
                                         display: "flex",
                                     }}
                                 >
                                     <AttachMoneyIcon
-                                        sx={{ color: "white", fontSize: 28 }}
+                                        sx={{ color: "#071A1D", fontSize: 28 }}
                                     />
                                 </Box>
                                 <Box>
                                     <Typography
                                         variant="body2"
-                                        color="text.secondary"
+                                        sx={{ color: "#8FB5B1" }}
                                         gutterBottom
                                     >
                                         Preț
@@ -466,15 +480,14 @@ const ApartmentDetail = () => {
                                     <Typography
                                         variant="h4"
                                         fontWeight={900}
-                                        color="primary"
+                                        sx={{ color: "#00E0C6" }}
                                     >
                                         {apartment.Cost_per_interval}{" "}
                                         {apartment.Currency}
                                         <Typography
                                             component="span"
                                             variant="body1"
-                                            color="text.secondary"
-                                            sx={{ ml: 1 }}
+                                            sx={{ color: "#8FB5B1", ml: 1 }}
                                         >
                                             /{" "}
                                             {getIntervalLabel(apartment.Interval)}
@@ -483,10 +496,18 @@ const ApartmentDetail = () => {
                                 </Box>
                             </Box>
 
-                            <Divider sx={{ my: 3 }} />
+                            <Divider sx={{ my: 3, borderColor: "#12383D" }} />
 
                             {/* Proprietar */}
-                            <Card variant="outlined" sx={{ mb: 3, borderRadius: 2 }}>
+                            <Card
+                                variant="outlined"
+                                sx={{
+                                    mb: 3,
+                                    borderRadius: 2,
+                                    background: "#0C2529",
+                                    borderColor: "#12383D",
+                                }}
+                            >
                                 <CardContent>
                                     <Box
                                         sx={{
@@ -497,23 +518,38 @@ const ApartmentDetail = () => {
                                         }}
                                     >
                                         <PersonIcon
-                                            sx={{ color: "#2563eb", fontSize: 28 }}
+                                            sx={{ color: "#00E0C6", fontSize: 28 }}
                                         />
-                                        <Typography variant="h6" fontWeight={700}>
+                                        <Typography
+                                            variant="h6"
+                                            fontWeight={700}
+                                            sx={{ color: "#E6F7F5" }}
+                                        >
                                             Proprietar
                                         </Typography>
                                     </Box>
                                     {owner && (
                                         <>
-                                            <Typography variant="body1" gutterBottom>
+                                            <Typography
+                                                variant="body1"
+                                                sx={{ color: "#8FB5B1" }}
+                                                gutterBottom
+                                            >
                                                 <strong>Nume:</strong> {owner.Name}{" "}
                                                 {owner.Surname}
                                             </Typography>
-                                            <Typography variant="body1" gutterBottom>
+                                            <Typography
+                                                variant="body1"
+                                                sx={{ color: "#8FB5B1" }}
+                                                gutterBottom
+                                            >
                                                 <strong>Email:</strong>{" "}
                                                 {owner.Email || "N/A"}
                                             </Typography>
-                                            <Typography variant="body1">
+                                            <Typography
+                                                variant="body1"
+                                                sx={{ color: "#8FB5B1" }}
+                                            >
                                                 <strong>Telefon:</strong> {owner.Phone}
                                             </Typography>
                                         </>
@@ -525,7 +561,12 @@ const ApartmentDetail = () => {
                             {!isAvailable && renter && (
                                 <Card
                                     variant="outlined"
-                                    sx={{ mb: 3, borderRadius: 2 }}
+                                    sx={{
+                                        mb: 3,
+                                        borderRadius: 2,
+                                        background: "#0C2529",
+                                        borderColor: "#12383D",
+                                    }}
                                 >
                                     <CardContent>
                                         <Box
@@ -537,21 +578,39 @@ const ApartmentDetail = () => {
                                             }}
                                         >
                                             <PersonIcon
-                                                sx={{ color: "#ef4444", fontSize: 28 }}
+                                                sx={{
+                                                    color: "#FF4D6D",
+                                                    fontSize: 28,
+                                                }}
                                             />
-                                            <Typography variant="h6" fontWeight={700}>
+                                            <Typography
+                                                variant="h6"
+                                                fontWeight={700}
+                                                sx={{ color: "#E6F7F5" }}
+                                            >
                                                 Chiriaș Curent
                                             </Typography>
                                         </Box>
-                                        <Typography variant="body1" gutterBottom>
+                                        <Typography
+                                            variant="body1"
+                                            sx={{ color: "#8FB5B1" }}
+                                            gutterBottom
+                                        >
                                             <strong>Nume:</strong> {renter.Name}{" "}
                                             {renter.Surname}
                                         </Typography>
-                                        <Typography variant="body1" gutterBottom>
+                                        <Typography
+                                            variant="body1"
+                                            sx={{ color: "#8FB5B1" }}
+                                            gutterBottom
+                                        >
                                             <strong>Email:</strong>{" "}
                                             {renter.Email || "N/A"}
                                         </Typography>
-                                        <Typography variant="body1">
+                                        <Typography
+                                            variant="body1"
+                                            sx={{ color: "#8FB5B1" }}
+                                        >
                                             <strong>Telefon:</strong> {renter.Phone}
                                         </Typography>
                                     </CardContent>
@@ -567,8 +626,9 @@ const ApartmentDetail = () => {
                                 disabled={!isAvailable}
                                 sx={{
                                     background: isAvailable
-                                        ? "linear-gradient(90deg, #2563eb, #4f46e5, #7c3aed)"
-                                        : "#d1d5db",
+                                        ? "linear-gradient(90deg, #00E0C6, #00BFA6)"
+                                        : "rgba(0, 224, 198, 0.3)",
+                                    color: isAvailable ? "#071A1D" : "#8FB5B1",
                                     py: 1.8,
                                     borderRadius: 2,
                                     fontWeight: 700,
@@ -578,7 +638,7 @@ const ApartmentDetail = () => {
                                             ? "translateY(-2px)"
                                             : "none",
                                         boxShadow: isAvailable
-                                            ? "0 12px 24px rgba(37, 99, 235, 0.4)"
+                                            ? "0 12px 24px rgba(0, 224, 198, 0.4)"
                                             : "none",
                                     },
                                 }}
@@ -591,8 +651,8 @@ const ApartmentDetail = () => {
                             {isAvailable && (
                                 <Typography
                                     variant="caption"
-                                    color="text.secondary"
                                     sx={{
+                                        color: "#8FB5B1",
                                         display: "block",
                                         mt: 2,
                                         textAlign: "center",
@@ -606,8 +666,20 @@ const ApartmentDetail = () => {
                 </Box>
 
                 {/* Informații suplimentare */}
-                <Paper sx={{ mt: 4, p: 4, borderRadius: 4 }}>
-                    <Typography variant="h5" fontWeight={700} sx={{ mb: 3 }}>
+                <Paper
+                    sx={{
+                        mt: 4,
+                        p: 4,
+                        borderRadius: 4,
+                        background: "#0F2F34",
+                        border: "1px solid #12383D",
+                    }}
+                >
+                    <Typography
+                        variant="h5"
+                        fontWeight={700}
+                        sx={{ mb: 3, color: "#E6F7F5" }}
+                    >
                         Informații Suplimentare
                     </Typography>
                 </Paper>
