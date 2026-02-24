@@ -255,7 +255,7 @@ const ApartmentDetail = () => {
                                 disabled={!isAvailable}
                                 sx={{ py: 1.8, borderRadius: 2, fontWeight: 700, fontSize: 16 }}
                             >
-                                {isAvailable ? "Închiriază Acum (soon)" : "Indisponibil"}
+                                {isAvailable ? "Închiriază Acum" : "Indisponibil"}
                             </Button>
 
                             {isAvailable && (

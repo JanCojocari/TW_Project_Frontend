@@ -186,10 +186,13 @@ const Header = () => {
                                 <IconButton
                                     onClick={() => {logout()}}
                                     sx={{
-                                        color: "error.main",
-                                        border: "1px solid",
-                                        borderColor: "error.light",
-                                        "&:hover": { background: colors.errorAlpha15 },
+                                        color: "#b23b3b",
+                                        border: "1px solid #b23b3b",
+                                        "&:hover": {
+                                            background: "rgba(192, 57, 43, 0.3)",
+                                            borderColor: "#96281B",
+                                            color: "#96281B",
+                                        },
                                     }}
                                 >
                                     <LogoutIcon fontSize="small" />

@@ -6,9 +6,9 @@ const raw = {
     bgPaper:     '#FFFFFF',
     bgAlternate: '#EAE7E1',
 
-    primaryMain:  '#4C8BF5',
-    primaryLight: '#7BAEF8',
-    primaryDark:  '#2F6FE4',
+    primaryMain:  '#7096BE',
+    primaryLight: '#9DB8D4',
+    primaryDark:  '#4E7AA6',
 
     secondaryMain:  '#FF7A5C',
     secondaryLight: '#FFB38A',
@@ -31,6 +31,18 @@ const raw = {
     textDisabled:  '#9CA3AF',
 
     divider: 'rgba(76, 139, 245, 0.12)',
+
+    footerGradientStart: '#7096BE',
+    footerGradientMid:   '#3A5F82',
+    footerGradientEnd:   '#1A2E42',
+    footerGlow:          'rgba(112, 150, 190, 0.25)',
+    footerText:          'rgba(255, 255, 255, 0.6)',
+    footerTextHover:     '#FFFFFF',
+    footerTextMuted:     'rgba(255, 255, 255, 0.35)',
+    footerBorder:        'rgba(255, 255, 255, 0.1)',
+    footerLogoBg:        'rgba(255, 255, 255, 0.15)',
+    footerLogoBorder:    'rgba(255, 255, 255, 0.2)',
+    footerLinkUnderline: 'rgba(255, 255, 255, 0.4)',
 };
 
 export const rentoraTheme = createTheme({
@@ -82,7 +94,7 @@ export const rentoraTheme = createTheme({
     },
 
     typography: {
-        fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+        fontFamily: '"Nunito", "Segoe UI", system-ui, Arial, sans-serif',
         h1: { fontWeight: 900, fontSize: '3rem',    lineHeight: 1.2 },
         h2: { fontWeight: 900, fontSize: '2.5rem',  lineHeight: 1.2 },
         h3: { fontWeight: 900, fontSize: '2rem',    lineHeight: 1.3 },
@@ -126,11 +138,12 @@ export const rentoraTheme = createTheme({
         MuiAppBar: {
             styleOverrides: {
                 root: {
-                    background:     raw.bgPaper,
-                    borderBottom:   `1px solid ${raw.divider}`,
+                    background:     `linear-gradient(90deg, #D8E2EE 0%, #C3D2E5 40%, #8AA8CC 100%)`,
+                    borderBottom:   `1px solid rgba(138, 168, 204, 0.3)`,
                     backdropFilter: 'blur(12px)',
                     color:          raw.textPrimary,
-                    boxShadow:      `0 1px 12px ${alpha(raw.primaryMain, 0.08)}`,
+                    boxShadow:      `0 2px 16px rgba(138, 168, 204, 0.25)`,
+                    borderRadius:    0,
                 },
             },
         },
@@ -170,9 +183,10 @@ export const rentoraTheme = createTheme({
                     },
                 },
                 text: {
-                    color: raw.primaryMain,
+                    color: "#4A5568",
                     '&:hover': {
-                        background: alpha(raw.primaryMain, 0.06),
+                        color:      "#3A6A9E",  
+                        background: "rgba(112, 150, 190, 0.06)",
                     },
                 },
             },
@@ -360,4 +374,5 @@ export const rentoraTheme = createTheme({
     },
 });
 
+export {raw};
 export default rentoraTheme;
