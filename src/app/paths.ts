@@ -10,4 +10,5 @@
     apartmentDetail: (id: number) => `/apartments/${id}`,
     editProfile: "/dashboard/edit-profile",
     support: "/support",
+    payment: "/payments",
 } as const;
