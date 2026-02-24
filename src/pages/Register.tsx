@@ -11,6 +11,8 @@ import {
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { gradients, colors } from "../theme/gradients.ts";
+
 
 const Register = () => {
     const navigate = useNavigate();
@@ -21,7 +23,7 @@ const Register = () => {
                 pt: 15,
                 pb: 10,
                 minHeight: "100vh",
-                background: "#071A1D",
+                bgcolor: "background.default",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -37,40 +39,41 @@ const Register = () => {
                     right: "-5%",
                     width: "40%",
                     height: "40%",
-                    background: "radial-gradient(circle, rgba(0, 224, 198, 0.05) 0%, transparent 70%)",
+                    background: `radial-gradient(circle, ${colors.primaryAlpha10} 0%, transparent 70%)`,
                     zIndex: 0,
                 }}
             />
 
             <Container maxWidth="sm" sx={{ position: "relative", zIndex: 1 }}>
                 <Paper
-                    elevation={0}
+                    elevation={2}
                     sx={{
                         p: 6,
-                        borderRadius: 8,
-                        background: "#0F2F34",
-                        border: "1px solid #12383D",
-                        boxShadow: "0 40px 100px rgba(0, 0, 0, 0.6)",
+                        borderRadius: 6,
+                        border: `1px solid ${colors.border}`,
                     }}
                 >
                     {/* Logo Rentora */}
                     <Box display="flex" alignItems="center" justifyContent={"center"} gap={1.5} mb={5}>
                         <Box
                             sx={{
-                                background: "rgba(0, 224, 198, 0.1)",
+                                background: gradients.primary,
                                 p: 1.5,
                                 borderRadius: 2.5,
-                                border: "1px solid rgba(0, 224, 198, 0.2)",
+                                boxShadow: `0 4px 14px ${colors.primaryAlpha25}`,
                             }}
                         >
-                            <ApartmentIcon sx={{ color: "#00E0C6", fontSize: 32 }} />
+                            <ApartmentIcon sx={{ color: "#FFFFFF", fontSize: 30 }}
+                            />
                         </Box>
                         <Typography
                             variant="h4"
                             fontWeight={900}
                             sx={{
-                                color: "#E6F7F5",
                                 letterSpacing: "-1px",
+                                background: gradients.textPrimary,
+                                WebkitBackgroundClip: "text",
+                                WebkitTextFillColor: "transparent",
                             }}
                         >
                             Rentora
@@ -83,7 +86,7 @@ const Register = () => {
                         variant="h5"
                         fontWeight={900}
                         mb={5}
-                        sx={{ color: "#E6F7F5", letterSpacing: "-0.5px" }}
+                        sx={{ letterSpacing: "-0.5px" }}
                     >
                         Creează Cont Nou
                     </Typography>
@@ -96,36 +99,12 @@ const Register = () => {
                                 type="text"
                                 fullWidth
                                 required
-                                sx={{
-                                    "& .MuiOutlinedInput-root": {
-                                        color: "#E6F7F5",
-                                        background: "#0C2529",
-                                        borderRadius: 3,
-                                        "& fieldset": { borderColor: "#12383D" },
-                                        "&:hover fieldset": { borderColor: "#00E0C6" },
-                                        "&.Mui-focused fieldset": { borderColor: "#00E0C6" }
-                                    },
-                                    "& .MuiInputLabel-root": { color: "#5C7A77" },
-                                    "& .MuiInputLabel-root.Mui-focused": { color: "#00E0C6" }
-                                }}
                             />
                             <TextField
                                 label="Prenume"
                                 type="text"
                                 fullWidth
                                 required
-                                sx={{
-                                    "& .MuiOutlinedInput-root": {
-                                        color: "#E6F7F5",
-                                        background: "#0C2529",
-                                        borderRadius: 3,
-                                        "& fieldset": { borderColor: "#12383D" },
-                                        "&:hover fieldset": { borderColor: "#00E0C6" },
-                                        "&.Mui-focused fieldset": { borderColor: "#00E0C6" }
-                                    },
-                                    "& .MuiInputLabel-root": { color: "#5C7A77" },
-                                    "& .MuiInputLabel-root.Mui-focused": { color: "#00E0C6" }
-                                }}
                             />
                         </Box>
 
@@ -134,18 +113,6 @@ const Register = () => {
                             type="email"
                             fullWidth
                             required
-                            sx={{
-                                "& .MuiOutlinedInput-root": {
-                                    color: "#E6F7F5",
-                                    background: "#0C2529",
-                                    borderRadius: 3,
-                                    "& fieldset": { borderColor: "#12383D" },
-                                    "&:hover fieldset": { borderColor: "#00E0C6" },
-                                    "&.Mui-focused fieldset": { borderColor: "#00E0C6" }
-                                },
-                                "& .MuiInputLabel-root": { color: "#5C7A77" },
-                                "& .MuiInputLabel-root.Mui-focused": { color: "#00E0C6" }
-                            }}
                         />
 
                         <TextField
@@ -153,18 +120,6 @@ const Register = () => {
                             type="tel"
                             fullWidth
                             required
-                            sx={{
-                                "& .MuiOutlinedInput-root": {
-                                    color: "#E6F7F5",
-                                    background: "#0C2529",
-                                    borderRadius: 3,
-                                    "& fieldset": { borderColor: "#12383D" },
-                                    "&:hover fieldset": { borderColor: "#00E0C6" },
-                                    "&.Mui-focused fieldset": { borderColor: "#00E0C6" }
-                                },
-                                "& .MuiInputLabel-root": { color: "#5C7A77" },
-                                "& .MuiInputLabel-root.Mui-focused": { color: "#00E0C6" }
-                            }}
                         />
 
                         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2.5 }}>
@@ -174,18 +129,6 @@ const Register = () => {
                                 fullWidth
                                 InputLabelProps={{ shrink: true }}
                                 required
-                                sx={{
-                                    "& .MuiOutlinedInput-root": {
-                                        color: "#E6F7F5",
-                                        background: "#0C2529",
-                                        borderRadius: 3,
-                                        "& fieldset": { borderColor: "#12383D" },
-                                        "&:hover fieldset": { borderColor: "#00E0C6" },
-                                        "&.Mui-focused fieldset": { borderColor: "#00E0C6" }
-                                    },
-                                    "& .MuiInputLabel-root": { color: "#5C7A77" },
-                                    "& .MuiInputLabel-root.Mui-focused": { color: "#00E0C6" }
-                                }}
                             />
 
                             <TextField
@@ -194,19 +137,7 @@ const Register = () => {
                                 fullWidth
                                 defaultValue=""
                                 required
-                                sx={{
-                                    "& .MuiOutlinedInput-root": {
-                                        color: "#E6F7F5",
-                                        background: "#0C2529",
-                                        borderRadius: 3,
-                                        "& fieldset": { borderColor: "#12383D" },
-                                        "&:hover fieldset": { borderColor: "#00E0C6" },
-                                        "&.Mui-focused fieldset": { borderColor: "#00E0C6" }
-                                    },
-                                    "& .MuiInputLabel-root": { color: "#5C7A77" },
-                                    "& .MuiInputLabel-root.Mui-focused": { color: "#00E0C6" },
-                                    "& .MuiSelect-icon": { color: "#00E0C6" }
-                                }}
+                                
                             >
                                 <MenuItem value="">Nespecificat</MenuItem>
                                 <MenuItem value="M">Masculin</MenuItem>
@@ -220,18 +151,6 @@ const Register = () => {
                                 type="password"
                                 fullWidth
                                 required
-                                sx={{
-                                    "& .MuiOutlinedInput-root": {
-                                        color: "#E6F7F5",
-                                        background: "#0C2529",
-                                        borderRadius: 3,
-                                        "& fieldset": { borderColor: "#12383D" },
-                                        "&:hover fieldset": { borderColor: "#00E0C6" },
-                                        "&.Mui-focused fieldset": { borderColor: "#00E0C6" }
-                                    },
-                                    "& .MuiInputLabel-root": { color: "#5C7A77" },
-                                    "& .MuiInputLabel-root.Mui-focused": { color: "#00E0C6" }
-                                }}
                             />
 
                             <TextField
@@ -239,18 +158,6 @@ const Register = () => {
                                 type="password"
                                 fullWidth
                                 required
-                                sx={{
-                                    "& .MuiOutlinedInput-root": {
-                                        color: "#E6F7F5",
-                                        background: "#0C2529",
-                                        borderRadius: 3,
-                                        "& fieldset": { borderColor: "#12383D" },
-                                        "&:hover fieldset": { borderColor: "#00E0C6" },
-                                        "&.Mui-focused fieldset": { borderColor: "#00E0C6" }
-                                    },
-                                    "& .MuiInputLabel-root": { color: "#5C7A77" },
-                                    "& .MuiInputLabel-root.Mui-focused": { color: "#00E0C6" }
-                                }}
                             />
                         </Box>
 
@@ -258,23 +165,11 @@ const Register = () => {
                             fullWidth
                             size="large"
                             variant="contained"
-                            sx={{
-                                mt: 3,
-                                py: 2,
-                                borderRadius: 3,
-                                fontWeight: 900,
-                                fontSize: "16px",
-                                textTransform: "none",
-                                background: "linear-gradient(90deg, #00E0C6, #00BFA6)",
-                                color: "#071A1D",
-                                boxShadow: "0 0 20px rgba(0, 224, 198, 0.3)",
-                                transition: "all 0.3s ease",
-                                "&:hover": {
-                                    transform: "translateY(-3px)",
-                                    boxShadow: "0 0 30px rgba(0, 224, 198, 0.5)",
-                                    background: "linear-gradient(90deg, #00FFF0, #00E0C6)",
-                                }
-                            }}
+                            sx={{ mt: 2, 
+                                py: 1.8, 
+                                borderRadius: 3, 
+                                fontSize: "16px" }}
+
                             onClick={() => navigate("/login")}
                         >
                             Creează Contul
@@ -285,17 +180,16 @@ const Register = () => {
                         align="center"
                         mt={5}
                         fontSize={14}
-                        sx={{ color: "#8FB5B1", fontWeight: 500 }}
+                        color="text.secondary"
+
                     >
                         Ai deja un cont activ?{" "}
                         <Link
                             to="/login"
-                            style={{
-                                color: "#00E0C6",
-                                textDecoration: "none",
-                                fontWeight: 800,
-                                marginLeft: "4px"
-                            }}
+                            style={{ color: colors.primary, 
+                                textDecoration: "none", 
+                                fontWeight: 800, 
+                                marginLeft: 4 }}
                         >
                             Autentifică-te
                         </Link>

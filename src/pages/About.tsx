@@ -1,278 +1,118 @@
+import { Box, Container, Typography, Card, CardContent, Button, Paper } from "@mui/material";
 import {
-    Box,
-    Container,
-    Typography,
-    Card,
-    CardContent,
-    Button,
-    Paper,
-} from "@mui/material";
-import {
-    Info as InfoIcon,
-    Visibility as VisibilityIcon,
-    EmojiObjects as EmojiObjectsIcon,
-    Favorite as FavoriteIcon,
-    Speed as SpeedIcon,
-    VerifiedUser as VerifiedUserIcon,
-    Groups as GroupsIcon,
-    TrendingUp as TrendingUpIcon,
-    ArrowForward as ArrowForwardIcon,
-    Apartment as ApartmentIcon,
-    People as PeopleIcon,
-    CheckCircle as CheckCircleIcon,
+    Info as InfoIcon, Visibility as VisibilityIcon,
+    EmojiObjects as EmojiObjectsIcon, Favorite as FavoriteIcon,
+    Speed as SpeedIcon, VerifiedUser as VerifiedUserIcon,
+    Groups as GroupsIcon, TrendingUp as TrendingUpIcon,
+    ArrowForward as ArrowForwardIcon, Apartment as ApartmentIcon,
+    People as PeopleIcon, CheckCircle as CheckCircleIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { paths } from "../app/paths";
+import { gradients, colors } from "../theme/gradients.ts";
 
 const About = () => {
     const navigate = useNavigate();
 
     const missionCards = [
-        {
-            icon: <VisibilityIcon sx={{ fontSize: 40 }} />,
-            title: "Viziunea Noastră",
-            description: "Să devenim cea mai de încredere platformă imobiliară din Moldova, unde fiecare persoană găsește locuința ideală cu ușurință și transparență.",
-        },
-        {
-            icon: <EmojiObjectsIcon sx={{ fontSize: 40 }} />,
-            title: "Inovație Continuă",
-            description: "Utilizăm cele mai moderne tehnologii pentru a oferi o experiență superioară utilizatorilor noștri, simplificând procesul de căutare și închiriere.",
-        },
-        {
-            icon: <FavoriteIcon sx={{ fontSize: 40 }} />,
-            title: "Orientare către Client",
-            description: "Prioritizăm nevoile utilizatorilor noștri, oferind suport dedicat și soluții personalizate pentru fiecare situație.",
-        },
+        { icon: <VisibilityIcon sx={{ fontSize: 40 }} />,    title: "Viziunea Noastră",        description: "Să devenim cea mai de încredere platformă imobiliară din Moldova, unde fiecare persoană găsește locuința ideală cu ușurință și transparență." },
+        { icon: <EmojiObjectsIcon sx={{ fontSize: 40 }} />,  title: "Inovație Continuă",       description: "Utilizăm cele mai moderne tehnologii pentru a oferi o experiență superioară utilizatorilor noștri, simplificând procesul de căutare și închiriere." },
+        { icon: <FavoriteIcon sx={{ fontSize: 40 }} />,      title: "Orientare către Client",  description: "Prioritizăm nevoile utilizatorilor noștri, oferind suport dedicat și soluții personalizate pentru fiecare situație." },
     ];
 
     const values = [
-        {
-            icon: <SpeedIcon sx={{ fontSize: 32 }} />,
-            title: "Rapiditate",
-            description: "Platformă optimizată pentru căutări rapide și eficiente",
-        },
-        {
-            icon: <VerifiedUserIcon sx={{ fontSize: 32 }} />,
-            title: "Transparență",
-            description: "Informații clare și verificate despre fiecare proprietate",
-        },
-        {
-            icon: <GroupsIcon sx={{ fontSize: 32 }} />,
-            title: "Comunitate",
-            description: "Conectăm oameni și construim relații de încredere",
-        },
-        {
-            icon: <TrendingUpIcon sx={{ fontSize: 32 }} />,
-            title: "Creștere",
-            description: "Îmbunătățire continuă și evoluție constantă",
-        },
+        { icon: <SpeedIcon sx={{ fontSize: 32 }} />,         title: "Rapiditate",   description: "Platformă optimizată pentru căutări rapide și eficiente" },
+        { icon: <VerifiedUserIcon sx={{ fontSize: 32 }} />,  title: "Transparență", description: "Informații clare și verificate despre fiecare proprietate" },
+        { icon: <GroupsIcon sx={{ fontSize: 32 }} />,        title: "Comunitate",   description: "Conectăm oameni și construim relații de încredere" },
+        { icon: <TrendingUpIcon sx={{ fontSize: 32 }} />,    title: "Creștere",     description: "Îmbunătățire continuă și evoluție constantă" },
     ];
 
     const stats = [
-        {
-            icon: <ApartmentIcon sx={{ fontSize: 48 }} />,
-            value: "10,000+",
-            label: "Proprietăți active",
-        },
-        {
-            icon: <PeopleIcon sx={{ fontSize: 48 }} />,
-            value: "50,000+",
-            label: "Utilizatori înregistrați",
-        },
-        {
-            icon: <CheckCircleIcon sx={{ fontSize: 48 }} />,
-            value: "8,500+",
-            label: "Contracte încheiate",
-        },
+        { icon: <ApartmentIcon sx={{ fontSize: 48 }} />, value: "10,000+", label: "Proprietăți active" },
+        { icon: <PeopleIcon sx={{ fontSize: 48 }} />,    value: "50,000+", label: "Utilizatori înregistrați" },
+        { icon: <CheckCircleIcon sx={{ fontSize: 48 }} />,value: "8,500+", label: "Contracte încheiate" },
     ];
 
     return (
-        <Box sx={{ pt: 5, minHeight: "100vh", background: "#071A1D" }}>
-            {/* Hero Section */}
+        <Box sx={{ pt: 5, minHeight: "100vh", bgcolor: "background.default" }}>
+
+            {/* ── Hero ───────────────────────────────────────────────────── */}
             <Box
                 sx={{
-                    background: "linear-gradient(135deg, #071A1D 0%, #0C2529 50%, #0F2F34 100%)",
-                    py: { xs: 8, md: 12 },
-                    position: "relative",
-                    overflow: "hidden",
-                    borderBottom: "1px solid #12383D",
-                    "&::before": {
-                        content: '""',
-                        position: "absolute",
-                        top: "-50%",
-                        right: "-10%",
-                        width: "600px",
-                        height: "600px",
-                        background: "rgba(0, 224, 198, 0.08)",
-                        borderRadius: "50%",
-                        filter: "blur(80px)",
-                    },
-                    "&::after": {
-                        content: '""',
-                        position: "absolute",
-                        bottom: "-40%",
-                        left: "-5%",
-                        width: "500px",
-                        height: "500px",
-                        background: "rgba(0, 224, 198, 0.05)",
-                        borderRadius: "50%",
-                        filter: "blur(60px)",
-                    },
+                    background:   gradients.hero,
+                    py:           { xs: 8, md: 12 },
+                    position:     "relative",
+                    overflow:     "hidden",
+                    borderBottom: `1px solid ${colors.border}`,
                 }}
             >
                 <Container maxWidth="lg">
-                    <Box
-                        sx={{
-                            position: "relative",
-                            zIndex: 2,
-                            textAlign: "center",
-                        }}
-                    >
+                    <Box sx={{ position: "relative", zIndex: 2, textAlign: "center" }}>
                         <Box
                             sx={{
-                                display: "inline-flex",
-                                background: "rgba(0, 224, 198, 0.1)",
-                                backdropFilter: "blur(10px)",
-                                p: 2,
+                                display:      "inline-flex",
+                                background:   colors.primaryAlpha10,
+                                p:            2,
                                 borderRadius: "16px",
-                                border: "1.5px solid rgba(0, 224, 198, 0.2)",
-                                mb: 3,
+                                border:       `1.5px solid ${colors.primaryAlpha25}`,
+                                mb:           3,
                             }}
                         >
-                            <InfoIcon sx={{ fontSize: 48, color: "#00E0C6" }} />
+                            <InfoIcon sx={{ fontSize: 48, color: "primary.main" }} />
                         </Box>
 
                         <Typography
                             variant="h2"
-                            sx={{
-                                color: "#E6F7F5",
-                                fontWeight: 900,
-                                fontSize: { xs: "36px", md: "56px" },
-                                mb: 3,
-                                lineHeight: 1.2,
-                                letterSpacing: "-1.5px",
-                            }}
+                            sx={{ fontWeight: 900, fontSize: { xs: "36px", md: "56px" }, mb: 3, lineHeight: 1.2, letterSpacing: "-1.5px" }}
                         >
-                            Despre <Box component="span" sx={{ color: "#00E0C6" }}>Rentora</Box>
+                            Despre{" "}
+                            <Box component="span" sx={{ background: gradients.textPrimary, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                                Rentora
+                            </Box>
                         </Typography>
 
-                        <Typography
-                            variant="h5"
-                            sx={{
-                                color: "#8FB5B1",
-                                mb: 2,
-                                fontSize: { xs: "18px", md: "24px" },
-                                fontWeight: 400,
-                                lineHeight: 1.6,
-                                maxWidth: "800px",
-                                mx: "auto",
-                            }}
-                        >
+                        <Typography variant="h5" color="text.secondary" sx={{ mb: 2, fontWeight: 400, lineHeight: 1.6, maxWidth: "800px", mx: "auto" }}>
                             Platforma ta de încredere pentru găsirea locuinței perfecte în Moldova
                         </Typography>
-
-                        <Typography
-                            variant="body1"
-                            sx={{
-                                color: "#8FB5B1",
-                                fontSize: { xs: "16px", md: "18px" },
-                                fontWeight: 300,
-                                lineHeight: 1.8,
-                                maxWidth: "700px",
-                                mx: "auto",
-                            }}
-                        >
-                            Rentora conectează proprietari cu chiriași, oferind o experiență modernă,
-                            sigură și eficientă în căutarea și gestionarea proprietăților imobiliare.
+                        <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 300, lineHeight: 1.8, maxWidth: "700px", mx: "auto" }}>
+                            Rentora conectează proprietari cu chiriași, oferind o experiență modernă, sigură și eficientă în căutarea și gestionarea proprietăților imobiliare.
                         </Typography>
                     </Box>
                 </Container>
             </Box>
 
-            {/* Mission Section */}
-            <Box sx={{ py: { xs: 6, md: 10 }, background: "#0C2529", borderBottom: "1px solid #12383D" }}>
+            {/* ── Mission ──────────────────────────────────────────────── */}
+            <Box sx={{ py: { xs: 6, md: 10 }, bgcolor: "background.paper", borderBottom: `1px solid ${colors.border}` }}>
                 <Container maxWidth="lg">
-                    <Typography
-                        variant="h3"
-                        sx={{
-                            textAlign: "center",
-                            mb: 2,
-                            fontWeight: 900,
-                            color: "#E6F7F5",
-                            letterSpacing: "-1px",
-                        }}
-                    >
-                        Misiunea <Box component="span" sx={{ color: "#00E0C6" }}>Noastră</Box>
+                    <Typography variant="h3" sx={{ textAlign: "center", mb: 2, fontWeight: 900, letterSpacing: "-1px" }}>
+                        Misiunea{" "}
+                        <Box component="span" sx={{ background: gradients.textPrimary, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                            Noastră
+                        </Box>
                     </Typography>
-                    <Typography
-                        variant="h6"
-                        sx={{
-                            textAlign: "center",
-                            color: "#8FB5B1",
-                            mb: 6,
-                            fontWeight: 400,
-                            maxWidth: "700px",
-                            mx: "auto",
-                        }}
-                    >
+                    <Typography variant="h6" color="text.secondary" sx={{ textAlign: "center", mb: 6, fontWeight: 400, maxWidth: "700px", mx: "auto" }}>
                         Ne dedicăm să transformăm experiența de căutare a locuințelor în Moldova
                     </Typography>
 
-                    <Box
-                        sx={{
-                            display: "grid",
-                            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" },
-                            gap: 3,
-                        }}
-                    >
-                        {missionCards.map((card, index) => (
-                            <Card
-                                key={index}
-                                sx={{
-                                    background: "#0F2F34",
-                                    border: "1px solid #12383D",
-                                    borderRadius: 4,
-                                    height: "100%",
-                                    transition: "all 0.3s ease",
-                                    "&:hover": {
-                                        transform: "translateY(-8px)",
-                                        boxShadow: "0 20px 40px rgba(0, 224, 198, 0.1)",
-                                        borderColor: "#00E0C6",
-                                    },
-                                }}
-                            >
+                    <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" }, gap: 3 }}>
+                        {missionCards.map((card, i) => (
+                            <Card key={i}>
                                 <CardContent sx={{ textAlign: "center", pt: 4, pb: 4 }}>
                                     <Box
                                         sx={{
-                                            background: "linear-gradient(135deg, #00E0C6, #00BFA6)",
+                                            background:   gradients.primary,
                                             borderRadius: "12px",
-                                            p: 2,
-                                            display: "inline-flex",
-                                            mb: 3,
-                                            color: "#071A1D",
+                                            p:            2,
+                                            display:      "inline-flex",
+                                            mb:           3,
+                                            color:        "#FFFFFF",
+                                            boxShadow:    `0 6px 20px ${colors.primaryAlpha25}`,
                                         }}
                                     >
                                         {card.icon}
                                     </Box>
-                                    <Typography
-                                        variant="h6"
-                                        sx={{
-                                            fontWeight: 700,
-                                            mb: 2,
-                                            color: "#E6F7F5",
-                                        }}
-                                    >
-                                        {card.title}
-                                    </Typography>
-                                    <Typography
-                                        variant="body2"
-                                        sx={{
-                                            color: "#8FB5B1",
-                                            lineHeight: 1.7,
-                                        }}
-                                    >
-                                        {card.description}
-                                    </Typography>
+                                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>{card.title}</Typography>
+                                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>{card.description}</Typography>
                                 </CardContent>
                             </Card>
                         ))}
@@ -280,112 +120,56 @@ const About = () => {
                 </Container>
             </Box>
 
-            {/* Values Section */}
-            <Box sx={{ py: { xs: 6, md: 10 }, background: "#071A1D", borderBottom: "1px solid #12383D" }}>
+            {/* ── Values ───────────────────────────────────────────────── */}
+            <Box sx={{ py: { xs: 6, md: 10 }, bgcolor: "background.default", borderBottom: `1px solid ${colors.border}` }}>
                 <Container maxWidth="lg">
-                    <Box
-                        sx={{
-                            display: "grid",
-                            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-                            gap: 6,
-                            alignItems: "center",
-                        }}
-                    >
-                        {/* Left Side - Text Content */}
+                    <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 6, alignItems: "center" }}>
                         <Box>
-                            <Typography
-                                variant="h3"
-                                sx={{
-                                    mb: 3,
-                                    fontWeight: 900,
-                                    color: "#E6F7F5",
-                                    letterSpacing: "-1px",
-                                }}
-                            >
-                                Valorile <Box component="span" sx={{ color: "#00E0C6" }}>Noastre</Box>
+                            <Typography variant="h3" sx={{ mb: 3, fontWeight: 900, letterSpacing: "-1px" }}>
+                                Valorile{" "}
+                                <Box component="span" sx={{ background: gradients.textPrimary, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                                    Noastre
+                                </Box>
                             </Typography>
-                            <Typography
-                                variant="body1"
-                                sx={{
-                                    color: "#8FB5B1",
-                                    lineHeight: 1.8,
-                                    fontSize: "17px",
-                                    mb: 3,
-                                }}
-                            >
-                                La Rentora, credem în puterea transparenței și a inovației. Ne ghidăm după
-                                principii solide care ne permit să oferim cea mai bună experiență utilizatorilor noștri.
+                            <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.8, fontSize: "17px", mb: 3 }}>
+                                La Rentora, credem în puterea transparenței și a inovației. Ne ghidăm după principii solide care ne permit să oferim cea mai bună experiență utilizatorilor noștri.
                             </Typography>
-                            <Typography
-                                variant="body1"
-                                sx={{
-                                    color: "#8FB5B1",
-                                    lineHeight: 1.8,
-                                    fontSize: "17px",
-                                }}
-                            >
-                                Fiecare decizie pe care o luăm este orientată către construirea unei platforme
-                                de care comunitatea să fie mândră și pe care să se poată baza.
+                            <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.8, fontSize: "17px" }}>
+                                Fiecare decizie pe care o luăm este orientată către construirea unei platforme de care comunitatea să fie mândră.
                             </Typography>
                         </Box>
 
-                        {/* Right Side - Values Grid */}
-                        <Box
-                            sx={{
-                                display: "grid",
-                                gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-                                gap: 3,
-                            }}
-                        >
-                            {values.map((value, index) => (
+                        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 3 }}>
+                            {values.map((value, i) => (
                                 <Box
-                                    key={index}
+                                    key={i}
                                     sx={{
-                                        background: "rgba(0, 224, 198, 0.03)",
-                                        border: "1px solid #12383D",
+                                        background:  colors.primaryAlpha06,
+                                        border:      `1px solid ${colors.border}`,
                                         borderRadius: 4,
-                                        p: 3,
-                                        transition: "all 0.3s ease",
+                                        p:           3,
+                                        transition:  "all 0.3s ease",
                                         "&:hover": {
-                                            transform: "translateY(-4px)",
-                                            boxShadow: "0 12px 24px rgba(0, 224, 198, 0.08)",
-                                            borderColor: "#00E0C6",
+                                            transform:   "translateY(-4px)",
+                                            boxShadow:   `0 12px 24px ${colors.primaryAlpha15}`,
+                                            borderColor: "primary.main",
                                         },
                                     }}
                                 >
                                     <Box
                                         sx={{
-                                            background: "linear-gradient(135deg, #00E0C6, #00BFA6)",
+                                            background:   gradients.primary,
                                             borderRadius: "10px",
-                                            p: 1.5,
-                                            display: "inline-flex",
-                                            mb: 2,
-                                            color: "#071A1D",
+                                            p:            1.5,
+                                            display:      "inline-flex",
+                                            mb:           2,
+                                            color:        "#FFFFFF",
                                         }}
                                     >
                                         {value.icon}
                                     </Box>
-                                    <Typography
-                                        variant="h6"
-                                        sx={{
-                                            fontWeight: 700,
-                                            mb: 1,
-                                            color: "#E6F7F5",
-                                            fontSize: "18px",
-                                        }}
-                                    >
-                                        {value.title}
-                                    </Typography>
-                                    <Typography
-                                        variant="body2"
-                                        sx={{
-                                            color: "#8FB5B1",
-                                            lineHeight: 1.6,
-                                            fontSize: "14px",
-                                        }}
-                                    >
-                                        {value.description}
-                                    </Typography>
+                                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, fontSize: "18px" }}>{value.title}</Typography>
+                                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>{value.description}</Typography>
                                 </Box>
                             ))}
                         </Box>
@@ -393,90 +177,36 @@ const About = () => {
                 </Container>
             </Box>
 
-            {/* Statistics Section */}
-            <Box sx={{ py: { xs: 6, md: 10 }, background: "#0C2529", borderBottom: "1px solid #12383D" }}>
+            {/* ── Stats ────────────────────────────────────────────────── */}
+            <Box sx={{ py: { xs: 6, md: 10 }, bgcolor: "background.paper", borderBottom: `1px solid ${colors.border}` }}>
                 <Container maxWidth="lg">
-                    <Typography
-                        variant="h3"
-                        sx={{
-                            textAlign: "center",
-                            mb: 2,
-                            fontWeight: 900,
-                            color: "#E6F7F5",
-                            letterSpacing: "-1px",
-                        }}
-                    >
-                        Rentora în <Box component="span" sx={{ color: "#00E0C6" }}>Cifre</Box>
+                    <Typography variant="h3" sx={{ textAlign: "center", mb: 2, fontWeight: 900, letterSpacing: "-1px" }}>
+                        Rentora în{" "}
+                        <Box component="span" sx={{ background: gradients.textPrimary, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                            Cifre
+                        </Box>
                     </Typography>
-                    <Typography
-                        variant="h6"
-                        sx={{
-                            textAlign: "center",
-                            color: "#8FB5B1",
-                            mb: 6,
-                            fontWeight: 400,
-                            maxWidth: "700px",
-                            mx: "auto",
-                        }}
-                    >
+                    <Typography variant="h6" color="text.secondary" sx={{ textAlign: "center", mb: 6, fontWeight: 400, maxWidth: "700px", mx: "auto" }}>
                         Succesul nostru se reflectă în încrederea pe care utilizatorii o acordă platformei
                     </Typography>
 
-                    <Box
-                        sx={{
-                            display: "grid",
-                            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" },
-                            gap: 4,
-                        }}
-                    >
-                        {stats.map((stat, index) => (
+                    <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" }, gap: 4 }}>
+                        {stats.map((stat, i) => (
                             <Paper
-                                key={index}
-                                elevation={0}
-                                sx={{
-                                    background: "#0F2F34",
-                                    border: "1px solid #12383D",
-                                    borderRadius: 4,
-                                    p: 4,
-                                    textAlign: "center",
-                                    transition: "all 0.3s ease",
-                                    "&:hover": {
-                                        transform: "translateY(-8px)",
-                                        borderColor: "#00E0C6",
-                                        boxShadow: "0 20px 40px rgba(0, 224, 198, 0.1)",
-                                    },
-                                }}
+                                key={i}
+                                elevation={1}
+                                sx={{ p: 4, textAlign: "center", border: `1px solid ${colors.border}`, borderRadius: 4 }}
                             >
-                                <Box
-                                    sx={{
-                                        display: "inline-flex",
-                                        background: "linear-gradient(135deg, #00E0C6, #00BFA6)",
-                                        borderRadius: "16px",
-                                        p: 2,
-                                        mb: 3,
-                                        color: "#071A1D",
-                                    }}
-                                >
+                                <Box sx={{ display: "inline-flex", background: gradients.primary, borderRadius: "16px", p: 2, mb: 3, color: "#FFFFFF", boxShadow: `0 6px 20px ${colors.primaryAlpha25}` }}>
                                     {stat.icon}
                                 </Box>
                                 <Typography
                                     variant="h3"
-                                    sx={{
-                                        fontWeight: 900,
-                                        mb: 1,
-                                        color: "#00E0C6",
-                                    }}
+                                    sx={{ fontWeight: 900, mb: 1, background: gradients.textPrimary, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
                                 >
                                     {stat.value}
                                 </Typography>
-                                <Typography
-                                    variant="body1"
-                                    sx={{
-                                        color: "#8FB5B1",
-                                        fontWeight: 500,
-                                        fontSize: "16px",
-                                    }}
-                                >
+                                <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
                                     {stat.label}
                                 </Typography>
                             </Paper>
@@ -485,112 +215,24 @@ const About = () => {
                 </Container>
             </Box>
 
-            {/* CTA Section */}
-            <Box
-                sx={{
-                    py: { xs: 6, md: 10 },
-                    background: "linear-gradient(135deg, #071A1D 0%, #0C2529 50%, #0F2F34 100%)",
-                    position: "relative",
-                    overflow: "hidden",
-                    borderTop: "1px solid #12383D",
-                    "&::before": {
-                        content: '""',
-                        position: "absolute",
-                        top: "-30%",
-                        right: "-10%",
-                        width: "500px",
-                        height: "500px",
-                        background: "rgba(0, 224, 198, 0.08)",
-                        borderRadius: "50%",
-                        filter: "blur(80px)",
-                    },
-                }}
-            >
+            {/* ── CTA ──────────────────────────────────────────────────── */}
+            <Box sx={{ py: { xs: 6, md: 10 }, background: gradients.cta, position: "relative", overflow: "hidden", borderTop: `1px solid ${colors.border}` }}>
                 <Container maxWidth="lg">
-                    <Box
-                        sx={{
-                            textAlign: "center",
-                            position: "relative",
-                            zIndex: 2,
-                        }}
-                    >
-                        <Typography
-                            variant="h3"
-                            sx={{
-                                color: "#E6F7F5",
-                                fontWeight: 900,
-                                mb: 3,
-                                fontSize: { xs: "28px", md: "44px" },
-                                letterSpacing: "-1.5px",
-                            }}
-                        >
-                            Alătură-te Comunității <Box component="span" sx={{ color: "#00E0C6" }}>Rentora</Box>
+                    <Box sx={{ textAlign: "center", position: "relative", zIndex: 2 }}>
+                        <Typography variant="h3" sx={{ fontWeight: 900, mb: 3, fontSize: { xs: "28px", md: "44px" }, letterSpacing: "-1.5px" }}>
+                            Alătură-te Comunității{" "}
+                            <Box component="span" sx={{ background: gradients.textPrimary, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                                Rentora
+                            </Box>
                         </Typography>
-                        <Typography
-                            variant="h6"
-                            sx={{
-                                color: "#8FB5B1",
-                                mb: 4,
-                                fontWeight: 300,
-                                maxWidth: "700px",
-                                mx: "auto",
-                            }}
-                        >
+                        <Typography variant="h6" color="text.secondary" sx={{ mb: 4, fontWeight: 300, maxWidth: "700px", mx: "auto" }}>
                             Descoperă mii de proprietăți verificate și începe călătoria către locuința ta ideală astăzi
                         </Typography>
-                        <Box
-                            sx={{
-                                display: "flex",
-                                gap: 2,
-                                justifyContent: "center",
-                                flexWrap: "wrap",
-                            }}
-                        >
-                            <Button
-                                size="large"
-                                variant="contained"
-                                endIcon={<ArrowForwardIcon />}
-                                onClick={() => navigate(paths.listings)}
-                                sx={{
-                                    background: "linear-gradient(90deg, #00E0C6, #00BFA6)",
-                                    color: "#071A1D",
-                                    fontWeight: 700,
-                                    fontSize: 16,
-                                    px: 5,
-                                    py: 1.7,
-                                    borderRadius: 2,
-                                    boxShadow: "0 0 20px rgba(0, 224, 198, 0.3)",
-                                    transition: "all 0.3s ease",
-                                    "&:hover": {
-                                        background: "linear-gradient(90deg, #00FFF0, #00E0C6)",
-                                        transform: "translateY(-2px)",
-                                        boxShadow: "0 12px 32px rgba(0, 224, 198, 0.4)",
-                                    },
-                                }}
-                            >
+                        <Box sx={{ display: "flex", gap: 2, justifyContent: "center", flexWrap: "wrap" }}>
+                            <Button size="large" variant="contained" endIcon={<ArrowForwardIcon />} onClick={() => navigate(paths.listings)} sx={{ fontSize: 16, px: 5, py: 1.7, borderRadius: 2.5 }}>
                                 Explorează Anunțuri
                             </Button>
-                            <Button
-                                size="large"
-                                variant="outlined"
-                                onClick={() => navigate(paths.register)}
-                                sx={{
-                                    color: "#00E0C6",
-                                    borderColor: "#00E0C6",
-                                    fontWeight: 600,
-                                    fontSize: 16,
-                                    px: 5,
-                                    py: 1.7,
-                                    borderRadius: 2,
-                                    transition: "all 0.3s ease",
-                                    "&:hover": {
-                                        borderColor: "#00FFF0",
-                                        background: "rgba(0, 224, 198, 0.1)",
-                                        color: "#00FFF0",
-                                        transform: "translateY(-2px)",
-                                    },
-                                }}
-                            >
+                            <Button size="large" variant="outlined" onClick={() => navigate(paths.register)} sx={{ fontSize: 16, px: 5, py: 1.7, borderRadius: 2.5 }}>
                                 Creează Cont
                             </Button>
                         </Box>

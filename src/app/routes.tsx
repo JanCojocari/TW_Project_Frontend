@@ -14,7 +14,6 @@ export const publicRoutes = [
     { path: paths.dashboard, element: <Dashboard />},
     { path: paths.listings, element: <Listings /> },
     { path: paths.general, element: <Listings /> },
-    { path: paths.support, element: <Support /> },
 ];
 
 export const privateRoutes = [
@@ -25,6 +24,7 @@ export const privateRoutes = [
     },
     { path: paths.apartmentDetailRoute, element: <ApartmentDetail /> },
     { path: paths.editProfile, element: <EditProfile /> },
+    { path: paths.support, element: <Support /> },
 
 ];
 
