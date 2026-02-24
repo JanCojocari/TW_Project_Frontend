@@ -14,6 +14,8 @@ import { memo } from "react";
 import type { Apartment } from "../types/apartment.types";
 import { useNavigate } from "react-router-dom";
 import { paths } from "../app/paths.ts";
+import { gradients, colors } from "../theme/gradients.ts";
+
 
 interface Props {
     apartment: Apartment;
@@ -26,40 +28,28 @@ interface Props {
 const ApartmentCard = ({ apartment, favorites, toggleFavorite, getUserName, getStatus }: Props) => {
 
     const navigate = useNavigate();
-
-    const handleViewDetails = () => {
-        navigate(paths.apartmentDetail(apartment.Id_Apartment));
-    };
+    const isFav      = favorites.includes(apartment.Id_Apartment);
+    const isOccupied = apartment.Id_Renter !== null;
 
     return (
         <Card
             sx={{
-                background: "#0F2F34",
                 borderRadius: 4,
                 overflow: "hidden",
-                border: "1px solid #12383D",
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
-                transition: "all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1)",
                 position: "relative",
-                "&:hover": {
-                    transform: "translateY(-12px)",
-                    boxShadow: "0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 224, 198, 0.1)",
-                    borderColor: "#00E0C6",
-                    "& .image-overlay": { opacity: 1 },
-                    "& img": { transform: "scale(1.08)" },
-                },
+                "&:hover": { transform: "translateY(-10px)" },
             }}
         >
             {/* Image Container */}
             <Box
-                sx={{
-                    position: "relative",
-                    height: "260px",
+                sx={{ position: "relative",
+                    height: 240,
                     overflow: "hidden",
-                    background: "#071A1D",
-                }}
+                    bgcolor: "background.default" }}
+
             >
                 <img
                     src={apartment.image_url}
@@ -72,52 +62,33 @@ const ApartmentCard = ({ apartment, favorites, toggleFavorite, getUserName, getS
                     }}
                 />
 
-                {/* Image Overlay */}
-                <Box
-                    className="image-overlay"
-                    sx={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        background: "linear-gradient(to top, rgba(7, 26, 29, 0.8), transparent)",
-                        opacity: 0,
-                        transition: "opacity 0.3s ease",
-                    }}
-                />
-
                 {/* Favorite Button */}
                 <Button
                     onClick={() => toggleFavorite(apartment.Id_Apartment)}
                     sx={{
                         position: "absolute",
-                        top: 16,
-                        right: 16,
-                        background: "rgba(12, 37, 41, 0.8)",
+                        top: 14,
+                        right: 14,
                         minWidth: "auto",
-                        width: 44,
-                        height: 44,
+                        width: 42,
+                        height: 42,
                         borderRadius: "50%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
+                        bgcolor: "background.paper",
+                        color: isFav ? "error.main" : "text.secondary",
+                        border: `1px solid ${colors.border}`,
                         backdropFilter: "blur(8px)",
-                        border: "1px solid #12383D",
-                        color: favorites.includes(apartment.Id_Apartment) ? "#FF4D6D" : "#8FB5B1",
+                        boxShadow: 1,
                         "&:hover": {
-                            background: "#0F2F34",
-                            borderColor: "#00E0C6",
-                            color: "#FF4D6D",
+                            bgcolor: "background.paper",
+                            color: "error.main",
                             transform: "scale(1.1)",
+                            boxShadow: 2,
                         },
                     }}
                 >
-                    {favorites.includes(apartment.Id_Apartment) ? (
-                        <FavoriteIcon sx={{ fontSize: 24 }} />
-                    ) : (
-                        <FavoriteBorderIcon sx={{ fontSize: 24 }} />
-                    )}
+                    
+                {isFav ? <FavoriteIcon sx={{ fontSize: 22 }} /> : <FavoriteBorderIcon sx={{ fontSize: 22 }} />}
+
                 </Button>
 
                 {/* Status Badge */}
@@ -130,19 +101,9 @@ const ApartmentCard = ({ apartment, favorites, toggleFavorite, getUserName, getS
                 >
                     <Chip
                         label={getStatus(apartment)}
-                        sx={{
-                            background:
-                                apartment.Id_Renter !== null
-                                    ? "rgba(255, 77, 109, 0.2)"
-                                    : "rgba(34, 227, 164, 0.2)",
-                            color: apartment.Id_Renter !== null ? "#FF4D6D" : "#22E3A4",
-                            backdropFilter: "blur(8px)",
-                            border: `1px solid ${apartment.Id_Renter !== null ? "rgba(255, 77, 109, 0.3)" : "rgba(34, 227, 164, 0.3)"}`,
-                            fontWeight: 800,
-                            letterSpacing: "0.5px",
-                            fontSize: "11px",
-                            textTransform: "uppercase",
-                        }}
+                        color={isOccupied ? "error" : "success"}
+                        size="small"
+                        sx={{ fontWeight: 800, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.5px", backdropFilter: "blur(8px)" }}
                     />
                 </Box>
             </Box>
@@ -153,21 +114,20 @@ const ApartmentCard = ({ apartment, favorites, toggleFavorite, getUserName, getS
                 <Box sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}>
                     <Box
                         sx={{
-                            background: "rgba(0, 224, 198, 0.1)",
+                            background: colors.primaryAlpha10,
                             p: 1.2,
                             borderRadius: 1.5,
-                            border: "1px solid rgba(0, 224, 198, 0.2)",
+                            border: `1px solid ${colors.primaryAlpha25}`,
                         }}
                     >
-                        <LocationOnIcon sx={{ color: "#00E0C6", fontSize: 20 }} />
+                        <LocationOnIcon sx={{ color: "primary.main", fontSize: 20 }} />
                     </Box>
                     <Typography
-                        sx={{
-                            fontWeight: 700,
-                            color: "#E6F7F5",
-                            fontSize: "15px",
-                            lineHeight: 1.4,
-                        }}
+                        sx={{ fontWeight: 700, 
+                            color: "text.primary", 
+                            fontSize: "15px", 
+                            lineHeight: 1.4 
+                    }}
                     >
                         {apartment.Address}
                     </Typography>
@@ -176,19 +136,15 @@ const ApartmentCard = ({ apartment, favorites, toggleFavorite, getUserName, getS
                 {/* Owner Info */}
                 <Box
                     sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 1.5,
-                        p: 2,
-                        background: "#0C2529",
-                        borderRadius: 2,
-                        border: "1px solid #12383D",
+                        display: "flex", flexDirection: "column", gap: 1.5,
+                        p: 2, bgcolor: "background.default",
+                        borderRadius: 2, border: `1px solid ${colors.border}`,
                     }}
                 >
                     <Box>
                         <Typography
                             sx={{
-                                color: "#5C7A77",
+                                color: "text.disabled",
                                 fontSize: "10px",
                                 textTransform: "uppercase",
                                 fontWeight: 800,
@@ -198,15 +154,15 @@ const ApartmentCard = ({ apartment, favorites, toggleFavorite, getUserName, getS
                         >
                             Proprietar
                         </Typography>
-                        <Typography sx={{ color: "#E6F7F5", fontWeight: 700, fontSize: "14px" }}>
+                        <Typography sx={{ color: "text.primary", fontWeight: 700, fontSize: "14px" }}>
                             {getUserName(apartment.Id_Owner)}
                         </Typography>
                     </Box>
                     {apartment.Id_Renter && (
-                        <Box sx={{ pt: 1, borderTop: "1px solid #12383D" }}>
+                        <Box sx={{ pt: 1, borderTop: `1px solid ${colors.border}` }}>
                             <Typography
                                 sx={{
-                                    color: "#5C7A77",
+                                    color: "#text.disabled",
                                     fontSize: "10px",
                                     textTransform: "uppercase",
                                     fontWeight: 800,
@@ -216,7 +172,7 @@ const ApartmentCard = ({ apartment, favorites, toggleFavorite, getUserName, getS
                             >
                                 Chiriaș
                             </Typography>
-                            <Typography sx={{ color: "#E6F7F5", fontWeight: 700, fontSize: "14px" }}>
+                            <Typography sx={{ color: "text.primary", fontWeight: 700, fontSize: "14px" }}>
                                 {getUserName(apartment.Id_Renter)}
                             </Typography>
                         </Box>
@@ -236,7 +192,7 @@ const ApartmentCard = ({ apartment, favorites, toggleFavorite, getUserName, getS
                     <Box>
                         <Typography
                             sx={{
-                                color: "#5C7A77",
+                                color: "text.disabled",
                                 fontSize: "10px",
                                 textTransform: "uppercase",
                                 fontWeight: 800,
@@ -246,20 +202,20 @@ const ApartmentCard = ({ apartment, favorites, toggleFavorite, getUserName, getS
                             Cost lunar
                         </Typography>
                         <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.5 }}>
-                            <Typography sx={{ color: "#00E0C6", fontWeight: 900, fontSize: "24px" }}>
+                            <Typography sx={{ color: "primary.main", fontWeight: 900, fontSize: "24px" }}>
                                 {apartment.Cost_per_interval}
                             </Typography>
-                            <Typography sx={{ color: "#8FB5B1", fontWeight: 700, fontSize: "14px" }}>
+                            <Typography sx={{ color: "text.secondary", fontWeight: 700, fontSize: "14px" }}>
                                 {apartment.Currency}
                             </Typography>
                         </Box>
                     </Box>
                     <Button
                         variant="contained"
-                        disabled={apartment.Id_Renter !== null}
-                        onClick={handleViewDetails}
+                        disabled={isOccupied}
+                        onClick={() => navigate(paths.apartmentDetail(apartment.Id_Apartment))}
+                        sx={{ px: 3 }}
                         sx={{
-                            background: apartment.Id_Renter !== null ? "rgba(255, 255, 255, 0.05)" : "linear-gradient(90deg, #00E0C6, #00BFA6)",
                             color: apartment.Id_Renter !== null ? "#5C7A77" : "#071A1D",
                             fontWeight: 800,
                             textTransform: "none",
@@ -267,7 +223,6 @@ const ApartmentCard = ({ apartment, favorites, toggleFavorite, getUserName, getS
                             px: 3,
                             boxShadow: apartment.Id_Renter !== null ? "none" : "0 0 12px rgba(0, 224, 198, 0.3)",
                             "&:hover": {
-                                background: "linear-gradient(90deg, #00FFF0, #00E0C6)",
                                 boxShadow: "0 0 20px rgba(0, 224, 198, 0.4)",
                             },
                         }}

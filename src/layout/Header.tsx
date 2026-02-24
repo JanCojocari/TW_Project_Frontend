@@ -22,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { paths } from "../app/paths";
 import { useAuth } from "../auth/AuthContext.tsx";
+import { gradients, colors } from "../theme/gradients.ts";
 
 const Header = () => {
     const navigate = useNavigate();
@@ -45,18 +46,9 @@ const Header = () => {
     };
 
     const drawer = (
-        <Box
-            sx={{
-                width: 250,
-                p: 3,
-                background: "#071A1D",
-                height: "100%",
-                borderLeft: "1px solid #12383D"
-            }}
-        >
+        <Box sx={{ width: 260, p: 3, height: "100%" }}>
             <Box display="flex" justifyContent="flex-end" mb={4}>
-                <IconButton onClick={handleDrawerToggle} sx={{ color: "#00E0C6" }}>
-                    <CloseIcon />
+                <IconButton onClick={handleDrawerToggle} color="primary">                    <CloseIcon />
                 </IconButton>
             </Box>
             <List>
@@ -64,57 +56,25 @@ const Header = () => {
                     item.path &&
                     (
                         <ListItem key={item.path} disablePadding>
-                            <ListItemButton
-                                onClick={() => handleNavigation(item.path)}
-                                sx={{
-                                    borderRadius: 2,
-                                    mb: 1,
-                                    "&:hover": {
-                                        background: "rgba(0, 224, 198, 0.05)",
-                                        "& .MuiListItemText-primary": { color: "#00E0C6" }
-                                    },
-                                }}
-                            >
-                                <ListItemText
+                            <ListItemButton onClick={() => handleNavigation(item.path)} sx={{ mb: 0.5 }}>
+
+                            <ListItemText
                                     primary={item.label}
-                                    primaryTypographyProps={{
-                                        fontWeight: 700,
-                                        color: "#8FB5B1",
-                                        fontSize: "1.1rem",
-                                    }}
-                                />
+                                    primaryTypographyProps={{ 
+                                        fontWeight: 700, 
+                                        color: "text.secondary", 
+                                        fontSize: "1.05rem" }}
+                            />
                             </ListItemButton>
                         </ListItem>
                     ))}
                 {
                     !isAuthenticated &&
                     <Stack spacing={2} sx={{ mt: 4, px: 2 }}>
-                        <Button
-                            fullWidth
-                            variant="outlined"
-                            sx={{
-                                color: "#E6F7F5",
-                                borderColor: "#12383D",
-                                fontWeight: 700,
-                                textTransform: "none",
-                                "&:hover": { borderColor: "#00E0C6", background: "rgba(0, 224, 198, 0.05)" }
-                            }}
-                            onClick={() => handleNavigation(paths.login)}
-                        >
+                        <Button fullWidth variant="outlined" onClick={() => handleNavigation(paths.login)}>
                             Log In
                         </Button>
-                        <Button
-                            fullWidth
-                            variant="contained"
-                            sx={{
-                                background: "linear-gradient(90deg, #00E0C6, #00BFA6)",
-                                color: "#071A1D",
-                                fontWeight: 800,
-                                textTransform: "none",
-                                boxShadow: "0 0 12px rgba(0, 224, 198, 0.35)",
-                            }}
-                            onClick={() => handleNavigation(paths.register)}
-                        >
+                        <Button fullWidth variant="contained" onClick={() => handleNavigation(paths.register)}>
                             Sign Up
                         </Button>
                     </Stack>
@@ -125,16 +85,8 @@ const Header = () => {
 
     return (
         <>
-            <AppBar
-                elevation={0}
-                sx={{
-                    background: "rgba(7, 26, 29, 0.85)",
-                    backdropFilter: "blur(12px)",
-                    borderBottom: "1px solid #12383D",
-                    py: 1,
-                }}
-            >
-                <Container maxWidth="lg">
+            <AppBar elevation={0} sx={{ py: 0.5 }}>
+            <Container maxWidth="lg">
                     <Toolbar disableGutters sx={{ justifyContent: "space-between" }}>
                         {/* Logo */}
                         <Box
@@ -150,24 +102,23 @@ const Header = () => {
                         >
                             <Box
                                 sx={{
-                                    background: "linear-gradient(135deg, #00E0C6, #00BFA6)",
+                                    background: gradients.primary,
                                     p: 1.2,
                                     borderRadius: 2,
                                     display: "flex",
-                                    boxShadow: "0 0 15px rgba(0, 224, 198, 0.3)",
+                                    boxShadow: `0 4px 12px ${colors.primaryAlpha25}`,
                                 }}
                             >
-                                <ApartmentIcon sx={{ color: "#071A1D", fontSize: 28 }} />
+                                <ApartmentIcon sx={{ color: "#FFFFFF", fontSize: 26 }} />
                             </Box>
 
                             <Typography
                                 variant="h5"
                                 fontWeight={900}
                                 sx={{
-                                    color: "#E6F7F5",
-                                    letterSpacing: "-0.5px",
                                     display: { xs: "none", sm: "block" },
-                                    background: "linear-gradient(90deg, #E6F7F5, #00E0C6)",
+                                    letterSpacing: "-0.5px",
+                                    background: gradients.textPrimary,
                                     WebkitBackgroundClip: "text",
                                     WebkitTextFillColor: "transparent",
                                 }}
@@ -187,13 +138,11 @@ const Header = () => {
                                         <Button
                                             key={item.path}
                                             sx={{
-                                                color: location.pathname === item.path ? "#00E0C6" : "#8FB5B1",
+                                                color: location.pathname === item.path ? "primary.main" : "text.secondary",
                                                 fontWeight: 700,
-                                                textTransform: "none",
                                                 fontSize: "15px",
                                                 px: 2,
                                                 py: 1,
-                                                transition: "all 0.2s ease",
                                                 position: "relative",
                                                 "&::after": location.pathname === item.path ? {
                                                     content: '""',
@@ -202,14 +151,10 @@ const Header = () => {
                                                     left: 16,
                                                     right: 16,
                                                     height: "2px",
-                                                    background: "#00E0C6",
-                                                    boxShadow: "0 0 8px #00FFF0",
+                                                    background: gradients.primary,
                                                     borderRadius: 2,
                                                 } : {},
-                                                "&:hover": {
-                                                    color: "#00E0C6",
-                                                    background: "rgba(0, 224, 198, 0.05)",
-                                                },
+                                                "&:hover": { color: "primary.main" },
                                             }}
                                             onClick={() => navigate(item.path)}
                                         >
@@ -218,37 +163,21 @@ const Header = () => {
                                     )
                             )}
 
-                            <Divider orientation="vertical" flexItem sx={{ mx: 2, height: 24, alignSelf: "center", borderColor: "#12383D" }} />
+                            <Divider orientation="vertical" flexItem sx={{ mx: 1, height: 24, alignSelf: "center" }} />
 
                             {!isAuthenticated ? (
-                                <Stack direction="row" spacing={2}>
+                                <Stack direction="row" spacing={1.5}>
                                     <Button
+                                        variant="text"
                                         onClick={() => navigate(paths.login)}
-                                        sx={{
-                                            color: "#E6F7F5",
-                                            fontWeight: 700,
-                                            textTransform: "none",
-                                            "&:hover": { color: "#00E0C6" }
-                                        }}
+                                        sx={{ color: "text.primary", fontWeight: 700 }}
                                     >
                                         Log In
                                     </Button>
                                     <Button
                                         variant="contained"
                                         onClick={() => navigate(paths.register)}
-                                        sx={{
-                                            background: "linear-gradient(90deg, #00E0C6, #00BFA6)",
-                                            color: "#071A1D",
-                                            fontWeight: 800,
-                                            textTransform: "none",
-                                            borderRadius: 2,
-                                            px: 3,
-                                            boxShadow: "0 0 12px rgba(0, 224, 198, 0.35)",
-                                            "&:hover": {
-                                                background: "linear-gradient(90deg, #00FFF0, #00E0C6)",
-                                                boxShadow: "0 0 20px rgba(0, 224, 198, 0.5)",
-                                            },
-                                        }}
+                                        sx={{ px: 3 }}
                                     >
                                         Sign Up
                                     </Button>
@@ -257,9 +186,10 @@ const Header = () => {
                                 <IconButton
                                     onClick={() => {logout()}}
                                     sx={{
-                                        color: "#FF4D6D",
-                                        border: "1px solid rgba(255, 77, 109, 0.2)",
-                                        "&:hover": { background: "rgba(255, 77, 109, 0.1)" }
+                                        color: "error.main",
+                                        border: "1px solid",
+                                        borderColor: "error.light",
+                                        "&:hover": { background: colors.errorAlpha15 },
                                     }}
                                 >
                                     <LogoutIcon fontSize="small" />
@@ -270,7 +200,8 @@ const Header = () => {
                         {/* Mobile Toggle */}
                         <IconButton
                             onClick={handleDrawerToggle}
-                            sx={{ display: { md: "none" }, color: "#00E0C6" }}
+                            color="primary"
+                            sx={{ display: { md: "none" } }}
                         >
                             <MenuIcon />
                         </IconButton>

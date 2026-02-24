@@ -7,7 +7,7 @@ const Login = () => {
             sx={{
                 pt: 5,
                 minHeight: "100vh",
-                background: "#071A1D",
+                bgcolor: "background.default",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",

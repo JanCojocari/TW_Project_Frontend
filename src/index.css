@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 :root {
-    background-color: #071A1D;
-    color: #E6F7F5;
+    background-color: #F8F9FB;
+    color: #1F2937;
 }
 
 body {
-    background-color: #071A1D;
-    color: #E6F7F5;
+    background-color: #F8F9FB;
+    color: #1F2937;
     margin: 0;
 }
 
 ::selection {
-    background: rgba(0, 224, 198, 0.3);
-    color: #00FFF0;
+    background: rgba(76, 139, 245, 0.2);
+    color: #2F6FE4;
 }
