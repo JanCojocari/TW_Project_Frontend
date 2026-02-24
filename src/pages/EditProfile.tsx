@@ -48,7 +48,7 @@ export default function EditProfile() {
         Email:    originalUser?.Email    ?? "",
         Phone:    originalUser?.Phone    ?? "",
         Birthday: originalUser?.Birthday ?? "",
-        Gender:   originalUser?.Gender   ?? null,
+        Gender:   originalUser?.Gender   ?? "",
     };
 
     const [form,             setForm]             = useState<FormFields>(initialForm);
