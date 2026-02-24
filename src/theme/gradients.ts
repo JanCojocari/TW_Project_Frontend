@@ -3,10 +3,11 @@
 
 export const gradients = {
     // Primary — Vacation Blue
-    primary:        'linear-gradient(135deg, #4C8BF5, #2F6FE4)',
-    primaryReverse: 'linear-gradient(135deg, #2F6FE4, #4C8BF5)',
-    primarySubtle:  'linear-gradient(135deg, rgba(76,139,245,0.08), rgba(47,111,228,0.08))',
-    primaryHover:   'linear-gradient(135deg, #2F6FE4, #4C8BF5)',   // used on :hover
+    primary:        'linear-gradient(135deg, #7096BE, #4E7AA6)',
+    primaryReverse: 'linear-gradient(135deg, #4E7AA6, #7096BE)',
+    primaryHover:   'linear-gradient(135deg, #4E7AA6, #7096BE)',
+    textPrimary:    'linear-gradient(90deg, #7096BE, #4E7AA6)',
+    textSunset:     'linear-gradient(90deg, #7096BE, #FF7A5C)',
 
     // Secondary — Warm Sunset Coral
     secondary:        'linear-gradient(135deg, #FF7A5C, #FFB38A)',
@@ -22,10 +23,6 @@ export const gradients = {
     bgLight: 'linear-gradient(135deg, #F8F9FB 0%, #EAE7E1 100%)',
     hero:    'radial-gradient(circle at 70% 30%, rgba(76,139,245,0.07), transparent 55%), linear-gradient(135deg, #F8F9FB 0%, #EAE7E1 100%)',
     cta:     'linear-gradient(135deg, #F8F9FB 0%, #EAE7E1 60%, #F8F9FB 100%)',
-
-    // Text gradients (use with WebkitBackgroundClip: 'text')
-    textPrimary: 'linear-gradient(90deg, #4C8BF5, #2F6FE4)',
-    textSunset:  'linear-gradient(90deg, #4C8BF5, #FF7A5C)',
 };
 
 export const colors = {
