@@ -103,7 +103,15 @@ const ApartmentCard = ({ apartment, favorites, toggleFavorite, getUserName, getS
                         label={getStatus(apartment)}
                         color={isOccupied ? "error" : "success"}
                         size="small"
-                        sx={{ fontWeight: 800, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.5px", backdropFilter: "blur(8px)" }}
+                        sx={{ 
+                            fontWeight: 800, 
+                            fontSize: "11px", 
+                            textTransform: "uppercase", 
+                            letterSpacing: "0.5px", 
+                            backdropFilter: "blur(8px)",
+                            bgcolor: isOccupied ? "#dc2626" : "#16a34a",
+                            color: "white",
+                        }}
                     />
                 </Box>
             </Box>
