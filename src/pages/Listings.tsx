@@ -43,7 +43,7 @@ const Listings = () => {
                 }}
             >
                 {/* Hero Header */}
-                <Box sx={{ mb: 10, textAlign: "center" }}>
+                <Box sx={{ mb: 3, textAlign: "center" }}>
                     <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
                         <Box
                             sx={{
@@ -83,7 +83,7 @@ const Listings = () => {
                 </Box>
 
                 {/* Search */}
-                <Box sx={{ width: "100%", mb: 8 }}>
+                <Box sx={{ width: "100%", mb: 4 }}>
                     <SearchBar onSearch={setSearchQuery} />
                 </Box>
 

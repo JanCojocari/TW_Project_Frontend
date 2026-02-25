@@ -1,6 +1,4 @@
-﻿// src/types/paymentPageConfig.ts
-
-import type { Currency } from "../types/apartment.types";
+﻿import type { Currency } from "./apartment.types";
 
 export type PaymentMethodId = "card" | "paypal" | "bank_transfer";
 
