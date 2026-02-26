@@ -208,9 +208,6 @@ const LocationTab = ({ location }: { location: MapLocation }) => (
 /* ─────────────────────────────────────────────────────────────────────────
    Tab 2 — Facilități
 ───────────────────────────────────────────────────────────────────────── */
-/* ─────────────────────────────────────────────────────────────────────────
-   Tab 2 — Facilități
-───────────────────────────────────────────────────────────────────────── */
 interface FacilityItem { key: keyof Facilities; label: string; icon: React.ReactNode; }
 
 const facilityGroups: { title: string; items: FacilityItem[] }[] = [
