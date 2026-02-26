@@ -273,8 +273,43 @@ const FacilitiesTab = ({ facilities }: { facilities: Facilities }) => (
         gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
         gap: 3,
     }}>
+        {facilityGroups.map((group) => (
+            <Paper key={group.title} variant="outlined"
+                   sx={{ p: 2.5, borderRadius: 3, border: `1px solid ${colors.border}` }}>
+                <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2, color: colors.primaryDark }}>
+                    {group.title}
+                </Typography>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                    {group.items.map((item) => {
+                        const active = facilities[item.key];
+                        return (
+                            <Box key={item.key} sx={{ display: "flex", alignItems: "center", gap: 1.5, opacity: active ? 1 : 0.4 }}>
+                                <Box sx={{
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                    width: 32, height: 32, borderRadius: 2,
+                                    bgcolor: active ? colors.primaryAlpha10 : "rgba(0,0,0,0.04)",
+                                    color: active ? colors.primaryDark : colors.textDisabled,
+                                    "& svg": { fontSize: 18 },
+                                }}>
+                                    {item.icon}
+                                </Box>
+                                <Typography variant="body2" fontWeight={active ? 600 : 400}
+                                            sx={{ color: active ? colors.textPrimary : colors.textDisabled, flex: 1 }}>
+                                    {item.label}
+                                </Typography>
+                                {active
+                                    ? <CheckIcon sx={{ fontSize: 16, color: colors.success }} />
+                                    : <CloseIcon sx={{ fontSize: 16, color: colors.textDisabled }} />
+                                }
+                            </Box>
+                        );
+                    })}
+                </Box>
+            </Paper>
+        ))}
     </Box>
 );
+
 
 /* ─────────────────────────────────────────────────────────────────────────
    Tab 3 — Informații suplimentare
