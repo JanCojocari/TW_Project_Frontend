@@ -73,20 +73,20 @@ export const apartmentAdditionalInfo: Record<number, AdditionalInfo> = {
 export const apartmentReviews: Record<number, Review[]> = {
     1: [
         {
-            Id_Review: 101, Id_Renter: 5, renterName: "Maria Ionescu", renterAvatarUrl: undefined,
+            Id_Review: 101, Id_Renter: 5, renterName: "Cojocari Jan", renterAvatarUrl: undefined,
             ratings: { overall: 9.2, cleanliness: 9.0, location: 9.5, valueForMoney: 8.8, comfort: 9.2, facilities: 9.0, communication: 9.5 },
             comment: "Apartament foarte curat și bine dotat. Proprietarul a fost extrem de receptiv și de ajutor. Locație perfectă, la câțiva pași de centru.",
             ownerResponse: "Mulțumesc frumos! A fost o plăcere să vă avem. Reveniți oricând!",
             createdAt: "2024-11-15", stayDuration: 3,
         },
         {
-            Id_Review: 102, Id_Renter: 7, renterName: "Alexandru Popescu",
+            Id_Review: 102, Id_Renter: 7, renterName: "Corman Gheorghe",
             ratings: { overall: 8.5, cleanliness: 8.0, location: 9.0, valueForMoney: 8.5, comfort: 8.5, facilities: 8.0, communication: 9.0 },
             comment: "Sejur plăcut. Apartamentul e exact cum apare în poze. Self check-in a mers perfect.",
             createdAt: "2024-10-22", stayDuration: 7,
         },
         {
-            Id_Review: 103, Id_Renter: 3, renterName: "Elena Rusu",
+            Id_Review: 103, Id_Renter: 3, renterName: "Istrati Cristian",
             ratings: { overall: 9.8, cleanliness: 10, location: 9.5, valueForMoney: 9.8, comfort: 10, facilities: 9.5, communication: 10 },
             comment: "Cel mai bun apartament în care am stat! Totul era impecabil, de la curățenie la dotări. Recomand cu căldură!",
             createdAt: "2024-09-10", stayDuration: 14,
