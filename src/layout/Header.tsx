@@ -35,6 +35,7 @@ const Header = () => {
     const menuItems = [
         !isAuthenticated ? { label: "Acasă", path: paths.home } : {},
         { label: "Anunțuri", path: paths.listings },
+        isAuthenticated ? { label: "Plasare anunț", path: paths.createListing } : {},
         isAuthenticated ? { label: "Dashboard", path: paths.dashboard } : {},
         !isAuthenticated ? { label: "Despre", path: paths.about } : {},
         { label: "Suport", path: paths.support },
