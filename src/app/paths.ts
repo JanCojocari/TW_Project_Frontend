@@ -11,4 +11,5 @@
     editProfile: "/dashboard/edit-profile",
     support: "/support",
     payment: "/payments",
+    createListing: "/createListing",
 } as const;
