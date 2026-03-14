@@ -6,7 +6,6 @@ import About from "../pages/About";
 import { paths } from "./paths";
 import Listings from "../pages/Listings.tsx";
 import ApartmentDetail from "../pages/ApartmentDetail.tsx";
-import EditProfile from "../pages/EditProfile.tsx";
 import Support from "../pages/Support";
 import PaymentPage from "../pages/Payment";
 import CreateListing from "../pages/CreateListing";
@@ -26,7 +25,6 @@ export const privateRoutes = [
         role: "role",
     },
     { path: paths.apartmentDetailRoute, element: <ApartmentDetail /> },
-    { path: paths.editProfile, element: <EditProfile /> },
     { path: paths.support, element: <Support /> },
     { path: paths.payment, element: <PaymentPage /> },
     { path: paths.createListing, element: <CreateListing /> },
