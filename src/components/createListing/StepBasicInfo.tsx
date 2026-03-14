@@ -32,7 +32,7 @@ const StepBasicInfo = ({ form, errors, set, clearError }: Props) => (
                 </Typography>
                 <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2 }}>
                     <TextField
-                        label="Preț" type="number" sx={{ flex: 2 }}
+                        label="Preț" type="number"sx={{ flex: 2 }}
                         value={form.cost} inputProps={{ min: 0 }}
                         onChange={e => { set("cost", e.target.value); clearError("cost"); }}
                         error={!!errors.cost} helperText={errors.cost}
