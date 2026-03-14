@@ -1,0 +1,9 @@
+/* App.css */
+/* Background-ul aplicației e controlat exclusiv de MuiCssBaseline din theme.ts */
+/* Nu adăuga background hardcodat aici */
+
+#root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}

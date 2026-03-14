@@ -4,13 +4,14 @@ import { ArrowBack as ArrowBackIcon, Home as HomeIcon } from "@mui/icons-materia
 import { gradients, colors } from "../theme/gradients.ts";
 import { paths } from "../app/paths.ts";
 import { useListingForm }  from "../types/UseListingForm.ts"
-import SuccessScreen       from "../components/CreateListing/SuccessScreen.tsx"
-import StepBasicInfo       from "../components/CreateListing/StepBasicInfo.tsx";
-import StepPhotos          from "../components/CreateListing/StepPhotos.tsx";
-import StepLocation        from "../components/CreateListing/StepLocation.tsx";
-import StepFacilities      from "../components/CreateListing/StepFacilities.tsx";
-import StepSpaceInfo       from "../components/CreateListing/StepSpaceInfo.tsx";
-import StepDescription     from "../components/CreateListing/StepDescription.tsx";
+import SuccessScreen       from "../components/createListing/SuccessScreen.tsx"
+import StepBasicInfo       from "../components/createListing/StepBasicInfo.tsx";
+import StepPhotos          from "../components/createListing/StepPhotos.tsx";
+import StepLocation        from "../components/createListing/StepLocation.tsx";
+import StepFacilities      from "../components/createListing/StepFacilities.tsx";
+import StepSpaceInfo       from "../components/createListing/StepSpaceInfo.tsx";
+import StepDescription     from "../components/createListing/StepDescription.tsx";
+
 
 const CreateListing = () => {
     const navigate = useNavigate();
@@ -41,15 +42,33 @@ const CreateListing = () => {
                             <Typography variant="body2" color="text.secondary">Completează detaliile apartamentului tău</Typography>
                         </Box>
                     </Box>
-                    <Box sx={{ mt: 3, p: 2.5, borderRadius: 3, bgcolor: colors.bgPaper, border: `1px solid ${colors.border}` }}>
+
+                    {/* ── Status bar — bgcolor din temă, nu hardcodat ── */}
+                    <Box sx={{
+                        mt: 3, p: 2.5, borderRadius: 3,
+                        bgcolor: "background.paper",
+                        border: `1px solid ${colors.border}`,
+                    }}>
                         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-                            <Typography variant="caption" fontWeight={700} color="text.secondary">Completare formular</Typography>
-                            <Typography variant="caption" fontWeight={800} color="primary.main">{progress}%</Typography>
+                            <Typography variant="caption" fontWeight={700} color="text.secondary">
+                                Completare formular
+                            </Typography>
+                            <Typography variant="caption" fontWeight={800} color="primary.main">
+                                {progress}%
+                            </Typography>
                         </Box>
-                        <LinearProgress variant="determinate" value={progress} sx={{
-                            height: 8, borderRadius: 4, bgcolor: colors.primaryAlpha10,
-                            "& .MuiLinearProgress-bar": { background: gradients.primary, borderRadius: 4 },
-                        }} />
+                        <LinearProgress
+                            variant="determinate"
+                            value={progress}
+                            sx={{
+                                height: 8, borderRadius: 4,
+                                bgcolor: colors.primaryAlpha10,
+                                "& .MuiLinearProgress-bar": {
+                                    background: gradients.primary,
+                                    borderRadius: 4,
+                                },
+                            }}
+                        />
                     </Box>
                 </Box>
 

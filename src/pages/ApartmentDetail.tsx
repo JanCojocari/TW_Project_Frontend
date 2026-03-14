@@ -69,13 +69,31 @@ const ApartmentDetail = () => {
                     </Box>
                 </Box>
 
-                <Paper elevation={1} sx={{ mt: 4, borderRadius: 4, overflow: "hidden", border: `1px solid ${colors.border}` }}>
-                    <Box sx={{ borderBottom: `1px solid ${colors.border}`, background: `linear-gradient(to bottom, ${colors.bgPaper}, ${colors.primaryAlpha06})`, px: { xs: 1, sm: 3 } }}>
-                        <Tabs value={activeTab} onChange={(_, v) => setActiveTab(v)} centered sx={{ "& .MuiTab-root": { minHeight: 60, px: { xs: 2, sm: 3 } } }}>
+                {/* ── Tab bar — bgcolor din temă, nu hardcodat ── */}
+                <Paper elevation={1} sx={{
+                    mt: 4, borderRadius: 4, overflow: "hidden",
+                    border: `1px solid ${colors.border}`,
+                    bgcolor: "background.paper",
+                }}>
+                    <Box sx={{
+                        borderBottom: `1px solid ${colors.border}`,
+                        bgcolor: "background.paper",   // ← în loc de linear-gradient cu bgPaper hardcodat
+                        px: { xs: 1, sm: 3 },
+                    }}>
+                        <Tabs
+                            value={activeTab}
+                            onChange={(_, v) => setActiveTab(v)}
+                            centered
+                            sx={{ "& .MuiTab-root": { minHeight: 60, px: { xs: 2, sm: 3 } } }}
+                        >
                             {tabConfig.map((tab, idx) => (
                                 <Tab key={tab.label} label={
                                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                        <Box sx={{ color: activeTab === idx ? "primary.main" : colors.textSecondary, display: "flex", alignItems: "center", transition: "color 0.2s ease" }}>
+                                        <Box sx={{
+                                            color: activeTab === idx ? "primary.main" : "text.secondary",
+                                            display: "flex", alignItems: "center",
+                                            transition: "color 0.2s ease",
+                                        }}>
                                             {tab.icon}
                                         </Box>
                                         <span>{tab.label}</span>
@@ -84,7 +102,7 @@ const ApartmentDetail = () => {
                             ))}
                         </Tabs>
                     </Box>
-                    <Box sx={{ p: { xs: 2, sm: 4 } }}>
+                    <Box sx={{ p: { xs: 2, sm: 4 }, bgcolor: "background.paper" }}>
                         <TabPanel value={activeTab} index={0}>{location   && <LocationTab location={location} />}</TabPanel>
                         <TabPanel value={activeTab} index={1}>{facilities && <FacilitiesTab facilities={facilities} />}</TabPanel>
                         <TabPanel value={activeTab} index={2}>{addInfo    && <AdditionalInfoTab info={addInfo} />}</TabPanel>
