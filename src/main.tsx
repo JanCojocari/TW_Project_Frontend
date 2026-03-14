@@ -1,17 +1,21 @@
 // main.tsx
-import { StrictMode }              from "react";
-import { createRoot }              from "react-dom/client";
+import { StrictMode }           from "react";
+import { createRoot }           from "react-dom/client";
 import "./index.css";
-import { AuthProvider }            from "./auth/AuthContext.tsx";
-import { AppRouter }               from "./app/router.tsx";
-import { RentoraThemeProvider }    from "./theme/ThemeContext.tsx";
+import "./i18n";                             // inițializare i18next
+import { AuthProvider }         from "./auth/AuthContext.tsx";
+import { AppRouter }            from "./app/router.tsx";
+import { RentoraThemeProvider } from "./theme/ThemeContext.tsx";
+import { LanguageProvider }     from "./context/LanguageContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
         <RentoraThemeProvider>
-            <AuthProvider>
-                <AppRouter />
-            </AuthProvider>
+            <LanguageProvider>
+                <AuthProvider>
+                    <AppRouter />
+                </AuthProvider>
+            </LanguageProvider>
         </RentoraThemeProvider>
     </StrictMode>,
 );

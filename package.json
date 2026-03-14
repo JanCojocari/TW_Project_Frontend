@@ -18,10 +18,12 @@
     "@tailwindcss/vite": "^4.1.18",
     "dayjs": "^1.11.20",
     "html2canvas": "^1.4.1",
+    "i18next": "^25.8.18",
     "jspdf": "^4.2.0",
     "lucide-react": "^0.563.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-i18next": "^16.5.8",
     "react-router-dom": "^7.13.0",
     "tailwindcss": "^4.1.18"
   },
