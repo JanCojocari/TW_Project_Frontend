@@ -23,6 +23,7 @@ import { useState } from "react";
 import { paths } from "../app/paths";
 import { useAuth } from "../auth/AuthContext.tsx";
 import { gradients, colors } from "../theme/gradients.ts";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 const Header = () => {
     const navigate = useNavigate();
@@ -38,6 +39,7 @@ const Header = () => {
         isAuthenticated ? { label: "Plasare anunț", path: paths.createListing } : {},
         isAuthenticated ? { label: "Dashboard", path: paths.dashboard } : {},
         !isAuthenticated ? { label: "Despre", path: paths.about } : {},
+        isAuthenticated ? { label: "Setări", path: paths.settings } : {},
         { label: "Suport", path: paths.support },
     ];
 

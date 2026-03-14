@@ -12,4 +12,5 @@
     support: "/support",
     payment: "/payments",
     createListing: "/createListing",
+    settings: "/settings",
 } as const;

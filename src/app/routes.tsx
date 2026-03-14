@@ -10,6 +10,7 @@ import EditProfile from "../pages/EditProfile.tsx";
 import Support from "../pages/Support";
 import PaymentPage from "../pages/Payment";
 import CreateListing from "../pages/CreateListing";
+import Settings from "../pages/Settings";
 
 // Trebuie de introdus rolul de chirias si de proprietar asa incat path-s sa se afiseze in dependenta de rol
 export const publicRoutes = [
@@ -29,7 +30,7 @@ export const privateRoutes = [
     { path: paths.support, element: <Support /> },
     { path: paths.payment, element: <PaymentPage /> },
     { path: paths.createListing, element: <CreateListing /> },
-
+    { path: paths.settings, element: <Settings /> },
 
 ];
 
