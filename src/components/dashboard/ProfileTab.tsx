@@ -1,12 +1,12 @@
-﻿import { useState } from "react";
+﻿// components/dashboard/ProfileTab.tsx
 import { Box, Button, Paper, Stack, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { colors } from "../../theme/gradients";
+import { paths } from "../../app/paths";
 import type { User } from "../../types/user.types";
-import ChangePasswordDialog from "./ChangePasswordDialog";
 
 interface Props {
     currentUser: User | null;
-    onEditProfile: () => void;
 }
 
 const labelStyle = {
@@ -17,8 +17,8 @@ const labelStyle = {
     letterSpacing: "1px",
 };
 
-export default function ProfileTab({ currentUser, onEditProfile }: Props) {
-    const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+export default function ProfileTab({ currentUser }: Props) {
+    const navigate = useNavigate();
 
     if (!currentUser) return (
         <Typography color="text.disabled" sx={{ textAlign: "center", py: 10 }}>
@@ -31,7 +31,9 @@ export default function ProfileTab({ currentUser, onEditProfile }: Props) {
             <Paper elevation={0} sx={{ p: 4, borderRadius: 3, bgcolor: "background.default", border: `1px solid ${colors.border}` }}>
                 <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems={{ xs: "flex-start", sm: "center" }} gap={3}>
                     <Box>
-                        <Typography variant="h5" fontWeight={900} sx={{ mb: 2 }}>{currentUser.Name} {currentUser.Surname}</Typography>
+                        <Typography variant="h5" fontWeight={900} sx={{ mb: 2 }}>
+                            {currentUser.Name} {currentUser.Surname}
+                        </Typography>
                         <Stack spacing={1}>
                             {[
                                 { label: "Email",   value: currentUser.Email    || "—" },
@@ -46,14 +48,24 @@ export default function ProfileTab({ currentUser, onEditProfile }: Props) {
                             ))}
                         </Stack>
                     </Box>
+
                     <Stack spacing={1.5}>
-                        <Button variant="contained" onClick={onEditProfile} sx={{ whiteSpace: "nowrap" }}>Editează Profil</Button>
-                        <Button variant="outlined"  onClick={() => setChangePasswordOpen(true)}>Schimbă Parola</Button>
+                        <Button
+                            variant="contained"
+                            onClick={() => navigate(paths.settings)}
+                            sx={{ whiteSpace: "nowrap" }}
+                        >
+                            Editează Profil
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            onClick={() => navigate(paths.settings)}
+                        >
+                            Schimbă Parola
+                        </Button>
                     </Stack>
                 </Stack>
             </Paper>
-
-            <ChangePasswordDialog open={changePasswordOpen} onClose={() => setChangePasswordOpen(false)} />
         </Stack>
     );
 }
