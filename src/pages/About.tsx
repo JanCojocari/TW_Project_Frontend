@@ -8,69 +8,76 @@ import {
     People as PeopleIcon, CheckCircle as CheckCircleIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { paths } from "../app/paths";
+import { paths }       from "../app/paths";
 import { gradients, colors } from "../theme/gradients.ts";
+import { useThemeMode } from "../theme/ThemeContext.tsx";
 
 const About = () => {
-    const navigate = useNavigate();
+    const navigate    = useNavigate();
+    const { isDark }  = useThemeMode();
+
+    // Gradiente de fundal adaptate per temă
+    const heroBg = isDark
+        ? "radial-gradient(circle at 70% 30%, rgba(76,139,245,0.07), transparent 55%), linear-gradient(135deg, #0F1724 0%, #172033 100%)"
+        : gradients.hero;
+
+    const ctaBg = isDark
+        ? "linear-gradient(135deg, #0F1724 0%, #1C2A40 60%, #0F1724 100%)"
+        : gradients.cta;
+
+    // Culoare card valori — în dark un alpha mai vizibil
+    const valueBg = isDark
+        ? "rgba(112, 150, 190, 0.08)"
+        : colors.primaryAlpha06;
 
     const missionCards = [
-        { icon: <VisibilityIcon sx={{ fontSize: 40 }} />,    title: "Viziunea Noastră",        description: "Să devenim cea mai de încredere platformă imobiliară din Moldova, unde fiecare persoană găsește locuința ideală cu ușurință și transparență." },
-        { icon: <EmojiObjectsIcon sx={{ fontSize: 40 }} />,  title: "Inovație Continuă",       description: "Utilizăm cele mai moderne tehnologii pentru a oferi o experiență superioară utilizatorilor noștri, simplificând procesul de căutare și închiriere." },
-        { icon: <FavoriteIcon sx={{ fontSize: 40 }} />,      title: "Orientare către Client",  description: "Prioritizăm nevoile utilizatorilor noștri, oferind suport dedicat și soluții personalizate pentru fiecare situație." },
+        { icon: <VisibilityIcon sx={{ fontSize: 40 }} />,   title: "Viziunea Noastră",       description: "Să devenim cea mai de încredere platformă imobiliară din Moldova, unde fiecare persoană găsește locuința ideală cu ușurință și transparență." },
+        { icon: <EmojiObjectsIcon sx={{ fontSize: 40 }} />, title: "Inovație Continuă",      description: "Utilizăm cele mai moderne tehnologii pentru a oferi o experiență superioară utilizatorilor noștri, simplificând procesul de căutare și închiriere." },
+        { icon: <FavoriteIcon sx={{ fontSize: 40 }} />,     title: "Orientare către Client", description: "Prioritizăm nevoile utilizatorilor noștri, oferind suport dedicat și soluții personalizate pentru fiecare situație." },
     ];
 
     const values = [
-        { icon: <SpeedIcon sx={{ fontSize: 32 }} />,         title: "Rapiditate",   description: "Platformă optimizată pentru căutări rapide și eficiente" },
-        { icon: <VerifiedUserIcon sx={{ fontSize: 32 }} />,  title: "Transparență", description: "Informații clare și verificate despre fiecare proprietate" },
-        { icon: <GroupsIcon sx={{ fontSize: 32 }} />,        title: "Comunitate",   description: "Conectăm oameni și construim relații de încredere" },
-        { icon: <TrendingUpIcon sx={{ fontSize: 32 }} />,    title: "Creștere",     description: "Îmbunătățire continuă și evoluție constantă" },
+        { icon: <SpeedIcon sx={{ fontSize: 32 }} />,        title: "Rapiditate",   description: "Platformă optimizată pentru căutări rapide și eficiente" },
+        { icon: <VerifiedUserIcon sx={{ fontSize: 32 }} />, title: "Transparență", description: "Informații clare și verificate despre fiecare proprietate" },
+        { icon: <GroupsIcon sx={{ fontSize: 32 }} />,       title: "Comunitate",   description: "Conectăm oameni și construim relații de încredere" },
+        { icon: <TrendingUpIcon sx={{ fontSize: 32 }} />,   title: "Creștere",     description: "Îmbunătățire continuă și evoluție constantă" },
     ];
 
     const stats = [
-        { icon: <ApartmentIcon sx={{ fontSize: 48 }} />, value: "10,000+", label: "Proprietăți active" },
-        { icon: <PeopleIcon sx={{ fontSize: 48 }} />,    value: "50,000+", label: "Utilizatori înregistrați" },
-        { icon: <CheckCircleIcon sx={{ fontSize: 48 }} />,value: "8,500+", label: "Contracte încheiate" },
+        { icon: <ApartmentIcon sx={{ fontSize: 48 }} />,   value: "10,000+", label: "Proprietăți active" },
+        { icon: <PeopleIcon sx={{ fontSize: 48 }} />,      value: "50,000+", label: "Utilizatori înregistrați" },
+        { icon: <CheckCircleIcon sx={{ fontSize: 48 }} />, value: "8,500+",  label: "Contracte încheiate" },
     ];
 
     return (
         <Box sx={{ pt: 5, minHeight: "100vh", bgcolor: "background.default" }}>
 
-            {/* ── Hero ───────────────────────────────────────────────────── */}
-            <Box
-                sx={{
-                    background:   gradients.hero,
-                    py:           { xs: 8, md: 12 },
-                    position:     "relative",
-                    overflow:     "hidden",
-                    borderBottom: `1px solid ${colors.border}`,
-                }}
-            >
+            {/* ── Hero ── */}
+            <Box sx={{
+                background:   heroBg,
+                py:           { xs: 8, md: 12 },
+                position:     "relative",
+                overflow:     "hidden",
+                borderBottom: `1px solid ${colors.border}`,
+            }}>
                 <Container maxWidth="lg">
                     <Box sx={{ position: "relative", zIndex: 2, textAlign: "center" }}>
-                        <Box
-                            sx={{
-                                display:      "inline-flex",
-                                background:   colors.primaryAlpha10,
-                                p:            2,
-                                borderRadius: "16px",
-                                border:       `1.5px solid ${colors.primaryAlpha25}`,
-                                mb:           3,
-                            }}
-                        >
+                        <Box sx={{
+                            display:      "inline-flex",
+                            bgcolor:      colors.primaryAlpha10,
+                            p:            2,
+                            borderRadius: "16px",
+                            border:       `1.5px solid ${colors.primaryAlpha25}`,
+                            mb:           3,
+                        }}>
                             <InfoIcon sx={{ fontSize: 48, color: "primary.main" }} />
                         </Box>
-
-                        <Typography
-                            variant="h2"
-                            sx={{ fontWeight: 900, fontSize: { xs: "36px", md: "56px" }, mb: 3, lineHeight: 1.2, letterSpacing: "-1.5px" }}
-                        >
+                        <Typography variant="h2" sx={{ fontWeight: 900, fontSize: { xs: "36px", md: "56px" }, mb: 3, lineHeight: 1.2, letterSpacing: "-1.5px" }}>
                             Despre{" "}
                             <Box component="span" sx={{ background: gradients.textPrimary, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                                 Rentora
                             </Box>
                         </Typography>
-
                         <Typography variant="h5" color="text.secondary" sx={{ mb: 2, fontWeight: 400, lineHeight: 1.6, maxWidth: "800px", mx: "auto" }}>
                             Platforma ta de încredere pentru găsirea locuinței perfecte în Moldova
                         </Typography>
@@ -81,7 +88,7 @@ const About = () => {
                 </Container>
             </Box>
 
-            {/* ── Mission ──────────────────────────────────────────────── */}
+            {/* ── Mission ── */}
             <Box sx={{ py: { xs: 6, md: 10 }, bgcolor: "background.paper", borderBottom: `1px solid ${colors.border}` }}>
                 <Container maxWidth="lg">
                     <Typography variant="h3" sx={{ textAlign: "center", mb: 2, fontWeight: 900, letterSpacing: "-1px" }}>
@@ -93,22 +100,11 @@ const About = () => {
                     <Typography variant="h6" color="text.secondary" sx={{ textAlign: "center", mb: 6, fontWeight: 400, maxWidth: "700px", mx: "auto" }}>
                         Ne dedicăm să transformăm experiența de căutare a locuințelor în Moldova
                     </Typography>
-
                     <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" }, gap: 3 }}>
                         {missionCards.map((card, i) => (
                             <Card key={i}>
                                 <CardContent sx={{ textAlign: "center", pt: 4, pb: 4 }}>
-                                    <Box
-                                        sx={{
-                                            background:   gradients.primary,
-                                            borderRadius: "12px",
-                                            p:            2,
-                                            display:      "inline-flex",
-                                            mb:           3,
-                                            color:        "#FFFFFF",
-                                            boxShadow:    `0 6px 20px ${colors.primaryAlpha25}`,
-                                        }}
-                                    >
+                                    <Box sx={{ background: gradients.primary, borderRadius: "12px", p: 2, display: "inline-flex", mb: 3, color: "#FFFFFF", boxShadow: `0 6px 20px ${colors.primaryAlpha25}` }}>
                                         {card.icon}
                                     </Box>
                                     <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>{card.title}</Typography>
@@ -120,7 +116,7 @@ const About = () => {
                 </Container>
             </Box>
 
-            {/* ── Values ───────────────────────────────────────────────── */}
+            {/* ── Values ── */}
             <Box sx={{ py: { xs: 6, md: 10 }, bgcolor: "background.default", borderBottom: `1px solid ${colors.border}` }}>
                 <Container maxWidth="lg">
                     <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 6, alignItems: "center" }}>
@@ -141,31 +137,19 @@ const About = () => {
 
                         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 3 }}>
                             {values.map((value, i) => (
-                                <Box
-                                    key={i}
-                                    sx={{
-                                        background:  colors.primaryAlpha06,
-                                        border:      `1px solid ${colors.border}`,
-                                        borderRadius: 4,
-                                        p:           3,
-                                        transition:  "all 0.3s ease",
-                                        "&:hover": {
-                                            transform:   "translateY(-4px)",
-                                            boxShadow:   `0 12px 24px ${colors.primaryAlpha15}`,
-                                            borderColor: "primary.main",
-                                        },
-                                    }}
-                                >
-                                    <Box
-                                        sx={{
-                                            background:   gradients.primary,
-                                            borderRadius: "10px",
-                                            p:            1.5,
-                                            display:      "inline-flex",
-                                            mb:           2,
-                                            color:        "#FFFFFF",
-                                        }}
-                                    >
+                                <Box key={i} sx={{
+                                    background:   valueBg,          // ← adaptiv per temă
+                                    border:       `1px solid ${colors.border}`,
+                                    borderRadius: 4,
+                                    p:            3,
+                                    transition:   "all 0.3s ease",
+                                    "&:hover": {
+                                        transform:   "translateY(-4px)",
+                                        boxShadow:   `0 12px 24px ${colors.primaryAlpha15}`,
+                                        borderColor: "primary.main",
+                                    },
+                                }}>
+                                    <Box sx={{ background: gradients.primary, borderRadius: "10px", p: 1.5, display: "inline-flex", mb: 2, color: "#FFFFFF" }}>
                                         {value.icon}
                                     </Box>
                                     <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, fontSize: "18px" }}>{value.title}</Typography>
@@ -177,7 +161,7 @@ const About = () => {
                 </Container>
             </Box>
 
-            {/* ── Stats ────────────────────────────────────────────────── */}
+            {/* ── Stats ── */}
             <Box sx={{ py: { xs: 6, md: 10 }, bgcolor: "background.paper", borderBottom: `1px solid ${colors.border}` }}>
                 <Container maxWidth="lg">
                     <Typography variant="h3" sx={{ textAlign: "center", mb: 2, fontWeight: 900, letterSpacing: "-1px" }}>
@@ -189,21 +173,13 @@ const About = () => {
                     <Typography variant="h6" color="text.secondary" sx={{ textAlign: "center", mb: 6, fontWeight: 400, maxWidth: "700px", mx: "auto" }}>
                         Succesul nostru se reflectă în încrederea pe care utilizatorii o acordă platformei
                     </Typography>
-
                     <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" }, gap: 4 }}>
                         {stats.map((stat, i) => (
-                            <Paper
-                                key={i}
-                                elevation={1}
-                                sx={{ p: 4, textAlign: "center", border: `1px solid ${colors.border}`, borderRadius: 4 }}
-                            >
+                            <Paper key={i} elevation={1} sx={{ p: 4, textAlign: "center", border: `1px solid ${colors.border}`, borderRadius: 4, bgcolor: "background.paper" }}>
                                 <Box sx={{ display: "inline-flex", background: gradients.primary, borderRadius: "16px", p: 2, mb: 3, color: "#FFFFFF", boxShadow: `0 6px 20px ${colors.primaryAlpha25}` }}>
                                     {stat.icon}
                                 </Box>
-                                <Typography
-                                    variant="h3"
-                                    sx={{ fontWeight: 900, mb: 1, background: gradients.textPrimary, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
-                                >
+                                <Typography variant="h3" sx={{ fontWeight: 900, mb: 1, background: gradients.textPrimary, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                                     {stat.value}
                                 </Typography>
                                 <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
@@ -215,8 +191,14 @@ const About = () => {
                 </Container>
             </Box>
 
-            {/* ── CTA ──────────────────────────────────────────────────── */}
-            <Box sx={{ py: { xs: 6, md: 10 }, background: gradients.cta, position: "relative", overflow: "hidden", borderTop: `1px solid ${colors.border}` }}>
+            {/* ── CTA ── */}
+            <Box sx={{
+                py:         { xs: 6, md: 10 },
+                background: ctaBg,              // ← adaptiv per temă
+                position:   "relative",
+                overflow:   "hidden",
+                borderTop:  `1px solid ${colors.border}`,
+            }}>
                 <Container maxWidth="lg">
                     <Box sx={{ textAlign: "center", position: "relative", zIndex: 2 }}>
                         <Typography variant="h3" sx={{ fontWeight: 900, mb: 3, fontSize: { xs: "28px", md: "44px" }, letterSpacing: "-1.5px" }}>
