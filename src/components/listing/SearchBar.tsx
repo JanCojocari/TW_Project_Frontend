@@ -1,9 +1,4 @@
-﻿import {
-    Paper,
-    TextField,
-    Button,
-    InputAdornment,
-} from "@mui/material";
+﻿import { Paper, TextField, Button, InputAdornment } from "@mui/material";
 import { Search as SearchIcon } from "@mui/icons-material";
 import { memo, useState, useCallback } from "react";
 import { colors } from "../../theme/gradients.ts";
@@ -23,11 +18,9 @@ const SearchBar = ({ onSearch }: Props) => {
         <Paper
             elevation={1}
             sx={{
-                mx: "auto",
                 width: "100%",
-                maxWidth: "800px",
                 p: 1.5,
-                mb: 8,
+                // mb: 8 eliminat — marginea e gestionată de containerul din Listings.tsx
                 display: "flex",
                 alignItems: "center",
                 gap: 2,
@@ -45,11 +38,7 @@ const SearchBar = ({ onSearch }: Props) => {
                 onChange={(e) => setInputValue(e.target.value)}
                 fullWidth
                 variant="standard"
-                onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                        handleSearch();
-                    }
-                }}
+                onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
                 InputProps={{
                     disableUnderline: true,
                     startAdornment: (
@@ -60,22 +49,13 @@ const SearchBar = ({ onSearch }: Props) => {
                 }}
                 sx={{
                     "& input": {
-                        fontSize: "16px",
-                        fontWeight: 500,
-                        color: "text.primary",
+                        fontSize: "16px", fontWeight: 500, color: "text.primary",
                         "&::placeholder": { color: "text.disabled", opacity: 1 },
                     },
                 }}
             />
-
-            <Button
-                variant="contained"
-                onClick={handleSearch}
-                sx=
-                    {{  px: 4, 
-                        borderRadius: 2.5, 
-                        whiteSpace: "nowrap" }}
-            >
+            <Button variant="contained" onClick={handleSearch}
+                    sx={{ px: 4, borderRadius: 2.5, whiteSpace: "nowrap" }}>
                 Caută
             </Button>
         </Paper>
