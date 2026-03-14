@@ -6,7 +6,7 @@
 } from "@mui/material";
 import { Search as SearchIcon } from "@mui/icons-material";
 import { memo, useState, useCallback } from "react";
-import { colors } from "../theme/gradients.ts";
+import { colors } from "../../theme/gradients.ts";
 
 interface Props {
     onSearch: (value: string) => void;

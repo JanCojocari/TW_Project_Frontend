@@ -3,7 +3,7 @@ import {publicRoutes, privateRoutes, notAuthRoutes} from "./routes";
 import {RequireAuth} from "../auth/RequireAuth";
 import App from "../App.tsx";
 import {OnlyNotAuth} from "../auth/OnlyNotAuth.tsx";
-import ScrollToTop from "../components/ScrollToTop.tsx"
+import ScrollToTop from "../components/general/ScrollToTop.tsx"
 
 export const AppRouter = () => (
     <BrowserRouter>

@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import LoginForm from "../components/LoginForm.tsx";
+import LoginForm from "../components/login/LoginForm.tsx";
 
 const Login = () => {
     return (

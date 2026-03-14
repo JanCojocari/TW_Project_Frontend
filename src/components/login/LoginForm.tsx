@@ -1,10 +1,9 @@
 ﻿import { Box, Button, Container, Paper, TextField, Typography, Tabs, Tab, Stack } from "@mui/material";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../auth/AuthContext.tsx";
+import { useAuth } from "../../auth/AuthContext.tsx";
 import { useState } from "react";
-import { gradients, colors } from "../theme/gradients.ts";
-
+import { gradients, colors } from "../../theme/gradients.ts";
 
 const LoginForm = () => {
     const navigate = useNavigate();

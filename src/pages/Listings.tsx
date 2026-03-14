@@ -4,8 +4,8 @@ import { useCallback, useMemo, useState } from "react";
 import { apartments } from "../mockdata/apartments.ts";
 import type { Apartment } from "../types/apartment.types.ts";
 import { users } from "../mockdata/users.ts";
-import ApartmentCard from "../components/ApartmentCard.tsx";
-import SearchBar from "../components/SearchBar.tsx";
+import ApartmentCard from "../components/listing/ApartmentCard.tsx";
+import SearchBar from "../components/listing/SearchBar.tsx";
 import { gradients, colors } from "../theme/gradients.ts";
 
 const Listings = () => {

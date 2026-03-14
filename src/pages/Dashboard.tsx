@@ -9,7 +9,7 @@ import { gradients, colors } from "../theme/gradients";
 
 import ProfileTab    from "../components/dashboard/ProfileTab";
 import MyListingsTab from "../components/dashboard/MyListingsTab";
-import PaymentsTab   from "../components/dashboard/PaymentsTab";
+import PaymentsTab   from "../components/dashboard/paymentTab/PaymentsTab";
 import FavoritesTab  from "../components/dashboard/FavoritesTab";
 
 type DashboardTab = 0 | 1 | 2 | 3;

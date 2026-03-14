@@ -1,6 +1,6 @@
 ﻿import { Box, Typography } from "@mui/material";
 import { users }        from "../../mockdata/users";
-import ApartmentCard    from "../ApartmentCard";
+import ApartmentCard    from "../listing/ApartmentCard";
 import type { Apartment } from "../../types/apartment.types";
 import type { User }      from "../../types/user.types";
 
