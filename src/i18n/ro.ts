@@ -258,6 +258,34 @@ export default {
         },
     },
 
+    // ── Support ───────────────────────────────────────────────────────────────
+    support: {
+        title:       "Suport &",
+        titleSpan:   "Contact",
+        subtitle:    "Ai întrebări? Suntem aici să te ajutăm!",
+        formTitle:   "Trimite-ne un mesaj",
+        email:       "Email",
+        subject:     "Subiect",
+        message:     "Mesaj",
+        send:        "Trimite Mesaj",
+        successMsg:  "Mesajul tău a fost trimis cu succes! Vom răspunde în cel mai scurt timp posibil.",
+        errorMsg:    "Toate câmpurile sunt obligatorii",
+        faqTitle:    "Întrebări",
+        faqSpan:     "Frecvente",
+        faqSubtitle: "Găsește răspunsuri la cele mai comune întrebări despre Rentora",
+        contact: {
+            email:   { label: "Email",   value: "support@rentora.com",     sub: "Răspundem în maxim 24 ore" },
+            phone:   { label: "Telefon", value: "+373 (60) 123-456",       sub: "Luni - Vineri, 9:00 - 18:00" },
+            address: { label: "Adresă",  value: "Str. Stefan cel Mare 1",  sub: "Chișinău, Moldova MD-2001" },
+        },
+        faqs: [
+            { q: "Cum pot să închiriez un apartament?",  a: "Răsfoiește anunțurile, selectează apartamentul dorit, apasă 'Vezi Detalii' și apoi 'Închiriază Acum'. Vei fi ghidat prin procesul de plată." },
+            { q: "Cum funcționează plata?",              a: "După selectarea apartamentului, vei fi redirecționat către pagina de plată. La final, vei primi automat contractul și nota de plată în format PDF." },
+            { q: "Pot anula o rezervare?",               a: "Da, poți anula o rezervare contactându-ne la support@rentora.com. Politica de anulare depinde de proprietar și de condițiile contractului." },
+            { q: "Cum adaug un apartament la favorite?", a: "Pe pagina de anunțuri, apasă iconița de inimă de pe cardul apartamentului. Apartamentele favorite pot fi vizualizate în Dashboard-ul tău." },
+        ],
+    },
+
     // ── Common ────────────────────────────────────────────────────────────────
     common: {
         loading:   "Se încarcă...",

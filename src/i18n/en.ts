@@ -247,6 +247,33 @@ export default {
         },
     },
 
+    support: {
+        title:       "Support &",
+        titleSpan:   "Contact",
+        subtitle:    "Have questions? We're here to help!",
+        formTitle:   "Send us a message",
+        email:       "Email",
+        subject:     "Subject",
+        message:     "Message",
+        send:        "Send Message",
+        successMsg:  "Your message has been sent successfully! We will reply as soon as possible.",
+        errorMsg:    "All fields are required",
+        faqTitle:    "Frequently Asked",
+        faqSpan:     "Questions",
+        faqSubtitle: "Find answers to the most common questions about Rentora",
+        contact: {
+            email:   { label: "Email",   value: "support@rentora.com",   sub: "We respond within 24 hours" },
+            phone:   { label: "Phone",   value: "+373 (60) 123-456",     sub: "Monday - Friday, 9:00 - 18:00" },
+            address: { label: "Address", value: "Stefan cel Mare St. 1", sub: "Chișinău, Moldova MD-2001" },
+        },
+        faqs: [
+            { q: "How can I rent an apartment?",           a: "Browse the listings, select the desired apartment, click 'View Details' and then 'Rent Now'. You will be guided through the payment process." },
+            { q: "How does payment work?",                 a: "After selecting the apartment, you will be redirected to the payment page. At the end, you will automatically receive the contract and payment receipt in PDF format." },
+            { q: "Can I cancel a reservation?",           a: "Yes, you can cancel a reservation by contacting us at support@rentora.com. The cancellation policy depends on the landlord and the contract conditions." },
+            { q: "How do I add an apartment to favorites?", a: "On the listings page, click the heart icon on the apartment card. Your favorite apartments can be viewed in your Dashboard." },
+        ],
+    },
+
     common: {
         loading:   "Loading...",
         error:     "An error occurred.",
