@@ -21,7 +21,7 @@ export const MOCK_USER: UserSettingsDto = {
     email:          "alex.moraru@email.com",
     phone:          "+373 69 123 456",
     birthday:       "1999-05-14",
-    gender:         "Masculin",
+    gender:         "male",
     accountBalance: 1240.00,
     currency:       "EUR",
     role:           "Renter",

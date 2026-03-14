@@ -32,6 +32,7 @@ const Header = () => {
         isAuthenticated  ? { label: t("nav.createListing"), path: paths.createListing  } : {},
         isAuthenticated  ? { label: t("nav.dashboard"),     path: paths.dashboard      } : {},
         !isAuthenticated ? { label: t("nav.about"),         path: paths.about          } : {},
+        isAuthenticated  ? { label: t("nav.settings"), path: paths.settings } : {},
         {                   label: t("nav.support"),         path: paths.support        },
     ];
 

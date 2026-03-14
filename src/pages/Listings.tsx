@@ -1,17 +1,20 @@
-﻿import { Box, Container, Typography, Button, Badge } from "@mui/material";
+﻿// pages/Listings.tsx
+import { Box, Container, Typography, Button, Badge } from "@mui/material";
 import { Home as HomeIcon, TrendingUp as TrendingUpIcon, FilterList as FilterListIcon } from "@mui/icons-material";
 import { useCallback, useMemo, useState } from "react";
-import { apartments }    from "../mockdata/apartments.ts";
-import type { Apartment } from "../types/apartment.types.ts";
-import { users }         from "../mockdata/users.ts";
-import ApartmentCard     from "../components/listing/ApartmentCard.tsx";
-import SearchBar         from "../components/listing/SearchBar.tsx";
-import FilterDrawer      from "../components/filter/FilterDrawer.tsx";
+import { useTranslation }    from "react-i18next";
+import { apartments }        from "../mockdata/apartments.ts";
+import type { Apartment }    from "../types/apartment.types.ts";
+import { users }             from "../mockdata/users.ts";
+import ApartmentCard         from "../components/listing/ApartmentCard.tsx";
+import SearchBar             from "../components/listing/SearchBar.tsx";
+import FilterDrawer          from "../components/filter/FilterDrawer.tsx";
 import { defaultFilters, type FilterState } from "../types//filterTypes.ts";
 import { gradients, colors } from "../theme/gradients.ts";
 import { getApartmentFacilities, getApartmentReviews, getApartmentLocation } from "../mockdata/Apartmentdetails.ts";
 
 const Listings = () => {
+    const { t } = useTranslation();
     const [searchQuery, setSearchQuery]      = useState("");
     const [favorites, setFavorites]          = useState<number[]>([]);
     const [drawerOpen, setDrawerOpen]        = useState(false);
@@ -21,9 +24,9 @@ const Listings = () => {
     const toggleFavorite = (id: number) =>
         setFavorites((prev) => prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]);
 
-    const getStatus   = (apt: Apartment) => apt.Id_Renter !== null ? "Ocupat" : "Disponibil";
+    const getStatus   = (apt: Apartment) => apt.Id_Renter !== null ? t("listings.occupied") : t("listings.available");
     const usersMap    = useMemo(() => Object.fromEntries(users.map((u) => [u.Id_User, u.Name])), []);
-    const getUserName = useCallback((id: number) => usersMap[id] ?? "Proprietar necunoscut", [usersMap]);
+    const getUserName = useCallback((id: number) => usersMap[id] ?? t("listings.available"), [usersMap, t]);
 
     const activeFilterCount = useMemo(() => {
         const f = appliedFilters;
@@ -96,20 +99,22 @@ const Listings = () => {
                         <Box sx={{ background: colors.primaryAlpha10, p: 1.5, px: 3, borderRadius: "100px", display: "flex", alignItems: "center", gap: 2, border: `1px solid ${colors.primaryAlpha25}`, boxShadow: `0 0 20px ${colors.primaryAlpha10}` }}>
                             <TrendingUpIcon sx={{ color: "primary.main", fontSize: 24 }} />
                             <Typography sx={{ color: "text.primary", fontWeight: 700, fontSize: "14px" }}>
-                                {filteredApartments.length} Proprietăți Active
+                                {filteredApartments.length} {t("listings.active")}
                             </Typography>
                         </Box>
                     </Box>
                     <Typography variant="h2" sx={{ fontWeight: 900, mb: 2, fontSize: { xs: "36px", md: "56px" }, letterSpacing: "-1.5px" }}>
-                        Colecția de{" "}
-                        <Box component="span" sx={{ background: gradients.textPrimary, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Imobiliare</Box>
+                        {t("listings.title")}{" "}
+                        <Box component="span" sx={{ background: gradients.textPrimary, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                            {t("listings.titleSpan")}
+                        </Box>
                     </Typography>
                     <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 400, maxWidth: "600px", mx: "auto" }}>
-                        Descoperă spații care inspiră, atent selecționate pentru standardele tale de viață.
+                        {t("listings.subtitle")}
                     </Typography>
                 </Box>
 
-                {/* Search bar + buton Filtre — aliniate pe același rând */}
+                {/* Search + Filtre */}
                 <Box sx={{ width: "100%", mb: 4, display: "flex", gap: 2, alignItems: "center" }}>
                     <Box sx={{ flex: 1 }}>
                         <SearchBar onSearch={setSearchQuery} />
@@ -121,7 +126,7 @@ const Listings = () => {
                             startIcon={<FilterListIcon />}
                             sx={{ px: 3, borderRadius: 2.5, fontWeight: 700, whiteSpace: "nowrap" }}
                         >
-                            Filtre
+                            {t("listings.filters")}
                         </Button>
                     </Badge>
                 </Box>
@@ -132,12 +137,12 @@ const Listings = () => {
                         <Box sx={{ width: "110px", height: "110px", margin: "0 auto 2.5rem", background: colors.primaryAlpha06, borderRadius: "36px", display: "flex", alignItems: "center", justifyContent: "center", border: `1px solid ${colors.primaryAlpha15}`, color: "primary.main" }}>
                             <HomeIcon sx={{ fontSize: 55 }} />
                         </Box>
-                        <Typography variant="h4" sx={{ mb: 2, fontWeight: 800 }}>Niciun rezultat găsit</Typography>
+                        <Typography variant="h4" sx={{ mb: 2, fontWeight: 800 }}>{t("listings.noResults")}</Typography>
                         <Typography variant="body1" color="text.secondary" sx={{ mb: 5, maxWidth: "400px", mx: "auto" }}>
-                            Nu am găsit nicio proprietate care să corespundă criteriilor tale.
+                            {t("listings.noResultsDesc")}
                         </Typography>
                         <Button variant="contained" onClick={() => { setSearchQuery(""); setAppliedFilters(defaultFilters); setPendingFilters(defaultFilters); }} sx={{ px: 6, py: 1.8, borderRadius: 2.5 }}>
-                            Resetează tot
+                            {t("listings.resetAll")}
                         </Button>
                     </Box>
                 )}
@@ -153,11 +158,12 @@ const Listings = () => {
                     </Box>
                 )}
 
+                {/* Paginare */}
                 {filteredApartments.length > 0 && (
                     <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 12 }}>
-                        <Button variant="outlined" sx={{ px: 3, borderRadius: 1.5 }}>← Anterior</Button>
+                        <Button variant="outlined" sx={{ px: 3, borderRadius: 1.5 }}>{t("listings.prev")}</Button>
                         <Button variant="contained" sx={{ minWidth: "50px", height: "50px", borderRadius: 1.5, fontWeight: 900 }}>1</Button>
-                        <Button variant="outlined" sx={{ px: 3, borderRadius: 1.5 }}>Următor →</Button>
+                        <Button variant="outlined" sx={{ px: 3, borderRadius: 1.5 }}>{t("listings.next")}</Button>
                     </Box>
                 )}
             </Container>

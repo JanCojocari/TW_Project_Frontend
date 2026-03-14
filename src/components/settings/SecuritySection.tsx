@@ -1,24 +1,27 @@
 ﻿// components/settings/SecuritySection.tsx
 import { Button, Grid, TextField } from "@mui/material";
-import SettingsSectionWrapper from "./SettingsSectionWraper.tsx";
-import type { PasswordForm } from "../../hooks/useSettingsForm";
+import { useTranslation }          from "react-i18next";
+import SettingsSectionWrapper      from "./SettingsSectionWraper.tsx";
+import type { PasswordForm }       from "../../hooks/useSettingsForm";
 
 interface Props {
-    password:  PasswordForm;
-    saving:    boolean;
-    onUpdate:  (field: keyof PasswordForm, value: string) => void;
-    onSave:    () => void;
+    password: PasswordForm;
+    saving:   boolean;
+    onUpdate: (field: keyof PasswordForm, value: string) => void;
+    onSave:   () => void;
 }
 
 export default function SecuritySection({ password, saving, onUpdate, onSave }: Props) {
+    const { t } = useTranslation();
+
     return (
         <SettingsSectionWrapper
-            title="Securitate"
-            description="Schimbă parola contului tău."
+            title={t("settings.security.title")}
+            description={t("settings.security.description")}
         >
             <Grid container spacing={2.5}>
                 <Grid item xs={12} sm={6}>
-                    <TextField fullWidth label="Parola curentă" size="small"
+                    <TextField fullWidth label={t("settings.security.current")} size="small"
                                type="password"
                                value={password.oldPassword}
                                onChange={(e) => onUpdate("oldPassword", e.target.value)}
@@ -26,25 +29,21 @@ export default function SecuritySection({ password, saving, onUpdate, onSave }: 
                 </Grid>
                 <Grid item xs={12} />
                 <Grid item xs={12} sm={6}>
-                    <TextField fullWidth label="Parolă nouă" size="small"
+                    <TextField fullWidth label={t("settings.security.new")} size="small"
                                type="password"
                                value={password.newPassword}
                                onChange={(e) => onUpdate("newPassword", e.target.value)}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                    <TextField fullWidth label="Confirmă parola nouă" size="small"
+                    <TextField fullWidth label={t("settings.security.confirm")} size="small"
                                type="password"
                                value={password.confirmPassword}
                                onChange={(e) => onUpdate("confirmPassword", e.target.value)}
-                               error={
-                                   !!password.confirmPassword &&
-                                   password.newPassword !== password.confirmPassword
-                               }
+                               error={!!password.confirmPassword && password.newPassword !== password.confirmPassword}
                                helperText={
-                                   !!password.confirmPassword &&
-                                   password.newPassword !== password.confirmPassword
-                                       ? "Parolele nu coincid"
+                                   !!password.confirmPassword && password.newPassword !== password.confirmPassword
+                                       ? t("settings.security.mismatch")
                                        : ""
                                }
                     />
@@ -53,7 +52,7 @@ export default function SecuritySection({ password, saving, onUpdate, onSave }: 
                     <Button variant="contained" disabled={saving} onClick={onSave}
                             sx={{ borderRadius: 2, px: 4 }}
                     >
-                        {saving ? "Se salvează..." : "Schimbă parola"}
+                        {saving ? t("settings.security.saving") : t("settings.security.save")}
                     </Button>
                 </Grid>
             </Grid>

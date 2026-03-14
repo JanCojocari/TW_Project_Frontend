@@ -1,20 +1,22 @@
-﻿import { useNavigate } from "react-router-dom";
+﻿// pages/CreateListing.tsx
+import { useNavigate }    from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Box, Container, Typography, Button, Alert, LinearProgress } from "@mui/material";
 import { ArrowBack as ArrowBackIcon, Home as HomeIcon } from "@mui/icons-material";
 import { gradients, colors } from "../theme/gradients.ts";
-import { paths } from "../app/paths.ts";
-import { useListingForm }  from "../types/UseListingForm.ts"
-import SuccessScreen       from "../components/createListing/SuccessScreen.tsx"
-import StepBasicInfo       from "../components/createListing/StepBasicInfo.tsx";
-import StepPhotos          from "../components/createListing/StepPhotos.tsx";
-import StepLocation        from "../components/createListing/StepLocation.tsx";
-import StepFacilities      from "../components/createListing/StepFacilities.tsx";
-import StepSpaceInfo       from "../components/createListing/StepSpaceInfo.tsx";
-import StepDescription     from "../components/createListing/StepDescription.tsx";
-
+import { paths }             from "../app/paths.ts";
+import { useListingForm }    from "../types/UseListingForm.ts";
+import SuccessScreen         from "../components/createListing/SuccessScreen.tsx";
+import StepBasicInfo         from "../components/createListing/StepBasicInfo.tsx";
+import StepPhotos            from "../components/createListing/StepPhotos.tsx";
+import StepLocation          from "../components/createListing/StepLocation.tsx";
+import StepFacilities        from "../components/createListing/StepFacilities.tsx";
+import StepSpaceInfo         from "../components/createListing/StepSpaceInfo.tsx";
+import StepDescription       from "../components/createListing/StepDescription.tsx";
 
 const CreateListing = () => {
     const navigate = useNavigate();
+    const { t }    = useTranslation();
     const {
         form, errors, submitted, progress,
         set, clearError, setFacility,
@@ -29,7 +31,7 @@ const CreateListing = () => {
             <Container maxWidth="md">
 
                 <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)} sx={{ mb: 3, fontWeight: 600 }}>
-                    Înapoi
+                    {t("createListing.back")}
                 </Button>
 
                 <Box sx={{ mb: 4 }}>
@@ -38,43 +40,30 @@ const CreateListing = () => {
                             <HomeIcon sx={{ fontSize: 28 }} />
                         </Box>
                         <Box>
-                            <Typography variant="h4" fontWeight={900}>Plasează un anunț</Typography>
-                            <Typography variant="body2" color="text.secondary">Completează detaliile apartamentului tău</Typography>
+                            <Typography variant="h4" fontWeight={900}>{t("createListing.title")}</Typography>
+                            <Typography variant="body2" color="text.secondary">{t("createListing.subtitle")}</Typography>
                         </Box>
                     </Box>
 
-                    {/* ── Status bar — bgcolor din temă, nu hardcodat ── */}
-                    <Box sx={{
-                        mt: 3, p: 2.5, borderRadius: 3,
-                        bgcolor: "background.paper",
-                        border: `1px solid ${colors.border}`,
-                    }}>
+                    <Box sx={{ mt: 3, p: 2.5, borderRadius: 3, bgcolor: "background.paper", border: `1px solid ${colors.border}` }}>
                         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
                             <Typography variant="caption" fontWeight={700} color="text.secondary">
-                                Completare formular
+                                {t("createListing.progress")}
                             </Typography>
                             <Typography variant="caption" fontWeight={800} color="primary.main">
                                 {progress}%
                             </Typography>
                         </Box>
-                        <LinearProgress
-                            variant="determinate"
-                            value={progress}
-                            sx={{
-                                height: 8, borderRadius: 4,
-                                bgcolor: colors.primaryAlpha10,
-                                "& .MuiLinearProgress-bar": {
-                                    background: gradients.primary,
-                                    borderRadius: 4,
-                                },
-                            }}
+                        <LinearProgress variant="determinate" value={progress}
+                                        sx={{ height: 8, borderRadius: 4, bgcolor: colors.primaryAlpha10,
+                                            "& .MuiLinearProgress-bar": { background: gradients.primary, borderRadius: 4 } }}
                         />
                     </Box>
                 </Box>
 
                 {Object.keys(errors).length > 0 && (
                     <Alert severity="error" sx={{ mb: 3, borderRadius: 3 }}>
-                        Te rugăm să completezi câmpurile obligatorii marcate mai jos.
+                        {t("createListing.errorsAlert")}
                     </Alert>
                 )}
 
@@ -92,12 +81,12 @@ const CreateListing = () => {
                 <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2, mb: 6 }}>
                     <Button variant="outlined" size="large" fullWidth onClick={() => navigate(-1)}
                             sx={{ py: 1.8, borderRadius: 2.5, fontWeight: 700 }}>
-                        Anulează
+                        {t("createListing.cancel")}
                     </Button>
                     <Button variant="contained" size="large" fullWidth
                             onClick={() => submit(() => setTimeout(() => navigate(paths.apartmentDetail(1)), 1500))}
                             sx={{ py: 1.8, borderRadius: 2.5, fontWeight: 800, fontSize: 16 }}>
-                        Publică anunțul
+                        {t("createListing.publish")}
                     </Button>
                 </Box>
 

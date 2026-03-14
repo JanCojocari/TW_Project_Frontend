@@ -1,25 +1,28 @@
-﻿import { Box, Paper, Typography, Chip } from "@mui/material";
+﻿// components/apartmentDetail/AdditionaInfoTab.tsx
+import { Box, Paper, Typography, Chip } from "@mui/material";
 import { MeetingRoom as RoomsIcon, SquareFoot as AreaIcon, Groups as GuestsIcon, AccessTime as TimeIcon, Cancel as CancelIcon } from "@mui/icons-material";
-import { colors } from "../../theme/gradients.ts";
+import { useTranslation } from "react-i18next";
+import { colors }         from "../../theme/gradients.ts";
 import type { AdditionalInfo } from "../../types/apartment.types";
 
-const cancellationLabels: Record<string, { label: string; color: "success" | "warning" | "error" }> = {
-    flexible: { label: "Flexibilă", color: "success" },
-    moderate: { label: "Moderată",  color: "warning" },
-    strict:   { label: "Strictă",   color: "error" },
+type CancelKey = "flexible" | "moderate" | "strict";
+const cancelColor: Record<CancelKey, "success" | "warning" | "error"> = {
+    flexible: "success", moderate: "warning", strict: "error",
 };
 
 const AdditionalInfoTab = ({ info }: { info: AdditionalInfo }) => {
+    const { t } = useTranslation();
+    const c = info.cancellationPolicy as CancelKey;
+
     const stats = [
-        { icon: <RoomsIcon />,  label: "Camere",       value: info.rooms },
-        { icon: <RoomsIcon />,  label: "Dormitoare",   value: info.bedrooms },
-        { icon: <RoomsIcon />,  label: "Băi",          value: info.bathrooms },
-        { icon: <RoomsIcon />,  label: "Paturi",       value: info.beds },
-        { icon: <AreaIcon />,   label: "Suprafață",    value: `${info.surfaceArea} m²` },
-        { icon: <GuestsIcon />, label: "Max. Oaspeți", value: info.maxGuests },
-        { icon: <RoomsIcon />,  label: "Etaj",         value: `${info.floor} / ${info.totalFloors}` },
+        { icon: <RoomsIcon />,  label: t("components.additionalInfo.rooms"),     value: info.rooms },
+        { icon: <RoomsIcon />,  label: t("components.additionalInfo.bedrooms"),  value: info.bedrooms },
+        { icon: <RoomsIcon />,  label: t("components.additionalInfo.bathrooms"), value: info.bathrooms },
+        { icon: <RoomsIcon />,  label: t("components.additionalInfo.beds"),      value: info.beds },
+        { icon: <AreaIcon />,   label: t("components.additionalInfo.surface"),   value: `${info.surfaceArea} m²` },
+        { icon: <GuestsIcon />, label: t("components.additionalInfo.maxGuests"), value: info.maxGuests },
+        { icon: <RoomsIcon />,  label: t("components.additionalInfo.floor"),     value: `${info.floor} / ${info.totalFloors}` },
     ];
-    const cancellation = cancellationLabels[info.cancellationPolicy];
 
     return (
         <Box>
@@ -35,42 +38,42 @@ const AdditionalInfoTab = ({ info }: { info: AdditionalInfo }) => {
 
             <Paper variant="outlined" sx={{ p: 3, borderRadius: 3, mb: 3, border: `1px solid ${colors.border}` }}>
                 <Typography variant="h6" fontWeight={700} sx={{ mb: 2 }}>
-                    <TimeIcon sx={{ mr: 1, verticalAlign: "middle", color: "primary.main" }} /> Check-in & Check-out
+                    <TimeIcon sx={{ mr: 1, verticalAlign: "middle", color: "primary.main" }} />
+                    {t("components.additionalInfo.checkin")}
                 </Typography>
                 <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2 }}>
                     <Box sx={{ flex: 1, p: 2, borderRadius: 2, bgcolor: colors.primaryAlpha06 }}>
-                        <Typography variant="body2" color="text.secondary" fontWeight={600}>Check-in</Typography>
+                        <Typography variant="body2" color="text.secondary" fontWeight={600}>{t("components.additionalInfo.checkInLabel")}</Typography>
                         <Typography variant="body1" fontWeight={700}>{info.checkInFrom} – {info.checkInUntil}</Typography>
-                        {info.selfCheckIn && <Chip label="Self check-in disponibil" size="small" color="success" sx={{ mt: 1, fontWeight: 600 }} />}
+                        {info.selfCheckIn && <Chip label={t("components.additionalInfo.selfCheckin")} size="small" color="success" sx={{ mt: 1, fontWeight: 600 }} />}
                     </Box>
                     <Box sx={{ flex: 1, p: 2, borderRadius: 2, bgcolor: "rgba(239,68,68,0.04)" }}>
-                        <Typography variant="body2" color="text.secondary" fontWeight={600}>Check-out</Typography>
+                        <Typography variant="body2" color="text.secondary" fontWeight={600}>{t("components.additionalInfo.checkOutLabel")}</Typography>
                         <Typography variant="body1" fontWeight={700}>{info.checkOutFrom} – {info.checkOutUntil}</Typography>
                     </Box>
                 </Box>
             </Paper>
 
             <Paper variant="outlined" sx={{ p: 3, borderRadius: 3, mb: 3, border: `1px solid ${colors.border}` }}>
-                <Typography variant="h6" fontWeight={700} sx={{ mb: 1.5 }}>Descriere</Typography>
+                <Typography variant="h6" fontWeight={700} sx={{ mb: 1.5 }}>{t("components.additionalInfo.description")}</Typography>
                 <Typography variant="body1" color="text.secondary" lineHeight={1.8}>{info.description}</Typography>
             </Paper>
 
             <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2 }}>
                 {info.houseRules && (
                     <Paper variant="outlined" sx={{ flex: 7, p: 3, borderRadius: 3, border: `1px solid ${colors.border}` }}>
-                        <Typography variant="h6" fontWeight={700} sx={{ mb: 1.5 }}>Regulile casei</Typography>
+                        <Typography variant="h6" fontWeight={700} sx={{ mb: 1.5 }}>{t("components.additionalInfo.houseRules")}</Typography>
                         <Typography variant="body2" color="text.secondary" lineHeight={1.8}>{info.houseRules}</Typography>
                     </Paper>
                 )}
                 <Paper variant="outlined" sx={{ flex: 5, p: 3, borderRadius: 3, border: `1px solid ${colors.border}` }}>
                     <Typography variant="h6" fontWeight={700} sx={{ mb: 1.5 }}>
-                        <CancelIcon sx={{ mr: 1, verticalAlign: "middle", color: "primary.main" }} /> Politică anulare
+                        <CancelIcon sx={{ mr: 1, verticalAlign: "middle", color: "primary.main" }} />
+                        {t("components.additionalInfo.cancellationPolicy")}
                     </Typography>
-                    <Chip label={cancellation.label} color={cancellation.color} sx={{ fontWeight: 700, fontSize: 14 }} />
+                    <Chip label={t(`components.additionalInfo.cancellation.${c}.label`)} color={cancelColor[c]} sx={{ fontWeight: 700, fontSize: 14 }} />
                     <Typography variant="body2" color="text.secondary" sx={{ mt: 1.5, lineHeight: 1.7 }}>
-                        {info.cancellationPolicy === "flexible" && "Rambursare integrală dacă anulați cu cel puțin 24h înainte."}
-                        {info.cancellationPolicy === "moderate" && "Rambursare 50% dacă anulați cu cel puțin 5 zile înainte."}
-                        {info.cancellationPolicy === "strict"   && "Fără rambursare după confirmarea rezervării."}
+                        {t(`components.additionalInfo.cancellation.${c}.desc`)}
                     </Typography>
                 </Paper>
             </Box>
