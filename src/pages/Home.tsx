@@ -5,7 +5,7 @@ import {
     ArrowForward as ArrowForwardIcon,
 } from "@mui/icons-material";
 import { useState } from "react";
-import LoginForm from "../components/LoginForm.tsx";
+import LoginForm from "../components/login/LoginForm.tsx";
 import { gradients, colors } from "../theme/gradients.ts";
 
 const features = [

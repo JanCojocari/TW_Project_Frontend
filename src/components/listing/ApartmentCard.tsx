@@ -11,10 +11,10 @@ import {
     Favorite as FavoriteIcon,
 } from "@mui/icons-material";
 import { memo } from "react";
-import type { Apartment } from "../types/apartment.types";
+import type { Apartment } from "../../types/apartment.types.ts";
 import { useNavigate } from "react-router-dom";
-import { paths } from "../app/paths.ts";
-import {colors } from "../theme/gradients.ts";
+import { paths } from "../../app/paths.ts";
+import {colors } from "../../theme/gradients.ts";
 
 
 interface Props {
