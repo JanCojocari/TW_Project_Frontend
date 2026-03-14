@@ -1,20 +1,24 @@
-﻿import { Box, Typography } from "@mui/material";
-import { users }        from "../../mockdata/users";
-import ApartmentCard    from "../listing/ApartmentCard.tsx";
-import type { Apartment } from "../../types/apartment.types";
-import type { User }      from "../../types/user.types";
+﻿// components/dashboard/MyListingsTab.tsx
+import { Box, Typography }  from "@mui/material";
+import { useTranslation }   from "react-i18next";
+import { users }            from "../../mockdata/users";
+import ApartmentCard        from "../listing/ApartmentCard.tsx";
+import type { Apartment }   from "../../types/apartment.types";
+import type { User }        from "../../types/user.types";
 
 interface Props {
-    myListings:      Apartment[];
-    favoriteIds:     number[];
+    myListings:       Apartment[];
+    favoriteIds:      number[];
     onToggleFavorite: (id: number) => void;
 }
 
 export default function MyListingsTab({ myListings, favoriteIds, onToggleFavorite }: Props) {
+    const { t } = useTranslation();
+
     if (myListings.length === 0) return (
         <Box sx={{ textAlign: "center", py: 10 }}>
             <Typography color="text.disabled" sx={{ fontSize: "18px", fontStyle: "italic" }}>
-                Nu ai publicat niciun anunț până în prezent.
+                {t("dashboard.myListings.empty")}
             </Typography>
         </Box>
     );
@@ -28,7 +32,9 @@ export default function MyListingsTab({ myListings, favoriteIds, onToggleFavorit
                     favorites={favoriteIds}
                     toggleFavorite={onToggleFavorite}
                     getUserName={(id) => users.find((u: User) => u.Id_User === id)?.Name || "User"}
-                    getStatus={(apartment: Apartment) => apartment.Id_Renter ? "Ocupat" : "Disponibil"}
+                    getStatus={(apartment: Apartment) => apartment.Id_Renter
+                        ? t("listings.occupied")
+                        : t("listings.available")}
                 />
             ))}
         </Box>

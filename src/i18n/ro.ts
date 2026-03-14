@@ -165,11 +165,14 @@ export default {
 
     // ── Dashboard ─────────────────────────────────────────────────────────────
     dashboard: {
-        title:   "Dashboard",
+        title:        "Dashboard",
+        subtitle:     "Monitorizează activitatea, gestionează portofoliul și plățile tale.",
+        controlPanel: "Control",
+        controlSpan:  "Panel",
         tabs: {
-            profile:    "Profil",
-            apartments: "Apartamente",
-            payments:   "Plăți",
+            profile:    "Profil Utilizator",
+            apartments: "Proprietățile Mele",
+            payments:   "Istoric Financiar",
             favorites:  "Favorite",
         },
         profile: {
@@ -182,13 +185,20 @@ export default {
             invalidSession: "Eroare: Sesiune utilizator invalidă.",
         },
         payments: {
-            title:       "Arhivă Plăți & Facturi",
-            download:    "Descarcă PDF",
-            generating:  "Se generează...",
-            success:     "Succes",
-            stored:      "Factură stocată pe server",
+            title:        "Arhivă Plăți & Facturi",
+            download:     "Descarcă PDF",
+            generating:   "Se generează...",
+            success:      "Succes",
+            stored:       "Factură stocată pe server",
             firstDownload: "Prima descărcare — PDF generat și salvat pe server",
-            serverStored: "Factura este stocată pe server — se deschide direct",
+            serverStored:  "Factura este stocată pe server — se deschide direct",
+            rentLabel:    "Chirie Apartament",
+        },
+        favorites: {
+            empty: "Lista ta de favorite este goală.",
+        },
+        myListings: {
+            empty: "Nu ai publicat niciun anunț până în prezent.",
         },
     },
 
@@ -285,6 +295,42 @@ export default {
             { q: "Pot anula o rezervare?",               a: "Da, poți anula o rezervare contactându-ne la support@rentora.com. Politica de anulare depinde de proprietar și de condițiile contractului." },
             { q: "Cum adaug un apartament la favorite?", a: "Pe pagina de anunțuri, apasă iconița de inimă de pe cardul apartamentului. Apartamentele favorite pot fi vizualizate în Dashboard-ul tău." },
         ],
+    },
+
+    // ── Auth ─────────────────────────────────────────────────────────────────
+    auth: {
+        register: {
+            title:           "Creează Cont Nou",
+            name:            "Nume",
+            surname:         "Prenume",
+            email:           "Email",
+            phone:           "Telefon",
+            birthday:        "Data nașterii",
+            gender:          "Gen",
+            genderDefault:   "Nespecificat",
+            genderMale:      "Masculin",
+            genderFemale:    "Feminin",
+            password:        "Parolă",
+            confirmPassword: "Confirmă Parola",
+            submit:          "Creează Contul",
+            haveAccount:     "Ai deja un cont activ?",
+            loginLink:       "Autentifică-te",
+        },
+        login: {
+            tabLandlord:     "Proprietari",
+            tabTenant:       "Chiriași",
+            portalLandlord:  "Portal Proprietar",
+            portalTenant:    "Portal Chiriaș",
+            email:           "Email",
+            password:        "Parolă",
+            emailRequired:   "Email-ul este obligatoriu",
+            emailInvalid:    "Email invalid",
+            passwordRequired: "Parola este obligatorie",
+            passwordMin:     "Parola trebuie să aibă minimum 6 caractere",
+            submit:          "Conectează-te acum",
+            noAccount:       "Nu ai un cont valid?",
+            registerLink:    "Creează cont",
+        },
     },
 
     // ── Common ────────────────────────────────────────────────────────────────

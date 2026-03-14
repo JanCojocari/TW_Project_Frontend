@@ -1,11 +1,12 @@
-﻿// components/dashboard/payments/PaymentsTab.tsx
+﻿// components/dashboard/paymentTab/PaymentsTab.tsx
 import { Alert, Snackbar, Stack, Typography } from "@mui/material";
+import { useTranslation }     from "react-i18next";
 import { useInvoiceDownload } from "../../../hooks/useInvoiceDownload";
 import { MOCK_PAYMENTS }      from "../../../mockdata/payments.ts";
 import PaymentRow             from "./paymentRow.tsx";
 
 export default function PaymentsTab() {
-    // TODO: înlocuiește cu date reale → const payments = await userService.getPayments()
+    const { t }    = useTranslation();
     const payments = MOCK_PAYMENTS;
 
     const { downloadInvoice, loadingId, error, clearError } = useInvoiceDownload({
@@ -15,7 +16,7 @@ export default function PaymentsTab() {
     return (
         <Stack spacing={4}>
             <Typography variant="h5" fontWeight={900} sx={{ mb: 2 }}>
-                Arhivă Plăți & Facturi
+                {t("dashboard.payments.title")}
             </Typography>
 
             <Stack spacing={2.5}>
@@ -29,12 +30,8 @@ export default function PaymentsTab() {
                 ))}
             </Stack>
 
-            <Snackbar
-                open={!!error}
-                autoHideDuration={6000}
-                onClose={clearError}
-                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-            >
+            <Snackbar open={!!error} autoHideDuration={6000} onClose={clearError}
+                      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
                 <Alert severity="warning" variant="filled" onClose={clearError}>
                     {error}
                 </Alert>

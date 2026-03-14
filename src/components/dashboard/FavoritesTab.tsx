@@ -1,8 +1,10 @@
-﻿import { Box, Typography } from "@mui/material";
-import { users }        from "../../mockdata/users";
-import ApartmentCard    from "../listing/ApartmentCard";
-import type { Apartment } from "../../types/apartment.types";
-import type { User }      from "../../types/user.types";
+﻿// components/dashboard/FavoritesTab.tsx
+import { Box, Typography }  from "@mui/material";
+import { useTranslation }   from "react-i18next";
+import { users }            from "../../mockdata/users";
+import ApartmentCard        from "../listing/ApartmentCard";
+import type { Apartment }   from "../../types/apartment.types";
+import type { User }        from "../../types/user.types";
 
 interface Props {
     favoriteApartments: Apartment[];
@@ -11,10 +13,12 @@ interface Props {
 }
 
 export default function FavoritesTab({ favoriteApartments, favoriteIds, onToggleFavorite }: Props) {
+    const { t } = useTranslation();
+
     if (favoriteApartments.length === 0) return (
         <Box sx={{ textAlign: "center", py: 10 }}>
             <Typography color="text.disabled" sx={{ fontSize: "18px", fontStyle: "italic" }}>
-                Lista ta de favorite este goală.
+                {t("dashboard.favorites.empty")}
             </Typography>
         </Box>
     );
@@ -28,7 +32,9 @@ export default function FavoritesTab({ favoriteApartments, favoriteIds, onToggle
                     favorites={favoriteIds}
                     toggleFavorite={onToggleFavorite}
                     getUserName={(id) => users.find((u: User) => u.Id_User === id)?.Name || "User"}
-                    getStatus={(apartment: Apartment) => apartment.Id_Renter ? "Ocupat" : "Disponibil"}
+                    getStatus={(apartment: Apartment) => apartment.Id_Renter
+                        ? t("listings.occupied")
+                        : t("listings.available")}
                 />
             ))}
         </Box>

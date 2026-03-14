@@ -156,11 +156,14 @@ export default {
     },
 
     dashboard: {
-        title:   "Dashboard",
+        title:        "Dashboard",
+        subtitle:     "Monitor your activity, manage your portfolio and payments.",
+        controlPanel: "Control",
+        controlSpan:  "Panel",
         tabs: {
-            profile:    "Profile",
-            apartments: "Apartments",
-            payments:   "Payments",
+            profile:    "User Profile",
+            apartments: "My Properties",
+            payments:   "Financial History",
             favorites:  "Favorites",
         },
         profile: {
@@ -180,6 +183,13 @@ export default {
             stored:       "Invoice stored on server",
             firstDownload: "First download — PDF generated and saved on server",
             serverStored:  "Invoice is stored on server — opens directly",
+            rentLabel:    "Apartment Rent",
+        },
+        favorites: {
+            empty: "Your favorites list is empty.",
+        },
+        myListings: {
+            empty: "You haven't published any listings yet.",
         },
     },
 
@@ -273,6 +283,41 @@ export default {
             { q: "Can I cancel a reservation?",           a: "Yes, you can cancel a reservation by contacting us at support@rentora.com. The cancellation policy depends on the landlord and the contract conditions." },
             { q: "How do I add an apartment to favorites?", a: "On the listings page, click the heart icon on the apartment card. Your favorite apartments can be viewed in your Dashboard." },
         ],
+    },
+
+    auth: {
+        register: {
+            title:           "Create New Account",
+            name:            "Last name",
+            surname:         "First name",
+            email:           "Email",
+            phone:           "Phone",
+            birthday:        "Date of birth",
+            gender:          "Gender",
+            genderDefault:   "Not specified",
+            genderMale:      "Male",
+            genderFemale:    "Female",
+            password:        "Password",
+            confirmPassword: "Confirm Password",
+            submit:          "Create Account",
+            haveAccount:     "Already have an account?",
+            loginLink:       "Log in",
+        },
+        login: {
+            tabLandlord:     "Landlords",
+            tabTenant:       "Tenants",
+            portalLandlord:  "Landlord Portal",
+            portalTenant:    "Tenant Portal",
+            email:           "Email",
+            password:        "Password",
+            emailRequired:   "Email is required",
+            emailInvalid:    "Invalid email",
+            passwordRequired: "Password is required",
+            passwordMin:     "Password must be at least 6 characters",
+            submit:          "Log in now",
+            noAccount:       "Don't have an account?",
+            registerLink:    "Create account",
+        },
     },
 
     common: {
