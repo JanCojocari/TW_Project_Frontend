@@ -36,12 +36,36 @@ const ImageCarousel = ({ images, altBase, statusChip }: Props) => {
             <Box sx={{ position: "absolute", top: 18, right: 18, bgcolor: "rgba(0,0,0,0.45)", backdropFilter: "blur(8px)", color: "white", fontSize: 12, fontWeight: 700, px: 1.5, py: 0.4, borderRadius: "20px", border: "1px solid rgba(255,255,255,0.15)", userSelect: "none" }}>
                 {current + 1} / {images.length}
             </Box>
+
+            {/* ── Butoane scroll — bgcolor din temă ── */}
             {(["prev", "next"] as const).map((dir) => (
-                <IconButton key={dir} onClick={() => go(dir)} aria-label={dir === "prev" ? "Imaginea anterioară" : "Imaginea următoare"}
-                            sx={{ position: "absolute", top: "50%", [dir === "prev" ? "left" : "right"]: 12, transform: "translateY(-50%)", bgcolor: "rgba(255,255,255,0.92)", backdropFilter: "blur(8px)", width: 40, height: 40, border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 10px rgba(0,0,0,0.15)", transition: "all 0.2s ease", "&:hover": { bgcolor: "white", transform: "translateY(-50%) scale(1.08)", boxShadow: `0 4px 16px ${colors.primaryAlpha25}` } }}>
-                    {dir === "prev" ? <ChevronLeftIcon sx={{ color: "primary.main" }} /> : <ChevronRightIcon sx={{ color: "primary.main" }} />}
+                <IconButton key={dir} onClick={() => go(dir)}
+                            aria-label={dir === "prev" ? "Imaginea anterioară" : "Imaginea următoare"}
+                            sx={{
+                                position: "absolute", top: "50%",
+                                [dir === "prev" ? "left" : "right"]: 12,
+                                transform: "translateY(-50%)",
+                                bgcolor: "background.paper",
+                                backdropFilter: "blur(8px)",
+                                width: 40, height: 40,
+                                border: `1px solid ${colors.border}`,
+                                boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
+                                transition: "all 0.2s ease",
+                                "&:hover": {
+                                    bgcolor: "background.paper",
+                                    transform: "translateY(-50%) scale(1.08)",
+                                    boxShadow: `0 4px 16px ${colors.primaryAlpha25}`,
+                                    borderColor: "primary.main",
+                                },
+                            }}
+                >
+                    {dir === "prev"
+                        ? <ChevronLeftIcon  sx={{ color: "primary.main" }} />
+                        : <ChevronRightIcon sx={{ color: "primary.main" }} />
+                    }
                 </IconButton>
             ))}
+
             <Box sx={{ position: "absolute", bottom: 14, left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
                 <Box sx={{ display: "flex", gap: 1, px: 1.2, py: 0.8, bgcolor: "rgba(0,0,0,0.35)", backdropFilter: "blur(10px)", borderRadius: 2.5, border: "1px solid rgba(255,255,255,0.12)" }}>
                     {images.map((url, idx) => (

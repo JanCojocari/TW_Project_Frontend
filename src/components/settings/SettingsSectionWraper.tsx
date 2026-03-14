@@ -15,15 +15,17 @@ export default function SettingsSectionWrapper({ title, description, children, d
             elevation={0}
             sx={{
                 borderRadius: 3,
-                border: `1px solid ${danger ? "#ffcdd2" : colors.border}`,
                 overflow: "hidden",
+                // ← border din temă, nu hardcodat
+                border: `1px solid ${danger ? "rgba(239,68,68,0.3)" : colors.border}`,
             }}
         >
             <Box
                 sx={{
                     px: 4, py: 2.5,
-                    borderBottom: `1px solid ${danger ? "#ffcdd2" : colors.border}`,
-                    bgcolor: danger ? "#fff5f5" : "background.default",
+                    borderBottom: `1px solid ${danger ? "rgba(239,68,68,0.3)" : colors.border}`,
+                    // ← bgcolor din temă: în dark "background.default" e #0F1724, nu alb
+                    bgcolor: danger ? "rgba(239,68,68,0.06)" : "background.default",
                 }}
             >
                 <Typography

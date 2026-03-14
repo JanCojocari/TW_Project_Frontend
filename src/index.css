@@ -1,17 +1,26 @@
-@import "tailwindcss";
+/* index.css */
+/* Background-ul și culoarea textului sunt gestionate de MuiCssBaseline din theme.ts */
+/* NU seta background sau color pe body aici — va suprascrie tema dark */
 
-:root {
-    background-color: #F8F9FB;
-    color: #1F2937;
+* {
+    box-sizing: border-box;
 }
 
-body {
-    background-color: #F8F9FB;
-    color: #1F2937;
-    margin: 0;
+/* Scroll bar stilizat — compatibil cu ambele teme */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
 }
 
-::selection {
-    background: rgba(76, 139, 245, 0.2);
-    color: #2F6FE4;
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(112, 150, 190, 0.35);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(112, 150, 190, 0.6);
 }
