@@ -5,14 +5,17 @@ import Dashboard from "../pages/Dashboard";
 import About from "../pages/About";
 import { paths } from "./paths";
 import Listings from "../pages/Listings.tsx";
-import ApartmentDetail from "../pages/ApartmentDetail.tsx"
+import ApartmentDetail from "../pages/ApartmentDetail.tsx";
+import Support from "../pages/Support";
+import PaymentPage from "../pages/Payment";
+import CreateListing from "../pages/CreateListing";
+import Settings from "../pages/Settings";
+import type {AuthContextType} from "../auth/AuthContext.tsx"
 
 // Trebuie de introdus rolul de chirias si de proprietar asa incat path-s sa se afiseze in dependenta de rol
 export const publicRoutes = [
-    { path: paths.dashboard, element: <Dashboard />},
     { path: paths.listings, element: <Listings /> },
     { path: paths.general, element: <Listings /> },
-
 ];
 
 export const privateRoutes = [
@@ -22,6 +25,11 @@ export const privateRoutes = [
         role: "role",
     },
     { path: paths.apartmentDetailRoute, element: <ApartmentDetail /> },
+    { path: paths.dashboard, element: <Dashboard />},
+    { path: paths.support, element: <Support /> },
+    { path: paths.payment, element: <PaymentPage /> },
+    { path: paths.createListing, element: <CreateListing /> },
+    { path: paths.settings, element: <Settings /> },
 
 ];
 

@@ -8,5 +8,9 @@
     general:"*",
     apartmentDetailRoute: "/apartments/:id",
     apartmentDetail: (id: number) => `/apartments/${id}`,
-
+    editProfile: "/dashboard/edit-profile",
+    support: "/support",
+    payment: "/payments",
+    createListing: "/createListing",
+    settings: "/settings",
 } as const;
