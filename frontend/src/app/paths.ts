@@ -13,4 +13,5 @@
     payment: "/payments",
     createListing: "/createListing",
     settings: "/settings",
+    serverError: "/500",
 } as const;

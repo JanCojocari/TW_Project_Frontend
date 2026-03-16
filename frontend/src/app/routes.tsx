@@ -10,6 +10,7 @@ import Support from "../pages/Support";
 import PaymentPage from "../pages/Payment";
 import CreateListing from "../pages/CreateListing";
 import Settings from "../pages/Settings";
+import ServerError from "../pages/ServerError";
 import type {AuthContextType} from "../auth/AuthContext.tsx"
 
 // Trebuie de introdus rolul de chirias si de proprietar asa incat path-s sa se afiseze in dependenta de rol
@@ -38,4 +39,5 @@ export const notAuthRoutes = [
     { path: paths.login, element: <Login /> },
     { path: paths.register, element: <Register /> },
     { path: paths.about, element: <About /> },
+    { path: paths.serverError, element: <ServerError /> },
 ];
