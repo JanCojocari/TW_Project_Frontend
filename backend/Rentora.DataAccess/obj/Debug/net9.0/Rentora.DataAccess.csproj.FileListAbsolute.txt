@@ -1,0 +1,16 @@
+C:\Users\Cristi\UTM\TW\Frontend\rentora\backend\Rentora.DataAccess\bin\Debug\net9.0\Rentora.DataAccess.deps.json
+C:\Users\Cristi\UTM\TW\Frontend\rentora\backend\Rentora.DataAccess\bin\Debug\net9.0\Rentora.DataAccess.dll
+C:\Users\Cristi\UTM\TW\Frontend\rentora\backend\Rentora.DataAccess\bin\Debug\net9.0\Rentora.DataAccess.pdb
+C:\Users\Cristi\UTM\TW\Frontend\rentora\backend\Rentora.DataAccess\bin\Debug\net9.0\Rentora.Domain.dll
+C:\Users\Cristi\UTM\TW\Frontend\rentora\backend\Rentora.DataAccess\bin\Debug\net9.0\Rentora.Domain.pdb
+C:\Users\Cristi\UTM\TW\Frontend\rentora\backend\Rentora.DataAccess\obj\Debug\net9.0\Rentora.DataAccess.csproj.AssemblyReference.cache
+C:\Users\Cristi\UTM\TW\Frontend\rentora\backend\Rentora.DataAccess\obj\Debug\net9.0\Rentora.DataAccess.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Cristi\UTM\TW\Frontend\rentora\backend\Rentora.DataAccess\obj\Debug\net9.0\Rentora.DataAccess.AssemblyInfoInputs.cache
+C:\Users\Cristi\UTM\TW\Frontend\rentora\backend\Rentora.DataAccess\obj\Debug\net9.0\Rentora.DataAccess.AssemblyInfo.cs
+C:\Users\Cristi\UTM\TW\Frontend\rentora\backend\Rentora.DataAccess\obj\Debug\net9.0\Rentora.DataAccess.csproj.CoreCompileInputs.cache
+C:\Users\Cristi\UTM\TW\Frontend\rentora\backend\Rentora.DataAccess\obj\Debug\net9.0\Rentora.DataAccess.sourcelink.json
+C:\Users\Cristi\UTM\TW\Frontend\rentora\backend\Rentora.DataAccess\obj\Debug\net9.0\Rentora..CCA03EEB.Up2Date
+C:\Users\Cristi\UTM\TW\Frontend\rentora\backend\Rentora.DataAccess\obj\Debug\net9.0\Rentora.DataAccess.dll
+C:\Users\Cristi\UTM\TW\Frontend\rentora\backend\Rentora.DataAccess\obj\Debug\net9.0\refint\Rentora.DataAccess.dll
+C:\Users\Cristi\UTM\TW\Frontend\rentora\backend\Rentora.DataAccess\obj\Debug\net9.0\Rentora.DataAccess.pdb
+C:\Users\Cristi\UTM\TW\Frontend\rentora\backend\Rentora.DataAccess\obj\Debug\net9.0\ref\Rentora.DataAccess.dll

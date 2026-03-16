@@ -1,0 +1,106 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "Rentora.API/1.0.0": {
+        "dependencies": {
+          "Microsoft.AspNetCore.OpenApi": "9.0.13",
+          "Rentora.BusinessLayer": "1.0.0"
+        },
+        "runtime": {
+          "Rentora.API.dll": {}
+        }
+      },
+      "Microsoft.AspNetCore.OpenApi/9.0.13": {
+        "dependencies": {
+          "Microsoft.OpenApi": "1.6.17"
+        },
+        "runtime": {
+          "lib/net9.0/Microsoft.AspNetCore.OpenApi.dll": {
+            "assemblyVersion": "9.0.13.0",
+            "fileVersion": "9.0.1326.6409"
+          }
+        }
+      },
+      "Microsoft.OpenApi/1.6.17": {
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.OpenApi.dll": {
+            "assemblyVersion": "1.6.17.0",
+            "fileVersion": "1.6.17.0"
+          }
+        }
+      },
+      "Rentora.BusinessLayer/1.0.0": {
+        "dependencies": {
+          "Rentora.DataAccess": "1.0.0",
+          "Rentora.Domain": "1.0.0"
+        },
+        "runtime": {
+          "Rentora.BusinessLayer.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Rentora.DataAccess/1.0.0": {
+        "dependencies": {
+          "Rentora.Domain": "1.0.0"
+        },
+        "runtime": {
+          "Rentora.DataAccess.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Rentora.Domain/1.0.0": {
+        "runtime": {
+          "Rentora.Domain.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Rentora.API/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.AspNetCore.OpenApi/9.0.13": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-AYSHrRDS4hpmZupq56HjBePEHVTDZ5G4ffZYCWxPcuZ129X5RowwGWSDJY9D+I4W+EpVT0vSBbE2pp6Qy2Y+8g==",
+      "path": "microsoft.aspnetcore.openapi/9.0.13",
+      "hashPath": "microsoft.aspnetcore.openapi.9.0.13.nupkg.sha512"
+    },
+    "Microsoft.OpenApi/1.6.17": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Le+kehlmrlQfuDFUt1zZ2dVwrhFQtKREdKBo+rexOwaCoYP0/qpgT9tLxCsZjsgR5Itk1UKPcbgO+FyaNid/bA==",
+      "path": "microsoft.openapi/1.6.17",
+      "hashPath": "microsoft.openapi.1.6.17.nupkg.sha512"
+    },
+    "Rentora.BusinessLayer/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Rentora.DataAccess/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Rentora.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

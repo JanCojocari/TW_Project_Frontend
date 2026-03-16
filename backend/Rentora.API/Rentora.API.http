@@ -1,0 +1,6 @@
+@Rentora.API_HostAddress = http://localhost:5231
+
+GET {{Rentora.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
