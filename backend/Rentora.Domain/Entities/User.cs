@@ -33,7 +33,7 @@ public class User
     public Role Role { get; set; } = Role.Renter;
 
     public ICollection<Apartment> OwnedApartments { get; set; } = new List<Apartment>();
-    public ICollection<Favorite> Favorites { get; set } = new List<Favorite>();
+    public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
     public ICollection<RecentView> RecentViews { get; set; } = new List<RecentView>();
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
 
