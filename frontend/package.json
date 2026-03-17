@@ -16,6 +16,7 @@
     "@mui/material": "^7.3.7",
     "@mui/x-date-pickers": "^8.27.2",
     "@tailwindcss/vite": "^4.1.18",
+    "axios": "^1.13.6",
     "dayjs": "^1.11.20",
     "html2canvas": "^1.4.1",
     "i18next": "^25.8.18",
