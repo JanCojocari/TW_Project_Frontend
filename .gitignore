@@ -2,6 +2,8 @@
 # Build results
 backend/*/bin/
 backend/*/obj/
+backend/**/bin/
+backend/**/obj/
 
 # NuGet
 *.nuget.dgspec.json
