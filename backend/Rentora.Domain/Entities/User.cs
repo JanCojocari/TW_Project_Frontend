@@ -1,4 +1,5 @@
 ﻿namespace Rentora.Domain.Entities;
+using System.ComponentModel.DataAnnotations;
 using Rentora.Domain.Enums;
 
 public class User

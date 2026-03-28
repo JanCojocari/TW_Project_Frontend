@@ -1,4 +1,4 @@
-﻿import type { Currency, RentInterval, Facilities, AdditionalInfo } from "../../types/apartment.types";
+﻿import type { Currency, RentInterval, Facilities, AdditionalInfo } from "./apartment.types.ts";
 
 export type FormState = {
     address: string;

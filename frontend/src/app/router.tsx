@@ -13,7 +13,7 @@ const HealthCheck = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get("/health").catch(() => {
+        axios.get("/health/check").catch(() => {
             navigate(paths.serverError);
         });
     }, []);

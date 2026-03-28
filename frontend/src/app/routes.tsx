@@ -11,7 +11,6 @@ import PaymentPage from "../pages/Payment";
 import CreateListing from "../pages/CreateListing";
 import Settings from "../pages/Settings";
 import ServerError from "../pages/ServerError";
-import type {AuthContextType} from "../auth/AuthContext.tsx"
 
 // Trebuie de introdus rolul de chirias si de proprietar asa incat path-s sa se afiseze in dependenta de rol
 export const publicRoutes = [

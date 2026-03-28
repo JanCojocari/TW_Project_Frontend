@@ -1,6 +1,8 @@
-﻿namespace Rentora.Api.Controllers;
+﻿using Microsoft.AspNetCore.Mvc;
 
-[APIController]
+namespace Rentora.Api.Controllers;
+
+[ApiController]
 [Route("api/health")]
 public class HealthController: ControllerBase
 {

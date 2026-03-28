@@ -26,7 +26,7 @@ public class Apartment
 
     public MapLocation Location { get; set; } = new MapLocation();
     public Facilities Facilities { get; set; } = new Facilities();
-    public AdditionlInfo AdditionlInfo { get; set; } = new AdditionalInfo();
+    public AdditionalInfo AdditionlaInfo { get; set; } = new AdditionalInfo();
 
     public User Owner { get; set; } = null;
     public User? Renter { get; set; } = null;

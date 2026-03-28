@@ -1,28 +1,20 @@
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("FrontendPolicy", policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        policy.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
     });
 });
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
-app.UseCors("FrontendPolicy");
-app.UseHttpsRedirection();
-
-app.MapGet("/api/health", () => Results.Ok(new { status = "healthy" }))
-   .WithName("HealthCheck");
-
+app.MapOpenApi();
+app.UseCors("AllowAll");
+app.MapControllers();
 app.Run();

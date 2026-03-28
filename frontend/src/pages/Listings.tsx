@@ -13,6 +13,8 @@ import { defaultFilters, type FilterState } from "../types//filterTypes.ts";
 import { gradients, colors } from "../theme/gradients.ts";
 import { getApartmentFacilities, getApartmentReviews, getApartmentLocation } from "../mockdata/Apartmentdetails.ts";
 
+const LISTINGS_PER_PAGE = 24;
+
 const Listings = () => {
     const { t } = useTranslation();
     const [searchQuery, setSearchQuery]      = useState("");
@@ -20,66 +22,95 @@ const Listings = () => {
     const [drawerOpen, setDrawerOpen]        = useState(false);
     const [pendingFilters, setPendingFilters] = useState<FilterState>(defaultFilters);
     const [appliedFilters, setAppliedFilters] = useState<FilterState>(defaultFilters);
+    const [currentPage, setCurrentPage]      = useState(1);
 
     const toggleFavorite = (id: number) =>
-        setFavorites((prev) => prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]);
+        setFavorites((prev) => prev.includes(id) ? prev.filter((favId) => favId !== id) : [...prev, id]);
 
-    const getStatus   = (apt: Apartment) => apt.Id_Renter !== null ? t("listings.occupied") : t("listings.available");
-    const usersMap    = useMemo(() => Object.fromEntries(users.map((u) => [u.Id_User, u.Name])), []);
-    const getUserName = useCallback((id: number) => usersMap[id] ?? t("listings.available"), [usersMap, t]);
+    const getStatus  = (apt: Apartment) => apt.Id_Renter !== null ? t("listings.occupied") : t("listings.available");
+    const usersMap   = useMemo(() => Object.fromEntries(users.map((user) => [user.Id_User, user.Name])), []);
+    const getUserName = useCallback((userId: number) => usersMap[userId] ?? t("listings.available"), [usersMap, t]);
 
     const activeFilterCount = useMemo(() => {
-        const f = appliedFilters;
-        let n = 0;
-        if (f.currency !== "ALL")     n++;
-        if (f.interval !== "ALL")     n++;
-        if (f.availability !== "ALL") n++;
-        if (f.city)                   n++;
-        if (f.checkIn)                n++;
-        if (f.checkOut)               n++;
-        if (f.minRating !== null)     n++;
-        if (f.minReviews !== null)    n++;
-        const cfg: Record<string, number[]> = { ALL: [0,2000], USD: [0,1000], EUR: [0,1000], MDL: [0,5000] };
-        const [min, max] = cfg[f.currency] ?? [0, 2000];
-        if (f.priceRange[0] !== min || f.priceRange[1] !== max) n++;
-        n += Object.values(f.facilities).filter(Boolean).length;
-        return n;
+        const filters = appliedFilters;
+        let count = 0;
+        if (filters.currency !== "ALL")     count++;
+        if (filters.interval !== "ALL")     count++;
+        if (filters.availability !== "ALL") count++;
+        if (filters.city)                   count++;
+        if (filters.checkIn)                count++;
+        if (filters.checkOut)               count++;
+        if (filters.minRating !== null)     count++;
+        if (filters.minReviews !== null)    count++;
+        const defaultRangeByCurrency: Record<string, number[]> = { ALL: [0,2000], USD: [0,1000], EUR: [0,1000], MDL: [0,5000] };
+        const [defaultMin, defaultMax] = defaultRangeByCurrency[filters.currency] ?? [0, 2000];
+        if (filters.priceRange[0] !== defaultMin || filters.priceRange[1] !== defaultMax) count++;
+        count += Object.values(filters.facilities).filter(Boolean).length;
+        return count;
     }, [appliedFilters]);
 
     const filteredApartments = useMemo(() => {
-        const f = appliedFilters;
+        const filters = appliedFilters;
         return apartments.filter((apt) => {
             if (searchQuery) {
-                const q = searchQuery.toLowerCase();
-                if (!apt.Address.toLowerCase().includes(q) && !apt.Cost_per_interval.toString().includes(searchQuery)) return false;
+                const query = searchQuery.toLowerCase();
+                if (!apt.Address.toLowerCase().includes(query) && !apt.Cost_per_interval.toString().includes(searchQuery)) return false;
             }
-            if (f.availability === "available" && apt.Id_Renter !== null) return false;
-            if (f.availability === "occupied"  && apt.Id_Renter === null)  return false;
-            if (f.currency !== "ALL" && apt.Currency !== f.currency)       return false;
-            if (f.interval !== "ALL" && apt.Interval !== f.interval)       return false;
-            if (apt.Cost_per_interval < f.priceRange[0] || apt.Cost_per_interval > f.priceRange[1]) return false;
-            if (f.city) {
-                const loc   = getApartmentLocation(apt.Id_Apartment);
-                const query = f.city.toLowerCase();
-                if (!loc.city.toLowerCase().includes(query) && !(loc.region?.toLowerCase().includes(query)) && !apt.Address.toLowerCase().includes(query)) return false;
+            if (filters.availability === "available" && apt.Id_Renter !== null) return false;
+            if (filters.availability === "occupied"  && apt.Id_Renter === null)  return false;
+            if (filters.currency !== "ALL" && apt.Currency !== filters.currency) return false;
+            if (filters.interval !== "ALL" && apt.Interval !== filters.interval) return false;
+            if (apt.Cost_per_interval < filters.priceRange[0] || apt.Cost_per_interval > filters.priceRange[1]) return false;
+            if (filters.city) {
+                const location   = getApartmentLocation(apt.Id_Apartment);
+                const cityQuery  = filters.city.toLowerCase();
+                if (!location.city.toLowerCase().includes(cityQuery) && !(location.region?.toLowerCase().includes(cityQuery)) && !apt.Address.toLowerCase().includes(cityQuery)) return false;
             }
-            const activeFac = Object.entries(f.facilities).filter(([, v]) => v);
-            if (activeFac.length > 0) {
-                const fac = getApartmentFacilities(apt.Id_Apartment);
-                if (!activeFac.every(([k]) => fac[k as keyof typeof fac])) return false;
+            const activeFacilities = Object.entries(filters.facilities).filter(([, isActive]) => isActive);
+            if (activeFacilities.length > 0) {
+                const aptFacilities = getApartmentFacilities(apt.Id_Apartment);
+                if (!activeFacilities.every(([key]) => aptFacilities[key as keyof typeof aptFacilities])) return false;
             }
-            if (f.minRating !== null || f.minReviews !== null) {
+            if (filters.minRating !== null || filters.minReviews !== null) {
                 const reviews = getApartmentReviews(apt.Id_Apartment);
-                if (f.minReviews !== null && reviews.length < f.minReviews) return false;
-                if (f.minRating !== null) {
+                if (filters.minReviews !== null && reviews.length < filters.minReviews) return false;
+                if (filters.minRating !== null) {
                     if (!reviews.length) return false;
-                    const avg = reviews.reduce((s, r) => s + r.ratings.overall, 0) / reviews.length;
-                    if (avg < f.minRating) return false;
+                    const avgRating = reviews.reduce((sum, review) => sum + review.ratings.overall, 0) / reviews.length;
+                    if (avgRating < filters.minRating) return false;
                 }
             }
             return true;
         });
     }, [searchQuery, appliedFilters]);
+
+    // ── Pagination ───────────────────────────────────────────────────────────
+    const totalPages = Math.ceil(filteredApartments.length / LISTINGS_PER_PAGE);
+
+    const visibleApartments = useMemo(() => {
+        const startIndex = (currentPage - 1) * LISTINGS_PER_PAGE;
+        const endIndex   = startIndex + LISTINGS_PER_PAGE;
+        return filteredApartments.slice(startIndex, endIndex);
+    }, [filteredApartments, currentPage]);
+
+    const pageNumbers = useMemo(() =>
+            Array.from({ length: totalPages }, (_, index) => index + 1),
+        [totalPages]);
+
+    const goToPage = (page: number) => {
+        setCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    const goToPrevPage = () => { if (currentPage > 1) goToPage(currentPage - 1); };
+    const goToNextPage = () => { if (currentPage < totalPages) goToPage(currentPage + 1); };
+
+    const resetToFirstPage = () => setCurrentPage(1);
+
+    const handleSearch = (query: string) => { setSearchQuery(query); resetToFirstPage(); };
+    const handleApply  = () => { setAppliedFilters(pendingFilters); resetToFirstPage(); };
+    const handleReset  = () => { setPendingFilters(defaultFilters); setAppliedFilters(defaultFilters); resetToFirstPage(); };
+    const handleResetAll = () => { setSearchQuery(""); setAppliedFilters(defaultFilters); setPendingFilters(defaultFilters); resetToFirstPage(); };
 
     return (
         <Box sx={{ minHeight: "100vh", bgcolor: "background.default", py: { xs: 4, md: 8 }, pt: 10 }}>
@@ -88,8 +119,8 @@ const Listings = () => {
                 onClose={() => setDrawerOpen(false)}
                 filters={pendingFilters}
                 onChange={setPendingFilters}
-                onApply={() => setAppliedFilters(pendingFilters)}
-                onReset={() => { setPendingFilters(defaultFilters); setAppliedFilters(defaultFilters); }}
+                onApply={handleApply}
+                onReset={handleReset}
             />
 
             <Container maxWidth={false} sx={{ width: "100%", px: { xs: 2, sm: 3, md: 6, lg: 10 }, display: "flex", alignItems: "center", flexDirection: "column", mt: 10 }}>
@@ -114,10 +145,10 @@ const Listings = () => {
                     </Typography>
                 </Box>
 
-                {/* Search + Filtre */}
+                {/* Search + Filters */}
                 <Box sx={{ width: "100%", mb: 4, display: "flex", gap: 2, alignItems: "center" }}>
                     <Box sx={{ flex: 1 }}>
-                        <SearchBar onSearch={setSearchQuery} />
+                        <SearchBar onSearch={handleSearch} />
                     </Box>
                     <Badge badgeContent={activeFilterCount} color="primary" overlap="circular">
                         <Button
@@ -141,7 +172,7 @@ const Listings = () => {
                         <Typography variant="body1" color="text.secondary" sx={{ mb: 5, maxWidth: "400px", mx: "auto" }}>
                             {t("listings.noResultsDesc")}
                         </Typography>
-                        <Button variant="contained" onClick={() => { setSearchQuery(""); setAppliedFilters(defaultFilters); setPendingFilters(defaultFilters); }} sx={{ px: 6, py: 1.8, borderRadius: 2.5 }}>
+                        <Button variant="contained" onClick={handleResetAll} sx={{ px: 6, py: 1.8, borderRadius: 2.5 }}>
                             {t("listings.resetAll")}
                         </Button>
                     </Box>
@@ -150,7 +181,7 @@ const Listings = () => {
                 {/* Grid */}
                 {filteredApartments.length > 0 && (
                     <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", lg: "1fr 1fr 1fr" }, gap: 5, width: "100%" }}>
-                        {filteredApartments.map((apt, idx) => (
+                        {visibleApartments.map((apt, idx) => (
                             <Box key={apt.Id_Apartment} sx={{ animation: `fadeInUp 0.5s cubic-bezier(0.165,0.84,0.44,1) ${idx * 0.08}s both`, "@keyframes fadeInUp": { from: { opacity: 0, transform: "translateY(28px)" }, to: { opacity: 1, transform: "translateY(0)" } } }}>
                                 <ApartmentCard apartment={apt} toggleFavorite={toggleFavorite} favorites={favorites} getStatus={getStatus} getUserName={getUserName} />
                             </Box>
@@ -158,12 +189,37 @@ const Listings = () => {
                     </Box>
                 )}
 
-                {/* Paginare */}
-                {filteredApartments.length > 0 && (
-                    <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 12 }}>
-                        <Button variant="outlined" sx={{ px: 3, borderRadius: 1.5 }}>{t("listings.prev")}</Button>
-                        <Button variant="contained" sx={{ minWidth: "50px", height: "50px", borderRadius: 1.5, fontWeight: 900 }}>1</Button>
-                        <Button variant="outlined" sx={{ px: 3, borderRadius: 1.5 }}>{t("listings.next")}</Button>
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 1, mt: 12 }}>
+                        <Button
+                            variant="outlined"
+                            onClick={goToPrevPage}
+                            disabled={currentPage === 1}
+                            sx={{ px: 3, borderRadius: 1.5 }}
+                        >
+                            {t("listings.prev")}
+                        </Button>
+
+                        {pageNumbers.map((pageNumber) => (
+                            <Button
+                                key={pageNumber}
+                                variant={pageNumber === currentPage ? "contained" : "outlined"}
+                                onClick={() => goToPage(pageNumber)}
+                                sx={{ minWidth: "50px", height: "50px", borderRadius: 1.5, fontWeight: pageNumber === currentPage ? 900 : 400 }}
+                            >
+                                {pageNumber}
+                            </Button>
+                        ))}
+
+                        <Button
+                            variant="outlined"
+                            onClick={goToNextPage}
+                            disabled={currentPage === totalPages}
+                            sx={{ px: 3, borderRadius: 1.5 }}
+                        >
+                            {t("listings.next")}
+                        </Button>
                     </Box>
                 )}
             </Container>
