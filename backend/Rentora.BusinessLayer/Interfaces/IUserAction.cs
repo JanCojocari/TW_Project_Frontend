@@ -8,6 +8,8 @@ namespace Rentora.BusinessLayer.Interfaces
         ActionResponse Register(UserRegisterDto data);
         object Login(UserLoginDto data);
         UserDto? GetById(int id);
+        List<UserDto> GetAll();
+
         ActionResponse Update(int id, UserUpdateDto data);
         ActionResponse Delete(int id);
     }
