@@ -12,7 +12,7 @@ using Rentora.DataAccess;
 namespace Rentora.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260328180212_InitialCreate")]
+    [Migration("20260331092730_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -468,7 +468,7 @@ namespace Rentora.DataAccess.Migrations
                     b.HasOne("Rentora.Domain.Entities.User", "User")
                         .WithMany("Favorites")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Apartment");
@@ -481,7 +481,7 @@ namespace Rentora.DataAccess.Migrations
                     b.HasOne("Rentora.Domain.Entities.Apartment", "Apartment")
                         .WithMany()
                         .HasForeignKey("ApartmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Rentora.Domain.Entities.User", "Owner")
@@ -514,7 +514,7 @@ namespace Rentora.DataAccess.Migrations
                     b.HasOne("Rentora.Domain.Entities.User", "User")
                         .WithMany("RecentViews")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Apartment");
@@ -533,7 +533,7 @@ namespace Rentora.DataAccess.Migrations
                     b.HasOne("Rentora.Domain.Entities.User", "User")
                         .WithMany("Reviews")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Apartment");
@@ -556,7 +556,8 @@ namespace Rentora.DataAccess.Migrations
                 {
                     b.HasOne("Rentora.Domain.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("User");
                 });

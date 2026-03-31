@@ -1,7 +1,136 @@
-﻿namespace Rentora.DataAccess
+﻿namespace Rentora.DataAccess;
+
+using Microsoft.EntityFrameworkCore;
+using Rentora.Domain.Entities;
+
+public class AppDbContext : DbContext
 {
-    public class DbSession
+    public AppDbContext() { }
+
+    public DbSet<User> Users => Set<User>();
+    public DbSet<Apartment> Apartments => Set<Apartment>();
+    public DbSet<Facilities> Facilities => Set<Facilities>();
+    public DbSet<Review> Reviews => Set<Review>();
+    public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<Favorite> Favorites => Set<Favorite>();
+    public DbSet<RecentView> RecentViews => Set<RecentView>();
+    public DbSet<SupportRequest> SupportRequests => Set<SupportRequest>();
+    public DbSet<Session> Sessions => Set<Session>();
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        public static string? ConnectionString { get; set; }
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlServer(
+                DbSession.ConnectionString ?? 
+                "Server=localhost;Database=RentoraDB;Trusted_Connection=True;TrustServerCertificate=True"
+            );
+        }
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // User -> OwnedApartments (one-to-many)
+        modelBuilder.Entity<Apartment>()
+            .HasOne(a => a.Owner)
+            .WithMany(u => u.OwnedApartments)
+            .HasForeignKey(a => a.OwnedId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // User -> RentedApartment (optional)
+        modelBuilder.Entity<Apartment>()
+            .HasOne(a => a.Renter)
+            .WithMany()
+            .HasForeignKey(a => a.RenterId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        // Apartment -> Facilities (one-to-one)
+        modelBuilder.Entity<Facilities>()
+            .HasOne(f => f.Apartment)
+            .WithOne(a => a.Facilities)
+            .HasForeignKey<Facilities>(f => f.ApartmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Apartment -> Reviews
+        modelBuilder.Entity<Review>()
+            .HasOne(r => r.Apartment)
+            .WithMany(a => a.Reviews)
+            .HasForeignKey(r => r.ApartmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // User -> Reviews
+        modelBuilder.Entity<Review>()
+            .HasOne(r => r.User)
+            .WithMany(u => u.Reviews)
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Favorite (cheie compusa)
+        modelBuilder.Entity<Favorite>()
+            .HasKey(f => new { f.UserId, f.ApartmentId });
+
+        modelBuilder.Entity<Favorite>()
+            .HasOne(f => f.User)
+            .WithMany(u => u.Favorites)
+            .HasForeignKey(f => f.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Favorite>()
+            .HasOne(f => f.Apartment)
+            .WithMany(a => a.Favorites)
+            .HasForeignKey(f => f.ApartmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // RecentView
+        modelBuilder.Entity<RecentView>()
+            .HasOne(r => r.User)
+            .WithMany(u => u.RecentViews)
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<RecentView>()
+            .HasOne(r => r.Apartment)
+            .WithMany()
+            .HasForeignKey(r => r.ApartmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Payment -> Owner si Renter (doua FK spre User, fara cascade)
+        modelBuilder.Entity<Payment>()
+            .HasOne(p => p.Owner)
+            .WithMany()
+            .HasForeignKey(p => p.OwnerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Payment>()
+            .HasOne(p => p.Renter)
+            .WithMany()
+            .HasForeignKey(p => p.RenterId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // SupportRequest -> User (optional, userul poate fi anonim)
+        modelBuilder.Entity<SupportRequest>()
+            .HasOne(s => s.User)
+            .WithMany()
+            .HasForeignKey(s => s.UserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        // Session -> User
+        modelBuilder.Entity<Session>()
+            .HasOne(s => s.User)
+            .WithMany()
+            .HasForeignKey(s => s.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Owned types (stocate ca JSON in coloana apartamentului)
+        modelBuilder.Entity<Apartment>()
+            .OwnsOne(a => a.Location);
+
+        modelBuilder.Entity<Apartment>()
+            .OwnsOne(a => a.AdditionlaInfo);
+
+        // Email unic
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
     }
 }
