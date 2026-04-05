@@ -26,7 +26,7 @@ interface Props {
 }
 
 const MobileSummaryAccordion = ({ open, onToggle, effectiveTotal, currency, summaryCardProps }: Props) => {
-    const sym = CURRENCY_SYMBOLS[currency] ?? currency;
+    const sym = CURRENCY_SYMBOLS[currency as keyof typeof CURRENCY_SYMBOLS] ?? currency;
 
     return (
         <Box sx={{ display: { xs: "block", md: "none" }, mb: 3 }}>

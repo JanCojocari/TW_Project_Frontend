@@ -1,5 +1,5 @@
 ﻿// src/components/createListing/StepBasicInfo.tsx
-import React, { memo }              from "react";
+import { memo }                     from "react";
 import { Box, Typography, ToggleButtonGroup, ToggleButton } from "@mui/material";
 import { Home as HomeIcon }  from "@mui/icons-material";
 import { useTranslation }    from "react-i18next";

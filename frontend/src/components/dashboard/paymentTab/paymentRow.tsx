@@ -3,7 +3,7 @@ import { Box, Chip, Paper, Tooltip, Typography } from "@mui/material";
 import CheckCircleIcon   from "@mui/icons-material/CheckCircle";
 import { useTranslation } from "react-i18next";
 import { colors }         from "../../../theme/gradients";
-import DownloadButton     from "./DownloadButton";
+import DownloadButton     from "./downloadButton";
 import type { PaymentDto } from "../../../utils/pdf/buildInvoiceData";
 
 interface Props {

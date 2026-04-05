@@ -19,7 +19,7 @@ export const useOrderSummary = (
         const serviceFee  = Math.round(subtotal * SERVICE_FEE_RATE * 100) / 100;
 
         return {
-            currency: apt.Currency,
+            currency: apt.Currency as OrderSummary["currency"],
             items: [{
                 id:        String(apt.Id_Apartment),
                 title:     `Apartament – ${apt.Address}`,

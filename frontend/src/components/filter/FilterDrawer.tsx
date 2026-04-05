@@ -6,7 +6,7 @@ import { Box, Button, Drawer, IconButton, Typography } from "@mui/material";
 import { Close as CloseIcon, FilterList as FilterListIcon,
     RestartAlt as ResetIcon } from "@mui/icons-material";
 import { gradients, colors } from "../../theme/gradients";
-import type { FilterState }       from "./filterTypes";
+import type { FilterState }       from "../../types/filterTypes";
 import AvailabilityFilter         from "./AvailabilityFilter";
 import CurrencyIntervalFilter     from "./CurrencyIntervalFilter";
 import PriceFilter                from "./PriceFilter";

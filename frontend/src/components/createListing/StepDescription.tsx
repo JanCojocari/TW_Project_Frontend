@@ -1,5 +1,5 @@
 ﻿// src/components/createListing/StepDescription.tsx
-import React, { memo }       from "react";
+import { memo }              from "react";
 import { Box, Typography }   from "@mui/material";
 import { AttachMoney as MoneyIcon, Cancel as CancelIcon, CheckCircle as CheckIcon } from "@mui/icons-material";
 import { useTranslation }    from "react-i18next";

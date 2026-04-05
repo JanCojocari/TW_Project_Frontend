@@ -1,4 +1,4 @@
-﻿// src/components/settings/ProfileSection.tsx
+// src/components/settings/ProfileSection.tsx
 import { Button, Grid, MenuItem, TextField } from "@mui/material";
 import { DatePicker }           from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs }         from "@mui/x-date-pickers/AdapterDayjs";
@@ -42,25 +42,25 @@ export default function ProfileSection({ profile, saving, onUpdate, onSave }: Pr
                 description={t("settings.profile.description")}
             >
                 <Grid container spacing={2.5}>
-                    <Grid item xs={12} sm={6}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
                         <DebouncedTextField fullWidth label={t("settings.profile.name")} size="small"
                                             value={profile.name}
                                             onChange={(v) => onUpdate("name", v)}
                         />
                     </Grid>
-                    <Grid item xs={12} sm={6}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
                         <DebouncedTextField fullWidth label={t("settings.profile.surname")} size="small"
                                             value={profile.surname}
                                             onChange={(v) => onUpdate("surname", v)}
                         />
                     </Grid>
-                    <Grid item xs={12} sm={6}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
                         <DebouncedTextField fullWidth label={t("settings.profile.phone")} size="small"
                                             value={profile.phone}
                                             onChange={(v) => onUpdate("phone", v)}
                         />
                     </Grid>
-                    <Grid item xs={12} sm={6}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
                         <DatePicker
                             label={t("settings.profile.birthday")}
                             value={profile.birthday ? dayjs(profile.birthday) : null}
@@ -71,7 +71,7 @@ export default function ProfileSection({ profile, saving, onUpdate, onSave }: Pr
                             }}
                         />
                     </Grid>
-                    <Grid item xs={12} sm={6}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
                         <TextField fullWidth select label={t("settings.profile.gender")} size="small"
                                    value={normalizedGender}
                                    onChange={(e) => onUpdate("gender", e.target.value)}
@@ -81,8 +81,8 @@ export default function ProfileSection({ profile, saving, onUpdate, onSave }: Pr
                             ))}
                         </TextField>
                     </Grid>
-                    <Grid item xs={12} sm={6} />
-                    <Grid item xs={12}>
+                    <Grid size={{ xs: 12, sm: 6 }} />
+                    <Grid size={12}>
                         <Button variant="contained" disabled={saving} onClick={onSave}
                                 sx={{ borderRadius: 2, px: 4 }}
                         >

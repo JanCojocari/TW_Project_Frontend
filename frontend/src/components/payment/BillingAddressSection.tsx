@@ -1,6 +1,6 @@
 ﻿import { Box, Typography, Checkbox, FormControlLabel, Collapse } from "@mui/material";
 import { BILLING_ADDRESS_FIELDS, LABELS } from "../../types/paymentPageConfig";
-import type { FieldErrors } from "../../types/paymentPageConfig";
+type FieldErrors = Record<string, string | undefined>;
 import FormField from "./FormField.tsx";
 
 interface Props {

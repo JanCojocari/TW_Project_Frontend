@@ -5,13 +5,7 @@ import { useTranslation } from "react-i18next";
 import { colors }         from "../../theme/gradients.ts";
 import type { Facilities } from "../../types/apartment.types";
 
-interface FacilityItem { key: keyof Facilities; labelKey: string; icon: React.ReactNode; }
-interface FacilityGroup { titleKey: string; items: FacilityItem[]; }
 
-// Grupuri cu chei de traducere în loc de text hardcodat
-const facilityGroups: FacilityGroup[] = [
-    { titleKey: "filters.facilities", items: [] }, // nu e folosit direct — grupurile au chei proprii
-];
 
 const GROUPS: { titleKey: string; items: { key: keyof Facilities; labelKey: string; icon: React.ReactNode }[] }[] = [
     { titleKey: "g.internet", items: [
@@ -54,7 +48,7 @@ const GROUPS: { titleKey: string; items: { key: keyof Facilities; labelKey: stri
 
 // Traduceri inline pentru facilități (folosesc cheile din filterTypes dar mapate aici)
 const FacilitiesTab = ({ facilities }: { facilities: Facilities }) => {
-    const { t, i18n } = useTranslation();
+    const { i18n } = useTranslation();
     const isEn = i18n.language === "en";
 
     // Titluri grupuri

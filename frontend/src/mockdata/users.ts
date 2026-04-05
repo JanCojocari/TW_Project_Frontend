@@ -64,7 +64,7 @@ export const users: User[] = [
         Email: "ana@mail.com",
         Phone: "069888777",
         Birthday: "2001-04-19",
-        Gender: null,
+        Gender: "",
         Account_sold: 150
     },
     {

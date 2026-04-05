@@ -1,4 +1,4 @@
-﻿// src/components/settings/SecuritySection.tsx
+// src/components/settings/SecuritySection.tsx
 import { Button, Grid } from "@mui/material";
 import { useTranslation }          from "react-i18next";
 import SettingsSectionWrapper      from "./SettingsSectionWraper.tsx";
@@ -21,22 +21,22 @@ export default function SecuritySection({ password, saving, onUpdate, onSave }: 
             description={t("settings.security.description")}
         >
             <Grid container spacing={2.5}>
-                <Grid item xs={12} sm={6}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                     <DebouncedTextField fullWidth label={t("settings.security.current")} size="small"
                                         type="password"
                                         value={password.oldPassword}
                                         onChange={(v) => onUpdate("oldPassword", v)}
                     />
                 </Grid>
-                <Grid item xs={12} />
-                <Grid item xs={12} sm={6}>
+                <Grid size={12} />
+                <Grid size={{ xs: 12, sm: 6 }}>
                     <DebouncedTextField fullWidth label={t("settings.security.new")} size="small"
                                         type="password"
                                         value={password.newPassword}
                                         onChange={(v) => onUpdate("newPassword", v)}
                     />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                     <DebouncedTextField fullWidth label={t("settings.security.confirm")} size="small"
                                         type="password"
                                         value={password.confirmPassword}
@@ -49,7 +49,7 @@ export default function SecuritySection({ password, saving, onUpdate, onSave }: 
                                         }
                     />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid size={12}>
                     <Button variant="contained" disabled={saving} onClick={onSave}
                             sx={{ borderRadius: 2, px: 4 }}
                     >

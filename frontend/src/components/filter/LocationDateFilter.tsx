@@ -8,7 +8,7 @@ import { AdapterDayjs }   from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs, { type Dayjs }   from "dayjs";
 import FilterSection             from "./FilterSection";
-import type { FilterState }      from "./filterTypes";
+import type { FilterState }      from "../../types/filterTypes";
 
 interface Props {
     city:     string;

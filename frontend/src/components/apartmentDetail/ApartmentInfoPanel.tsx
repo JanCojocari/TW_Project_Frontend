@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { gradients, colors } from "../../theme/gradients.ts";
 import type { Apartment } from "../../types/apartment.types";
 
-interface User { Id_User: number; Name: string; Surname: string; Email?: string; Phone: string; }
+interface User { Id_User: number; Name: string; Surname: string; Email?: string | null; Phone: string; }
 interface Props { apartment: Apartment; owner: User | null | undefined; renter: User | null | undefined; isAvailable: boolean; }
 
 const iconBoxSx = { background: "", p: 1.5, borderRadius: 2, display: "flex", color: "#FFFFFF" };
