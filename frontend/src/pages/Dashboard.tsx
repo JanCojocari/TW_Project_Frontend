@@ -1,10 +1,11 @@
 ﻿// pages/Dashboard.tsx
-import { useMemo, useState }   from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate }         from "react-router-dom";
 import { useTranslation }      from "react-i18next";
 import { Box, Container, Paper, Tab, Tabs, Typography } from "@mui/material";
-import { apartments }          from "../mockdata/apartments";
+import type { Apartment }      from "../types/apartment.types";
 import { users }               from "../mockdata/users";
+import { apartmentService }    from "../services/apartmentService";
 import { paths }               from "../app/paths";
 import { gradients, colors }   from "../theme/gradients";
 import ProfileTab              from "../components/dashboard/ProfileTab";
@@ -31,14 +32,20 @@ export default function Dashboard() {
     const [tab, setTab] = useState<DashboardTab>(0);
     const currentUserId = 1;
 
-    const currentUser        = useMemo(() => users.find((u) => u.Id_User === currentUserId) ?? null, []);
-    const myListings         = useMemo(() => apartments.filter((a) => a.Id_Owner === currentUserId), []);
-    const [favoriteIds, setFavoriteIds] = useState<number[]>(() => getFavorites());
+    const currentUser                    = useMemo(() => users.find((u) => u.Id_User === currentUserId) ?? null, []);
+    const [myListings, setMyListings]    = useState<Apartment[]>([]);
+    const [allApartments, setAllApartments] = useState<Apartment[]>([]);
+    const [favoriteIds, setFavoriteIds]  = useState<number[]>(() => getFavorites());
+
+    useEffect(() => {
+        apartmentService.getByOwner(currentUserId).then(setMyListings).catch(() => setMyListings([]));
+        apartmentService.getAll().then(setAllApartments).catch(() => setAllApartments([]));
+    }, []);
 
     const favoriteApartments = useMemo(() => {
         const set = new Set(favoriteIds);
-        return apartments.filter((a) => set.has(a.Id_Apartment));
-    }, [favoriteIds]);
+        return allApartments.filter((a) => set.has(a.Id_Apartment));
+    }, [favoriteIds, allApartments]);
 
     const toggleFavorite = (id: number) => {
         setFavoriteIds((prev) => {

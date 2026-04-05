@@ -1,9 +1,8 @@
 ﻿// pages/Listings.tsx
 import { Box, Container, Typography, Button, Badge } from "@mui/material";
 import { Home as HomeIcon, TrendingUp as TrendingUpIcon, FilterList as FilterListIcon } from "@mui/icons-material";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation }    from "react-i18next";
-import { apartments }        from "../mockdata/apartments.ts";
 import type { Apartment }    from "../types/apartment.types.ts";
 import { users }             from "../mockdata/users.ts";
 import ApartmentCard         from "../components/listing/ApartmentCard.tsx";
@@ -11,18 +10,23 @@ import SearchBar             from "../components/listing/SearchBar.tsx";
 import FilterDrawer          from "../components/filter/FilterDrawer.tsx";
 import { defaultFilters, type FilterState } from "../types//filterTypes.ts";
 import { gradients, colors } from "../theme/gradients.ts";
-import { getApartmentFacilities, getApartmentReviews, getApartmentLocation } from "../mockdata/Apartmentdetails.ts";
+import { apartmentService }  from "../services/apartmentService.ts";
 
 const LISTINGS_PER_PAGE = 24;
 
 const Listings = () => {
     const { t } = useTranslation();
+    const [apartments, setApartments]         = useState<Apartment[]>([]);
     const [searchQuery, setSearchQuery]      = useState("");
     const [favorites, setFavorites]          = useState<number[]>([]);
     const [drawerOpen, setDrawerOpen]        = useState(false);
     const [pendingFilters, setPendingFilters] = useState<FilterState>(defaultFilters);
     const [appliedFilters, setAppliedFilters] = useState<FilterState>(defaultFilters);
     const [currentPage, setCurrentPage]      = useState(1);
+
+    useEffect(() => {
+        apartmentService.getAll().then(setApartments).catch(() => setApartments([]));
+    }, []);
 
     const toggleFavorite = (id: number) =>
         setFavorites((prev) => prev.includes(id) ? prev.filter((favId) => favId !== id) : [...prev, id]);
@@ -62,17 +66,15 @@ const Listings = () => {
             if (filters.interval !== "ALL" && apt.Interval !== filters.interval) return false;
             if (apt.Cost_per_interval < filters.priceRange[0] || apt.Cost_per_interval > filters.priceRange[1]) return false;
             if (filters.city) {
-                const location   = getApartmentLocation(apt.Id_Apartment);
-                const cityQuery  = filters.city.toLowerCase();
-                if (!location.city.toLowerCase().includes(cityQuery) && !(location.region?.toLowerCase().includes(cityQuery)) && !apt.Address.toLowerCase().includes(cityQuery)) return false;
+                const cityQuery = filters.city.toLowerCase();
+                if (!apt.location?.city?.toLowerCase().includes(cityQuery) && !apt.Address.toLowerCase().includes(cityQuery)) return false;
             }
             const activeFacilities = Object.entries(filters.facilities).filter(([, isActive]) => isActive);
             if (activeFacilities.length > 0) {
-                const aptFacilities = getApartmentFacilities(apt.Id_Apartment);
-                if (!activeFacilities.every(([key]) => aptFacilities[key as keyof typeof aptFacilities])) return false;
+                if (!activeFacilities.every(([key]) => apt.facilities[key as keyof typeof apt.facilities])) return false;
             }
             if (filters.minRating !== null || filters.minReviews !== null) {
-                const reviews = getApartmentReviews(apt.Id_Apartment);
+                const reviews = apt.reviews ?? [];
                 if (filters.minReviews !== null && reviews.length < filters.minReviews) return false;
                 if (filters.minRating !== null) {
                     if (!reviews.length) return false;

@@ -1,8 +1,9 @@
 ﻿// src/pages/CreateListing.tsx
-import { useCallback }    from "react";
+import { useCallback, useState } from "react";
 import { useNavigate }    from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Box, Container, Typography, Button, Alert } from "@mui/material";
+import { apartmentService, buildCreatePayload } from "../services/apartmentService.ts";
 import { ArrowBack as ArrowBackIcon, Home as HomeIcon } from "@mui/icons-material";
 import { gradients } from "../theme/gradients.ts";
 import { paths }     from "../app/paths.ts";
@@ -39,9 +40,20 @@ const CreateListing = () => {
         () => addLandmark(form.landmarkInput),
         [addLandmark, form.landmarkInput],
     );
+    const [apiError, setApiError] = useState<string | null>(null);
+
     const handleSubmit = useCallback(
-        () => submit(() => setTimeout(() => navigate(paths.apartmentDetail(1)), 1500)),
-        [submit, navigate],
+        () => submit(async () => {
+            setApiError(null);
+            try {
+                await apartmentService.create(1, buildCreatePayload(form));
+            } catch {
+                setApiError("Eroare la salvarea anunțului. Verificați conexiunea și încercați din nou.");
+                return;
+            }
+            setTimeout(() => navigate(paths.apartmentDetail(1)), 1500);
+        }),
+        [submit, navigate, form],
     );
 
     if (submitted) return <SuccessScreen />;
@@ -69,6 +81,11 @@ const CreateListing = () => {
                 {Object.keys(errors).length > 0 && (
                     <Alert severity="error" sx={{ mb: 3, borderRadius: 3 }}>
                         {t("createListing.errorsAlert")}
+                    </Alert>
+                )}
+                {apiError && (
+                    <Alert severity="error" sx={{ mb: 3, borderRadius: 3 }}>
+                        {apiError}
                     </Alert>
                 )}
 
