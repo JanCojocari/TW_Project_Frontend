@@ -1,29 +1,17 @@
-﻿// components/apartmentDetail/ReviewsTab.tsx
-import { Box, Paper, Typography, LinearProgress, Avatar } from "@mui/material";
+// components/apartmentDetail/ReviewsTab.tsx
+import { Box, Paper, Typography, Avatar } from "@mui/material";
 import { Star as StarIcon }   from "@mui/icons-material";
 import { useTranslation }     from "react-i18next";
 import { gradients, colors }  from "../../theme/gradients.ts";
-import type { Review }        from "../../types/apartment.types";
+import type { ReviewApiDto }  from "../../services/reviewService.ts";
 
-type RatingKey = "cleanliness" | "location" | "valueForMoney" | "comfort" | "facilities" | "communication";
-
-const RatingBar = ({ label, value }: { label: string; value: number }) => (
-    <Box sx={{ mb: 1.5 }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
-            <Typography variant="body2" color="text.secondary" fontWeight={500}>{label}</Typography>
-            <Typography variant="body2" fontWeight={700} color="primary.main">{value.toFixed(1)}</Typography>
-        </Box>
-        <LinearProgress variant="determinate" value={value * 10} sx={{ height: 6, borderRadius: 3, bgcolor: colors.primaryAlpha10, "& .MuiLinearProgress-bar": { background: gradients.primary, borderRadius: 3 } }} />
-    </Box>
-);
-
-const ReviewCard = ({ review }: { review: Review }) => {
-    const { t, i18n } = useTranslation();
-    const initials = review.renterName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
-    const date     = new Date(review.createdAt).toLocaleDateString(i18n.language === "en" ? "en-GB" : "ro-RO", { year: "numeric", month: "long" });
-    const stayText = review.stayDuration
-        ? ` · ${review.stayDuration} ${review.stayDuration === 1 ? t("components.reviews.day") : t("components.reviews.days")}`
-        : "";
+const ReviewCard = ({ review }: { review: ReviewApiDto }) => {
+    const { i18n } = useTranslation();
+    const initials = `U${review.userId}`;
+    const date     = new Date(review.createdAt).toLocaleDateString(
+        i18n.language === "en" ? "en-GB" : "ro-RO",
+        { year: "numeric", month: "long" }
+    );
 
     return (
         <Paper variant="outlined" sx={{ p: 3, borderRadius: 3, border: `1px solid ${colors.border}`, transition: "all 0.2s ease", "&:hover": { borderColor: colors.primary, boxShadow: `0 4px 16px ${colors.primaryAlpha10}` } }}>
@@ -31,13 +19,13 @@ const ReviewCard = ({ review }: { review: Review }) => {
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                     <Avatar sx={{ background: gradients.primary, fontWeight: 700, width: 42, height: 42 }}>{initials}</Avatar>
                     <Box>
-                        <Typography variant="subtitle2" fontWeight={700}>{review.renterName}</Typography>
-                        <Typography variant="caption" color="text.secondary">{date}{stayText}</Typography>
+                        <Typography variant="subtitle2" fontWeight={700}>User #{review.userId}</Typography>
+                        <Typography variant="caption" color="text.secondary">{date}</Typography>
                     </Box>
                 </Box>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, bgcolor: colors.primaryAlpha10, px: 1.5, py: 0.5, borderRadius: 2 }}>
                     <StarIcon sx={{ fontSize: 16, color: "#F59E0B" }} />
-                    <Typography variant="subtitle2" fontWeight={800} color="primary.main">{review.ratings.overall.toFixed(1)}</Typography>
+                    <Typography variant="subtitle2" fontWeight={800} color="primary.main">{review.rating}/10</Typography>
                 </Box>
             </Box>
             {review.comment && (
@@ -48,7 +36,7 @@ const ReviewCard = ({ review }: { review: Review }) => {
             {review.ownerResponse && (
                 <Box sx={{ mt: 2, p: 2, bgcolor: colors.primaryAlpha06, borderRadius: 2, borderLeft: `3px solid ${colors.primary}` }}>
                     <Typography variant="caption" fontWeight={700} color="primary.main" sx={{ display: "block", mb: 0.5 }}>
-                        {t("components.reviews.ownerResponse")}
+                        Owner response
                     </Typography>
                     <Typography variant="body2" color="text.secondary">{review.ownerResponse}</Typography>
                 </Box>
@@ -57,17 +45,8 @@ const ReviewCard = ({ review }: { review: Review }) => {
     );
 };
 
-const ReviewsTab = ({ reviews }: { reviews: Review[] }) => {
+const ReviewsTab = ({ reviews }: { reviews: ReviewApiDto[] }) => {
     const { t } = useTranslation();
-
-    const ratingCategories: { key: RatingKey; label: string }[] = [
-        { key: "cleanliness",   label: t("components.reviews.categories.cleanliness")   },
-        { key: "location",      label: t("components.reviews.categories.location")      },
-        { key: "valueForMoney", label: t("components.reviews.categories.valueForMoney") },
-        { key: "comfort",       label: t("components.reviews.categories.comfort")       },
-        { key: "facilities",    label: t("components.reviews.categories.facilities")    },
-        { key: "communication", label: t("components.reviews.categories.communication") },
-    ];
 
     if (reviews.length === 0) return (
         <Box sx={{ py: 6, textAlign: "center" }}>
@@ -76,30 +55,26 @@ const ReviewsTab = ({ reviews }: { reviews: Review[] }) => {
         </Box>
     );
 
-    const avgOverall    = reviews.reduce((s, r) => s + r.ratings.overall, 0) / reviews.length;
-    const avgByCategory = ratingCategories.map(cat => ({ ...cat, avg: reviews.reduce((s, r) => s + r.ratings[cat.key], 0) / reviews.length }));
-    const reviewCount   = reviews.length;
-    const reviewLabel   = reviewCount === 1 ? t("components.reviews.review") : t("components.reviews.reviews");
+    const avgRating   = reviews.reduce((s, r) => s + r.rating, 0) / reviews.length;
+    const reviewCount = reviews.length;
+    const reviewLabel = reviewCount === 1 ? t("components.reviews.review") : t("components.reviews.reviews");
 
     return (
         <Box>
             <Paper variant="outlined" sx={{ p: 3, borderRadius: 3, mb: 3, border: `1px solid ${colors.border}` }}>
-                <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, alignItems: { sm: "center" }, gap: 3 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
                     <Box sx={{ textAlign: "center", minWidth: 120 }}>
-                        <Typography variant="h2" fontWeight={900} color="primary.main" lineHeight={1}>{avgOverall.toFixed(1)}</Typography>
+                        <Typography variant="h2" fontWeight={900} color="primary.main" lineHeight={1}>{avgRating.toFixed(1)}</Typography>
                         <Typography variant="body2" color="text.secondary" fontWeight={600} sx={{ mt: 0.5 }}>{t("components.reviews.outOf")}</Typography>
                         <Box sx={{ display: "flex", justifyContent: "center", gap: 0.3, mt: 1 }}>
-                            {[1,2,3,4,5].map(i => <StarIcon key={i} sx={{ fontSize: 16, color: i <= Math.round(avgOverall / 2) ? "#F59E0B" : colors.primaryAlpha25 }} />)}
+                            {[1,2,3,4,5].map(i => <StarIcon key={i} sx={{ fontSize: 16, color: i <= Math.round(avgRating / 2) ? "#F59E0B" : colors.primaryAlpha25 }} />)}
                         </Box>
                         <Typography variant="caption" color="text.secondary">{reviewCount} {reviewLabel}</Typography>
-                    </Box>
-                    <Box sx={{ flex: 1 }}>
-                        {avgByCategory.map(cat => <RatingBar key={cat.key} label={cat.label} value={cat.avg} />)}
                     </Box>
                 </Box>
             </Paper>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                {reviews.map(r => <ReviewCard key={r.Id_Review} review={r} />)}
+                {reviews.map(r => <ReviewCard key={r.id} review={r} />)}
             </Box>
         </Box>
     );

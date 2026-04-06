@@ -8,6 +8,9 @@ import type { Apartment }    from "../types/apartment.types";
 import { users }             from "../mockdata/users";
 import { colors }            from "../theme/gradients.ts";
 import { apartmentService }  from "../services/apartmentService.ts";
+import { reviewService }     from "../services/reviewService.ts";
+import type { ReviewApiDto } from "../services/reviewService.ts";
+import { recentViewService } from "../services/recentViewService.ts";
 import ImageCarousel     from "../components/apartmentDetail/ImageCarousel.tsx";
 import AdditionalInfoTab from "../components/apartmentDetail/AdditionaInfoTab.tsx";
 import ApartmentInfoPanel from "../components/apartmentDetail/ApartmentInfoPanel.tsx";
@@ -23,12 +26,21 @@ const ApartmentDetail = () => {
     const [showRentSuccess, setShowRentSuccess] = useState(false);
     const [activeTab, setActiveTab]             = useState(0);
     const [apartment, setApartment]             = useState<Apartment | null>(null);
+    const [reviews, setReviews]                 = useState<ReviewApiDto[]>([]);
     const [loading, setLoading]                 = useState(true);
 
+    const currentUserId = 1;
+
     useEffect(() => {
+        const apartmentId = Number(id);
         setLoading(true);
-        apartmentService.getById(Number(id))
-            .then(setApartment)
+        apartmentService.getById(apartmentId)
+            .then(apt => {
+                setApartment(apt);
+                recentViewService.add(currentUserId, apartmentId).catch(() => {});
+                return reviewService.getByApartment(apartmentId);
+            })
+            .then(setReviews)
             .finally(() => setLoading(false));
     }, [id]);
 
@@ -37,7 +49,6 @@ const ApartmentDetail = () => {
     const location   = apartment?.location   ?? null;
     const facilities = apartment?.facilities ?? null;
     const addInfo    = apartment?.additionalInfo ?? null;
-    const reviews    = apartment?.reviews ?? [];
 
     // tabConfig în interiorul componentei — se re-evaluează la schimbarea limbii
     const tabConfig = [
