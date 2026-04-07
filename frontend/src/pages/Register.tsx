@@ -1,20 +1,82 @@
 // pages/Register.tsx
 import { Box, Button, Container, Paper, TextField, Typography, MenuItem, Stack } from "@mui/material";
-import ApartmentIcon             from "@mui/icons-material/Apartment";
-import { useNavigate }           from "react-router-dom";
-import { Link }                  from "react-router-dom";
-import { useTranslation }        from "react-i18next";
-import { DatePicker }            from "@mui/x-date-pickers/DatePicker";
-import { AdapterDayjs }          from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider }  from "@mui/x-date-pickers/LocalizationProvider";
-import { useState }              from "react";
-import dayjs, { type Dayjs }     from "dayjs";
-import { gradients, colors }     from "../theme/gradients.ts";
+import ApartmentIcon from "@mui/icons-material/Apartment";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { useState } from "react";
+import { type Dayjs } from "dayjs";
+import { gradients, colors } from "../theme/gradients.ts";
+
+import { useAxios } from "../api/AxiosContext.tsx";   // ← important
 
 const Register = () => {
-    const navigate  = useNavigate();
-    const { t }     = useTranslation();
+    const navigate = useNavigate();
+    const { t } = useTranslation();
+    const axios = useAxios();                       // ← folosești contextul
+
+    // State pentru formular
+    const [formData, setFormData] = useState({
+        name: "",
+        surname: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        phone: "",
+        gender: "",
+    });
+
     const [birthday, setBirthday] = useState<Dayjs | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value,
+        });
+    };
+
+    const handleRegister = async () => {
+        setError(null);
+
+        // Validări simple
+        if (formData.password !== formData.confirmPassword) {
+            setError("Parolele nu coincid!");
+            return;
+        }
+
+        if (!birthday) {
+            setError("Data nașterii este obligatorie!");
+            return;
+        }
+
+        const payload = {
+            name: formData.name,
+            surname: formData.surname,
+            email: formData.email,
+            password: formData.password,
+            phone: formData.phone,
+            birthday: birthday.format("YYYY-MM-DD"),
+            gender: formData.gender,
+        };
+
+        setLoading(true);
+
+        try {
+            await axios.post("/auth/register", payload);
+
+            navigate("/login");
+        } catch (err: any) {
+            const message = err?.response?.data?.message || err?.message || "A apărut o eroare la înregistrare";
+            setError(message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -45,12 +107,38 @@ const Register = () => {
 
                         <Stack spacing={2.5}>
                             <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2.5 }}>
-                                <TextField label={t("auth.register.name")}    type="text" fullWidth required />
-                                <TextField label={t("auth.register.surname")} type="text" fullWidth required />
+                                <TextField
+                                    name="name"
+                                    label={t("auth.register.name")}
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    fullWidth required
+                                />
+                                <TextField
+                                    name="surname"
+                                    label={t("auth.register.surname")}
+                                    value={formData.surname}
+                                    onChange={handleChange}
+                                    fullWidth required
+                                />
                             </Box>
 
-                            <TextField label={t("auth.register.email")} type="email" fullWidth required />
-                            <TextField label={t("auth.register.phone")} type="tel"   fullWidth required />
+                            <TextField
+                                name="email"
+                                label={t("auth.register.email")}
+                                type="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                fullWidth required
+                            />
+                            <TextField
+                                name="phone"
+                                label={t("auth.register.phone")}
+                                type="tel"
+                                value={formData.phone}
+                                onChange={handleChange}
+                                fullWidth required
+                            />
 
                             <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2.5 }}>
                                 <DatePicker
@@ -60,10 +148,18 @@ const Register = () => {
                                     disableFuture
                                     slotProps={{
                                         textField: { fullWidth: true, required: true },
-                                        popper:    { sx: { zIndex: 1400 } },
+                                        popper: { sx: { zIndex: 1400 } },
                                     }}
                                 />
-                                <TextField select label={t("auth.register.gender")} fullWidth defaultValue="" required>
+                                <TextField
+                                    name="gender"
+                                    select
+                                    label={t("auth.register.gender")}
+                                    value={formData.gender}
+                                    onChange={handleChange}
+                                    fullWidth
+                                    required
+                                >
                                     <MenuItem value="">{t("auth.register.genderDefault")}</MenuItem>
                                     <MenuItem value="M">{t("auth.register.genderMale")}</MenuItem>
                                     <MenuItem value="F">{t("auth.register.genderFemale")}</MenuItem>
@@ -71,14 +167,39 @@ const Register = () => {
                             </Box>
 
                             <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2.5 }}>
-                                <TextField label={t("auth.register.password")}        type="password" fullWidth required />
-                                <TextField label={t("auth.register.confirmPassword")} type="password" fullWidth required />
+                                <TextField
+                                    name="password"
+                                    label={t("auth.register.password")}
+                                    type="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    fullWidth required
+                                />
+                                <TextField
+                                    name="confirmPassword"
+                                    label={t("auth.register.confirmPassword")}
+                                    type="password"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                    fullWidth required
+                                />
                             </Box>
 
-                            <Button fullWidth size="large" variant="contained"
-                                    sx={{ mt: 2, py: 1.8, borderRadius: 3, fontSize: "16px" }}
-                                    onClick={() => navigate("/login")}>
-                                {t("auth.register.submit")}
+                            {error && (
+                                <Typography color="error" variant="body2" align="center">
+                                    {error}
+                                </Typography>
+                            )}
+
+                            <Button
+                                fullWidth
+                                size="large"
+                                variant="contained"
+                                sx={{ mt: 2, py: 1.8, borderRadius: 3, fontSize: "16px" }}
+                                onClick={handleRegister}
+                                disabled={loading}
+                            >
+                                {loading ? "Se înregistrează..." : t("auth.register.submit")}
                             </Button>
                         </Stack>
 

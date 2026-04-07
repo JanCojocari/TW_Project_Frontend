@@ -38,6 +38,7 @@ const LoginForm = () => {
 
     const handleSubmit = () => {
         if (validateForm()) {
+            const data = {userType: userType,email:email,password:password};
             login();
             navigate("/listings");
         }

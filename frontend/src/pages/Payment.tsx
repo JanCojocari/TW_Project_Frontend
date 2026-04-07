@@ -1,5 +1,5 @@
 ﻿import { useSearchParams } from "react-router-dom";
-import { Box, Container, Typography, Paper, Button, Alert, CircularProgress, Checkbox, FormControlLabel, IconButton, Snackbar } from "@mui/material";
+import { Box, Container, Typography, Paper, Button, Alert, CircularProgress,IconButton, Snackbar } from "@mui/material";
 import { ArrowBack as ArrowBackIcon, CheckCircle as CheckCircleIcon, Lock as LockIcon } from "@mui/icons-material";
 import { FIELDS_BY_METHOD, LABELS, CURRENCY_SYMBOLS } from "../types/paymentPageConfig";
 import type { PaymentMethodId, OrderSummary, PaymentPayload, PaymentResult } from "../types/paymentPageConfig";
