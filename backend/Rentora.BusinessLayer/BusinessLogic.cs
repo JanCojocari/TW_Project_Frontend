@@ -12,4 +12,5 @@ public class BusinessLogic
     public IApartmentAction ApartmentAction() => new ApartmentActionExecution();
     public IReviewAction ReviewAction() => new ReviewActionExecution();
     public IRecentViewAction RecentViewAction() => new RecentViewActionExecution();
+    public IPaymentAction PaymentAction() => new PaymentActionExecution();
 }
