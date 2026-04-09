@@ -7,7 +7,7 @@ import dayjs                    from "dayjs";
 import { useTranslation }       from "react-i18next";
 import SettingsSectionWrapper   from "./SettingsSectionWraper.tsx";
 import DebouncedTextField       from "../common/DebouncedTextField.tsx";
-import type { UserSettingsDto } from "../../mockdata/settingsMock";
+import type { UserSettingsDto } from "../../hooks/useSettingsForm";
 
 interface Props {
     profile:  UserSettingsDto;

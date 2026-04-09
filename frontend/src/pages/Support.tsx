@@ -8,6 +8,7 @@ import {
 import { useTranslation }    from "react-i18next";
 import { gradients, colors } from "../theme/gradients.ts";
 import DebouncedTextField    from "../components/common/DebouncedTextField.tsx";
+import { supportService }    from "../services/supportService.ts";
 
 const FaqItem = ({ question, answer }: { question: string; answer: string }) => {
     const [open, setOpen] = useState(false);
@@ -33,15 +34,22 @@ const Support = () => {
     const { t } = useTranslation();
     const [formData, setFormData]   = useState({ subject: "", message: "", email: "" });
     const [submitted, setSubmitted] = useState(false);
+    const [loading, setLoading]     = useState(false);
     const [error, setError]         = useState("");
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.email || !formData.subject || !formData.message) { setError(t("support.errorMsg")); return; }
-        setSubmitted(true);
-        setFormData({ subject: "", message: "", email: "" });
+        setLoading(true);
         setError("");
-        setTimeout(() => setSubmitted(false), 5000);
+        supportService.create({ email: formData.email, subject: formData.subject, message: formData.message })
+            .then(() => {
+                setSubmitted(true);
+                setFormData({ subject: "", message: "", email: "" });
+                setTimeout(() => setSubmitted(false), 5000);
+            })
+            .catch(() => setError("Eroare la trimiterea mesajului. Încearcă din nou."))
+            .finally(() => setLoading(false));
     };
 
     const handleChange = (field: string) => (value: string) => {
@@ -85,8 +93,8 @@ const Support = () => {
                                 <DebouncedTextField label={t("support.subject")}              value={formData.subject} onChange={handleChange("subject")} fullWidth required />
                                 <DebouncedTextField label={t("support.message")} value={formData.message} onChange={handleChange("message")} multiline fullWidth required
                                                     sx={{ flex: 1, "& .MuiOutlinedInput-root": { height: "100%", alignItems: "flex-start" }, "& textarea": { minHeight: "80px" } }} />
-                                <Button type="submit" variant="contained" size="large" startIcon={<SendIcon />} sx={{ py: 1.5, borderRadius: 2, fontSize: 16 }}>
-                                    {t("support.send")}
+                                <Button type="submit" variant="contained" size="large" startIcon={<SendIcon />} disabled={loading} sx={{ py: 1.5, borderRadius: 2, fontSize: 16 }}>
+                                    {loading ? "..." : t("support.send")}
                                 </Button>
                             </Box>
                         </Paper>

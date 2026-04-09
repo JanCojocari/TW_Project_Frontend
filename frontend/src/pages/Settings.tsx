@@ -1,20 +1,39 @@
-﻿// pages/settings/SettingsPage.tsx
+// pages/settings/SettingsPage.tsx
 import { Alert, Snackbar, Stack, Typography } from "@mui/material";
-import { useTranslation }        from "react-i18next";
-import { MOCK_USER }             from "../mockdata/settingsMock.ts";
-import { useSettingsForm }       from "../hooks/useSettingsForm";
-import ProfileSection            from "../components/settings/ProfileSection";
-import SecuritySection           from "../components/settings/SecuritySection";
-import BalanceSection            from "../components/settings/BalanceSection";
-import DangerZoneSection         from "../components/settings/DangerZoneSection";
+import { useTranslation }      from "react-i18next";
+import { useAuth }             from "../auth/AuthContext";
+import { useSettingsForm }     from "../hooks/useSettingsForm";
+import type { UserSettingsDto } from "../hooks/useSettingsForm";
+import ProfileSection          from "../components/settings/ProfileSection";
+import SecuritySection         from "../components/settings/SecuritySection";
+import BalanceSection          from "../components/settings/BalanceSection";
+import DangerZoneSection       from "../components/settings/DangerZoneSection";
 
 export default function SettingsPage() {
-    const { t } = useTranslation();
+    const { t }           = useTranslation();
+    const { currentUser } = useAuth();
+
+    const initialProfile: UserSettingsDto = currentUser ? {
+        id:             currentUser.id,
+        name:           currentUser.name,
+        surname:        currentUser.surname,
+        email:          currentUser.email,
+        phone:          currentUser.phone,
+        birthday:       currentUser.birthday?.split("T")[0] ?? "",
+        gender:         currentUser.gender ?? "male",
+        accountBalance: Number(currentUser.accountBalance),
+        currency:       "EUR",
+        role:           String(currentUser.role),
+    } : {
+        id: 0, name: "", surname: "", email: "", phone: "",
+        birthday: "", gender: "", accountBalance: 0, currency: "EUR", role: "",
+    };
+
     const {
         profile, updateProfile, password, updatePassword,
         saving, success, error, clearSuccess, clearError,
         saveProfile, savePassword, deleteAccount,
-    } = useSettingsForm(MOCK_USER);
+    } = useSettingsForm(initialProfile);
 
     return (
         <Stack spacing={3} sx={{ maxWidth: 720, mx: "auto", py: 4, px: { xs: 2, md: 0 } }}>

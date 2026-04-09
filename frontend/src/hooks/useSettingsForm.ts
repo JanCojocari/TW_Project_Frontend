@@ -1,9 +1,19 @@
-﻿// hooks/useSettingsForm.ts
-// State + handlers pentru toate secțiunile din Settings.
-// Înlocuiește funcțiile mock cu apeluri reale la API când e gata.
-
+// hooks/useSettingsForm.ts
 import { useState } from "react";
-import type { UserSettingsDto } from "../mockdata/settingsMock";
+import { userService } from "../services/userService";
+
+export interface UserSettingsDto {
+    id:             number;
+    name:           string;
+    surname:        string;
+    email:          string;
+    phone:          string;
+    birthday:       string;   // ISO date string
+    gender:         string;
+    accountBalance: number;
+    currency:       "EUR" | "USD" | "MDL";
+    role:           string;
+}
 
 export interface PasswordForm {
     oldPassword:     string;
@@ -16,11 +26,11 @@ const PASSWORD_INITIAL: PasswordForm = {
 };
 
 export function useSettingsForm(initial: UserSettingsDto) {
-    const [profile, setProfile]     = useState(initial);
-    const [password, setPassword]   = useState<PasswordForm>(PASSWORD_INITIAL);
-    const [saving, setSaving]       = useState(false);
-    const [success, setSuccess]     = useState<string | null>(null);
-    const [error, setError]         = useState<string | null>(null);
+    const [profile, setProfile]   = useState(initial);
+    const [password, setPassword] = useState<PasswordForm>(PASSWORD_INITIAL);
+    const [saving, setSaving]     = useState(false);
+    const [success, setSuccess]   = useState<string | null>(null);
+    const [error, setError]       = useState<string | null>(null);
 
     function updateProfile(field: keyof UserSettingsDto, value: string) {
         setProfile((prev) => ({ ...prev, [field]: value }));
@@ -30,15 +40,26 @@ export function useSettingsForm(initial: UserSettingsDto) {
         setPassword((prev) => ({ ...prev, [field]: value }));
     }
 
-    // TODO: înlocuiește cu PUT /api/users/{id}
     async function saveProfile() {
         setSaving(true);
-        await new Promise((r) => setTimeout(r, 800));   // simulare request
-        setSaving(false);
-        setSuccess("Profilul a fost actualizat cu succes.");
+        try {
+            await userService.update(profile.id, {
+                name:     profile.name,
+                surname:  profile.surname,
+                email:    profile.email,
+                phone:    profile.phone,
+                birthday: profile.birthday,
+                gender:   profile.gender,
+            });
+            setSuccess("Profilul a fost actualizat cu succes.");
+        } catch {
+            setError("Eroare la salvarea profilului. Încearcă din nou.");
+        } finally {
+            setSaving(false);
+        }
     }
 
-    // TODO: înlocuiește cu POST /api/auth/change-password
+    // TODO: replace with POST /api/auth/change-password when endpoint is available
     async function savePassword(): Promise<boolean> {
         if (password.newPassword !== password.confirmPassword) {
             setError("Parolele nu coincid.");
@@ -56,12 +77,16 @@ export function useSettingsForm(initial: UserSettingsDto) {
         return true;
     }
 
-    // TODO: înlocuiește cu DELETE /api/users/{id}
     async function deleteAccount() {
         setSaving(true);
-        await new Promise((r) => setTimeout(r, 1000));
-        setSaving(false);
-        setSuccess("Contul a fost șters.");
+        try {
+            await userService.delete(profile.id);
+            setSuccess("Contul a fost șters.");
+        } catch {
+            setError("Eroare la ștergerea contului. Încearcă din nou.");
+        } finally {
+            setSaving(false);
+        }
     }
 
     return {
