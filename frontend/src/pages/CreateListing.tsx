@@ -1,6 +1,7 @@
 ﻿// src/pages/CreateListing.tsx
 import { useCallback, useState } from "react";
 import { useNavigate }    from "react-router-dom";
+import { useAuth }        from "../auth/AuthContext.tsx";
 import { useTranslation } from "react-i18next";
 import { Box, Container, Typography, Button, Alert } from "@mui/material";
 import { apartmentService, buildCreatePayload } from "../services/apartmentService.ts";
@@ -19,8 +20,9 @@ import StepDescription    from "../components/createListing/StepDescription.tsx"
 const headerIcon = <HomeIcon sx={{ fontSize: 28 }} />;
 
 const CreateListing = () => {
-    const navigate = useNavigate();
-    const { t }    = useTranslation();
+    const navigate        = useNavigate();
+    const { t }           = useTranslation();
+    const { currentUser } = useAuth();
     const {
         form, errors, submitted,
         set, clearError, setFacility,
@@ -46,7 +48,7 @@ const CreateListing = () => {
         () => submit(async (markDone) => {
             setApiError(null);
             try {
-                await apartmentService.create(1, buildCreatePayload(form));
+                await apartmentService.create(currentUser?.id ?? 0, buildCreatePayload(form));
                 markDone();
                 setTimeout(() => navigate(paths.apartmentDetail(1)), 1500);
             } catch {

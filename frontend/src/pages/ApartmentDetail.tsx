@@ -7,6 +7,7 @@ import { ArrowBack as ArrowBackIcon, LocationOn as LocationOnIcon, Wifi as WifiI
 import type { Apartment }    from "../types/apartment.types";
 import type { User }         from "../types/user.types";
 import { colors }            from "../theme/gradients.ts";
+import { useAuth }           from "../auth/AuthContext.tsx";
 import { apartmentService }  from "../services/apartmentService.ts";
 import { reviewService }     from "../services/reviewService.ts";
 import type { ReviewApiDto } from "../services/reviewService.ts";
@@ -31,8 +32,7 @@ const ApartmentDetail = () => {
     const [owner, setOwner]                     = useState<User | null>(null);
     const [renter, setRenter]                   = useState<User | null>(null);
     const [loading, setLoading]                 = useState(true);
-
-    const currentUserId = 1;
+    const { currentUser }                       = useAuth();
 
     useEffect(() => {
         const apartmentId = Number(id);
@@ -42,8 +42,8 @@ const ApartmentDetail = () => {
         apartmentService.getById(apartmentId)
             .then(apt => {
                 setApartment(apt);
-                if (apt) {
-                    recentViewService.add(currentUserId, apartmentId).catch(() => {});
+                if (apt && currentUser) {
+                    recentViewService.add(currentUser.id, apartmentId).catch(() => {});
                     userService.getById(apt.Id_Owner).then(u => setOwner(mapUserApiToUser(u))).catch(() => {});
                     if (apt.Id_Renter) userService.getById(apt.Id_Renter).then(u => setRenter(mapUserApiToUser(u))).catch(() => {});
                 }
