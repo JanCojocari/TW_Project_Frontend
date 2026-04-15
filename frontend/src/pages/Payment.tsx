@@ -12,6 +12,8 @@ import SummaryCard                  from "../components/payment/SummaryCard.tsx"
 import BillingAddressSection        from "../components/payment/BillingAddressSection.tsx";
 import PaymentSuccessScreen         from "../components/payment/PaymentSuccessScreen.tsx";
 import MobileSummaryAccordion       from "../components/payment/MobileSummaryAccordion.tsx";
+import PayPalButton from "../components/payment/PayPalButton.tsx";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
     summary?:              OrderSummary;
@@ -24,6 +26,7 @@ interface Props {
 
 const PaymentPage = ({ summary: summaryProp, defaultPaymentMethod = "card", onPay, onBack, onSuccess, onError }: Props) => {
     const [searchParams]  = useSearchParams();
+    const navigate = useNavigate();
     const apartmentId     = searchParams.get("apartmentId");
     const summary         = useOrderSummary(summaryProp, apartmentId);
 
@@ -80,18 +83,35 @@ const PaymentPage = ({ summary: summaryProp, defaultPaymentMethod = "card", onPa
                             </Box>
 
                             {method === "card" && <BillingAddressSection formState={formState} errors={errors} sameAddress={sameAddress} onSameChange={setSameAddress} onChange={handleFieldChange} disabled={submitting} />}
-                            {method === "paypal" && <Alert severity="info" sx={{ mt: 2 }}>Vei fi redirecționat temporar la PayPal pentru a autoriza plata.</Alert>}
+                            {method === "paypal" && (
+                                <>
+                                    <Alert severity="info" sx={{ mt: 2 }}>Apasă butonul PayPal de mai jos pentru a autoriza plata.</Alert>
+                                    <PayPalButton
+                                        amount={summary.total - promoDiscount}
+                                        currency={summary.currency}
+                                        apartmentId={apartmentId ? Number(apartmentId) : 0}
+                                        onSuccess={(transactionId) => {
+                                            setSnackOpen(true);
+                                            onSuccess?.({ success: true, transactionId });
+                                            setTimeout(() => navigate("/dashboard"), 2500);
+                                        }}
+                                        onError={(msg) => setSubmitError(msg)}
+                                    />
+                                </>
+                            )}
                             {method === "bank_transfer" && <Alert severity="warning" sx={{ mt: 2 }}>Transferurile bancare pot dura 1–3 zile. Rezervarea se confirmă după primirea plății.</Alert>}
                         </Paper>
 
                         {submitError && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setSubmitError("")}>{submitError}</Alert>}
 
                         <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2, alignItems: "center" }}>
-                            <Button type="submit" variant="contained" size="large" fullWidth disabled={submitting}
-                                    startIcon={submitting ? <CircularProgress size={18} color="inherit" /> : <LockIcon />}
-                                    sx={{ py: 1.8, fontSize: 16, fontWeight: 800, borderRadius: 2.5, maxWidth: { sm: 340 } }} aria-busy={submitting}>
-                                {submitting ? LABELS.processing : `${LABELS.pay} · ${sym} ${effectiveTotal}`}
-                            </Button>
+                            {method !== "paypal" && (
+                                <Button type="submit" variant="contained" size="large" fullWidth disabled={submitting}
+                                        startIcon={submitting ? <CircularProgress size={18} color="inherit" /> : <LockIcon />}
+                                        sx={{ py: 1.8, fontSize: 16, fontWeight: 800, borderRadius: 2.5, maxWidth: { sm: 340 } }} aria-busy={submitting}>
+                                    {submitting ? LABELS.processing : `${LABELS.pay} · ${sym} ${effectiveTotal}`}
+                                </Button>
+                            )}
                             <Button variant="text" size="large" onClick={handleBack} disabled={submitting} sx={{ color: "text.secondary", fontWeight: 600 }}>
                                 {LABELS.back}
                             </Button>

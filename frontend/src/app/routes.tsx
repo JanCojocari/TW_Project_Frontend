@@ -15,6 +15,7 @@ import ServerError from "../pages/ServerError";
 // Trebuie de introdus rolul de chirias si de proprietar asa incat path-s sa se afiseze in dependenta de rol
 export const publicRoutes = [
     { path: paths.listings, element: <Listings /> },
+    { path: paths.serverError, element: <ServerError /> },
     { path: paths.general, element: <Listings /> },
 ];
 
@@ -38,5 +39,4 @@ export const notAuthRoutes = [
     { path: paths.login, element: <Login /> },
     { path: paths.register, element: <Register /> },
     { path: paths.about, element: <About /> },
-    { path: paths.serverError, element: <ServerError /> },
 ];

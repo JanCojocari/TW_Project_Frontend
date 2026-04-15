@@ -4,27 +4,10 @@ import {RequireAuth} from "../auth/RequireAuth";
 import App from "../App.tsx";
 import {OnlyNotAuth} from "../auth/OnlyNotAuth.tsx";
 import ScrollToTop from "../components/general/ScrollToTop.tsx";
-import { useEffect } from "react";
-import { useAxios } from "../api/AxiosContext.tsx";
-import { paths } from "./paths.ts";
-
-const HealthCheck = () => {
-    const axios = useAxios();
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        axios.get("/health/check").catch(() => {
-            navigate(paths.serverError);
-        });
-    }, []);
-
-    return null;
-};
 
 export const AppRouter = () => (
     <BrowserRouter>
         <ScrollToTop />
-        <HealthCheck />
         <Routes>
             <Route element={<App/>}>
                 {publicRoutes.map((route) => (

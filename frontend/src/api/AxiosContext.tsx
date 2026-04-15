@@ -17,7 +17,7 @@ export const AxiosProvider = ({ children }: { children: React.ReactNode }) => {
                 const isNetworkError = !error.response;
                 const is5xx = error.response?.status >= 500;
 
-                if (isNetworkError || is5xx) {
+                if ((isNetworkError || is5xx) && window.location.pathname !== "/500") {
                     window.location.href = "/500";
                 }
 
