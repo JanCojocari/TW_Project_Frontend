@@ -129,18 +129,7 @@ export const CARD_FIELDS: FieldConfig[] = [
     },
 ];
 
-export const PAYPAL_FIELDS: FieldConfig[] = [
-    {
-        name: "email",
-        label: "Email PayPal",
-        placeholder: "exemplu@email.com",
-        type: "email",
-        autoComplete: "email",
-        required: true,
-        validate: (v) =>
-            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? "Email invalid" : undefined,
-    },
-];
+export const PAYPAL_FIELDS: FieldConfig[] = [];
 
 export const BANK_FIELDS: FieldConfig[] = [
     {

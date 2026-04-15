@@ -21,6 +21,9 @@ public class Payment
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public string? InvoiceUrl { get; set; } //optional pt ca nota se genereaza dupa plata
+    
+    public string? TransactionId { get; set; }   // ID-ul returnat de PayPal
+    public string? PaymentMethod { get; set; }   // "card" | "paypal" | "bank_transfer"
 
     // Navigation
     public User Owner { get; set; } = null!;
