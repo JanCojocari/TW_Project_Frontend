@@ -1,5 +1,7 @@
 ﻿namespace Rentora.API.Controllers;
 
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Rentora.BusinessLayer;
 using Rentora.Domain.Models.SupportRequest;
@@ -10,9 +12,9 @@ public class SupportRequestController : ControllerBase
 {
     private readonly Rentora.BusinessLayer.Interfaces.ISupportRequestAction _supportAction;
 
-    public SupportRequestController()
+    public SupportRequestController(IConfiguration config)
     {
-        var bl = new BusinessLogic();
+        var bl = new BusinessLogic(config);
         _supportAction = bl.SupportRequestAction();
     }
 
@@ -25,6 +27,7 @@ public class SupportRequestController : ControllerBase
         return Ok(result.Message);
     }
 
+    [Authorize]
     [HttpGet]
     public IActionResult GetAll()
     {
@@ -32,6 +35,7 @@ public class SupportRequestController : ControllerBase
         return Ok(requests);
     }
 
+    [Authorize]
     [HttpGet("{id}")]
     public IActionResult GetById(int id)
     {
@@ -41,6 +45,7 @@ public class SupportRequestController : ControllerBase
         return Ok(request);
     }
 
+    [Authorize]
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
@@ -50,6 +55,7 @@ public class SupportRequestController : ControllerBase
         return Ok(result.Message);
     }
 
+    [Authorize]
     [HttpPatch("{id}/status")]
     public IActionResult UpdateStatus(int id, [FromBody] string status)
     {

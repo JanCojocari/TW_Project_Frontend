@@ -1,7 +1,10 @@
 ﻿namespace Rentora.API.Controllers;
 
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Rentora.BusinessLayer;
+using Rentora.BusinessLayer.Structure;
 using Rentora.Domain.Models.User;
 
 [Route("api/auth")]
@@ -10,10 +13,9 @@ public class AuthController : ControllerBase
 {
     private readonly Rentora.BusinessLayer.Interfaces.IUserAction _userAction;
 
-    public AuthController()
+    public AuthController(IConfiguration config)
     {
-        var bl = new BusinessLogic();
-        _userAction = bl.UserAction();
+        _userAction = new UserActionExecution(config);
     }
 
     [HttpPost("register")]

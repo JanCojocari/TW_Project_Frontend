@@ -1,5 +1,7 @@
 namespace Rentora.API.Controllers;
 
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Rentora.BusinessLayer;
 using Rentora.Domain.Models.Payment;
@@ -10,26 +12,29 @@ public class PaymentController : ControllerBase
 {
     private readonly Rentora.BusinessLayer.Interfaces.IPaymentAction _paymentAction;
 
-    public PaymentController()
+    public PaymentController(IConfiguration config)
     {
-        var bl = new BusinessLogic();
+        var bl = new BusinessLogic(config);
         _paymentAction = bl.PaymentAction();
     }
-
+    
+    [Authorize]
     [HttpGet("user/{userId}")]
     public IActionResult GetByUser(int userId)
     {
         var payments = _paymentAction.GetByUser(userId);
         return Ok(payments);
     }
-
+    
+    [Authorize]
     [HttpGet("apartment/{apartmentId}")]
     public IActionResult GetByApartment(int apartmentId)
     {
         var payments = _paymentAction.GetByApartment(apartmentId);
         return Ok(payments);
     }
-
+    
+    [Authorize]
     [HttpGet("{id}")]
     public IActionResult GetById(int id)
     {
@@ -39,6 +44,7 @@ public class PaymentController : ControllerBase
         return Ok(payment);
     }
 
+    [Authorize]
     [HttpPost("{renterId}")]
     public IActionResult Create(int renterId, [FromBody] PaymentCreateDto data)
     {

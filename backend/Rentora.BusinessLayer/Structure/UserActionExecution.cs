@@ -1,5 +1,6 @@
 ﻿namespace Rentora.BusinessLayer.Structure;
 
+using Microsoft.Extensions.Configuration;
 using Rentora.BusinessLayer.Core;
 using Rentora.BusinessLayer.Interfaces;
 using Rentora.Domain.Models.User;
@@ -7,6 +8,7 @@ using Rentora.Domain.Models.Responses;
 
 public class UserActionExecution : UserActions, IUserAction
 {
+    public UserActionExecution(IConfiguration config) : base(config) { }
     public ActionResponse Register(UserRegisterDto data)
         => RegisterExecution(data);
 

@@ -1,7 +1,10 @@
 ﻿namespace Rentora.API.Controllers;
 
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Rentora.BusinessLayer;
+using Rentora.BusinessLayer.Structure;
 using Rentora.Domain.Models.User;
 
 [Route("api/users")]
@@ -10,10 +13,9 @@ public class UserController : ControllerBase
 {
     private readonly Rentora.BusinessLayer.Interfaces.IUserAction _userAction;
 
-    public UserController()
+    public UserController(IConfiguration config)
     {
-        var bl = new BusinessLogic();
-        _userAction = bl.UserAction();
+        _userAction = new UserActionExecution(config);
     }
 
     [HttpPost("login")]
@@ -24,14 +26,16 @@ public class UserController : ControllerBase
             return Unauthorized(resp.Message);
         return Ok(result);
     }
-
+    
+    [Authorize]
     [HttpGet]
     public IActionResult GetAll()
     {
         var users = _userAction.GetAll();
         return Ok(users);
     }
-
+    
+    [Authorize]
     [HttpGet("{id}")]
     public IActionResult GetById(int id)
     {
@@ -41,6 +45,7 @@ public class UserController : ControllerBase
         return Ok(user);
     }
 
+    [Authorize]
     [HttpPut("{id}")]
     public IActionResult Update(int id, [FromBody] UserUpdateDto data)
     {
@@ -50,6 +55,7 @@ public class UserController : ControllerBase
         return Ok(result.Message);
     }
 
+    [Authorize]
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
