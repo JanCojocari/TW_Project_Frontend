@@ -11,12 +11,13 @@ import { useState } from "react";
 import { type Dayjs } from "dayjs";
 import { gradients, colors } from "../theme/gradients.ts";
 
-import { useAxios } from "../api/AxiosContext.tsx";   // ← important
+import { useAxios } from "../api/AxiosContext.tsx";
+import type {AxiosError} from "axios";   // ← important
 
 const Register = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
-    const axios = useAxios();                       // ← folosești contextul
+        const axios = useAxios();                       // ← folosești contextul
 
     // State pentru formular
     const [formData, setFormData] = useState({
@@ -70,7 +71,7 @@ const Register = () => {
             await axios.post("/auth/register", payload);
 
             navigate("/login");
-        } catch (err: any) {
+        } catch (err: AxiosError<{ message?: string }>) {
             const message = err?.response?.data?.message || err?.message || "A apărut o eroare la înregistrare";
             setError(message);
         } finally {

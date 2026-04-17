@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useAuth }       from "../../auth/AuthContext.tsx";
 import { useState }      from "react";
 import { gradients, colors } from "../../theme/gradients.ts";
-import { userService }   from "../../services/userService.ts";
+
 
 
 const LoginForm = () => {
@@ -40,17 +40,26 @@ const LoginForm = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!validateForm()) return;
+
         setApiError(null);
         setLoading(true);
-        userService.login(email, password)
-            .then(({ user }) => {
-                login(user);
-                navigate("/listings");
-            })
-            .catch(() => setApiError(t("auth.login.invalidCredentials") ?? "Email sau parolă incorectă."))
-            .finally(() => setLoading(false));
+
+        try {
+            await login(email, password);
+            navigate("/listings");
+
+        } catch (err: any) {
+            const message =
+                err.response?.data?.message ||
+                "Authentication failed. Please check the data entered.";
+
+            setApiError(message);
+
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (

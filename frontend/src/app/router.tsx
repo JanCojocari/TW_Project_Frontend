@@ -1,4 +1,4 @@
-﻿import {BrowserRouter, Routes, Route, useNavigate} from "react-router-dom";
+﻿import {BrowserRouter, Routes, Route} from "react-router-dom";
 import {publicRoutes, privateRoutes, notAuthRoutes} from "./routes";
 import {RequireAuth} from "../auth/RequireAuth";
 import App from "../App.tsx";
