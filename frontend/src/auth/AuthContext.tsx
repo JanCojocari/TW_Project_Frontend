@@ -5,7 +5,7 @@ import type { UserApiDto } from "../services/userService";
 import type { AxiosError } from "axios";
 
 const STORAGE_KEY = "rentora_user";
-const TOKEN_KEY = "accessToken";
+const TOKEN_KEY = "token"; // must match AxiosContext interceptor key
 
 type AuthContextType = {
     isAuthenticated: boolean;

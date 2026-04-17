@@ -74,6 +74,18 @@ public class AdminController : ControllerBase
         return Ok(result.Message);
     }
 
+    [HttpPatch("users/{id}/role")]
+    public IActionResult UpdateUserRole(int id, [FromBody] int role)
+    {
+        using var db = new AppDbContext();
+        var user = db.Users.FirstOrDefault(u => u.Id == id);
+        if (user == null) return NotFound($"User {id} not found.");
+        if (!Enum.IsDefined(typeof(Role), role)) return BadRequest("Invalid role value.");
+        user.Role = (Role)role;
+        db.SaveChanges();
+        return Ok($"User {id} role updated to {(Role)role}.");
+    }
+
     // ── LISTING MANAGEMENT ───────────────────────────────────────────────────
 
     [HttpGet("apartments")]

@@ -1,5 +1,5 @@
 // pages/AdminDashboard.tsx
-import { useState }          from "react";
+import { useState } from "react";
 import { Box, Container, Paper, Tab, Tabs, Typography, Chip } from "@mui/material";
 import {
     People as PeopleIcon,
@@ -10,6 +10,12 @@ import {
     BarChart as StatsIcon,
 } from "@mui/icons-material";
 import { gradients, colors } from "../theme/gradients";
+import UsersTab    from "../components/admin/UsersTab";
+import ListingsTab from "../components/admin/ListingsTab";
+import SupportTab  from "../components/admin/SupportTab";
+import ReviewsTab  from "../components/admin/ReviewsTab";
+import PaymentsTab from "../components/admin/PaymentsTab";
+import PlatformTab from "../components/admin/PlatformTab";
 
 type AdminTab = 0 | 1 | 2 | 3 | 4 | 5;
 
@@ -21,14 +27,6 @@ const tabConfig = [
     { label: "Payments", icon: <PaymentIcon   sx={{ fontSize: 18 }} /> },
     { label: "Platform", icon: <StatsIcon     sx={{ fontSize: 18 }} /> },
 ];
-
-const PlaceholderTab = ({ label }: { label: string }) => (
-    <Box sx={{ py: 8, textAlign: "center" }}>
-        <Typography color="text.disabled" sx={{ fontSize: 18, fontStyle: "italic" }}>
-            {label} — coming soon
-        </Typography>
-    </Box>
-);
 
 export default function AdminDashboard() {
     const [tab, setTab] = useState<AdminTab>(0);
@@ -77,12 +75,12 @@ export default function AdminDashboard() {
                 </Tabs>
 
                 <Box>
-                    {tab === 0 && <PlaceholderTab label="Users management" />}
-                    {tab === 1 && <PlaceholderTab label="Listings management" />}
-                    {tab === 2 && <PlaceholderTab label="Support management" />}
-                    {tab === 3 && <PlaceholderTab label="Reviews management" />}
-                    {tab === 4 && <PlaceholderTab label="Payments management" />}
-                    {tab === 5 && <PlaceholderTab label="Platform stats" />}
+                    {tab === 0 && <UsersTab />}
+                    {tab === 1 && <ListingsTab />}
+                    {tab === 2 && <SupportTab />}
+                    {tab === 3 && <ReviewsTab />}
+                    {tab === 4 && <PaymentsTab />}
+                    {tab === 5 && <PlatformTab />}
                 </Box>
 
             </Paper>
