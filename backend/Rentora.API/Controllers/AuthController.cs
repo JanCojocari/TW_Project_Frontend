@@ -30,7 +30,7 @@ public class AuthController : ControllerBase
     {
         var result = _userAction.Login(data);
         if (result is Rentora.Domain.Models.Responses.ActionResponse res && !res.IsSuccess)
-            return Unauthorized(res.Message);
+            return Unauthorized(new { message = res.Message });
         return Ok(result);
     }
 }
