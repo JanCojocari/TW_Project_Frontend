@@ -14,6 +14,7 @@ import { useNavigate }       from "react-router-dom";
 import { useState }          from "react";
 import { useTranslation }    from "react-i18next";
 import { paths }             from "../app/paths";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import { useAuth }           from "../auth/AuthContext.tsx";
 import { useThemeMode }      from "../theme/ThemeContext.tsx";
 import { gradients, colors } from "../theme/gradients.ts";
@@ -21,9 +22,10 @@ import LanguageSwitcher      from "../components/general/LanguageSwitcher.tsx";
 
 const Header = () => {
     const navigate = useNavigate();
-    const [mobileOpen, setMobileOpen]  = useState(false);
-    const { isAuthenticated, logout }  = useAuth();
-    const { isDark, toggleMode }       = useThemeMode();
+    const [mobileOpen, setMobileOpen]       = useState(false);
+    const { isAuthenticated, logout, currentUser } = useAuth();
+    const { isDark, toggleMode }            = useThemeMode();
+    const isAdmin = currentUser?.role === 0;
     const { t }                        = useTranslation();
 
     const menuItems = [
@@ -32,7 +34,7 @@ const Header = () => {
         isAuthenticated  ? { label: t("nav.createListing"), path: paths.createListing  } : {},
         isAuthenticated  ? { label: t("nav.dashboard"),     path: paths.dashboard      } : {},
         !isAuthenticated ? { label: t("nav.about"),         path: paths.about          } : {},
-        isAuthenticated  ? { label: t("nav.settings"), path: paths.settings } : {},
+        isAuthenticated  ? { label: t("nav.settings"),      path: paths.settings       } : {},
         {                   label: t("nav.support"),         path: paths.support        },
     ];
 
@@ -66,6 +68,14 @@ const Header = () => {
                         </ListItemButton>
                     </ListItem>
                 ))}
+                {isAdmin && (
+                    <ListItem disablePadding>
+                        <ListItemButton onClick={() => handleNavigation(paths.admin)} sx={{ mb: 0.5 }}>
+                            <AdminPanelSettingsIcon sx={{ mr: 1, color: "warning.main", fontSize: 20 }} />
+                            <ListItemText primary="Admin" primaryTypographyProps={{ fontWeight: 700, color: "warning.main", fontSize: "1.05rem" }} />
+                        </ListItemButton>
+                    </ListItem>
+                )}
                 {!isAuthenticated && (
                     <Stack spacing={2} sx={{ mt: 4, px: 2 }}>
                         <Button fullWidth variant="outlined"  onClick={() => handleNavigation(paths.login)}>{t("nav.login")}</Button>
@@ -112,6 +122,16 @@ const Header = () => {
                                     {item.label}
                                 </Button>
                             ))}
+
+                            {isAdmin && (
+                                <Button
+                                    startIcon={<AdminPanelSettingsIcon />}
+                                    onClick={() => navigate(paths.admin)}
+                                    sx={{ color: "warning.main", fontWeight: 700, fontSize: "15px", border: "1px solid", borderColor: "warning.main", borderRadius: 2, px: 2,
+                                          "&:hover": { bgcolor: "rgba(237,108,2,0.08)" } }}>
+                                    Admin
+                                </Button>
+                            )}
 
                             <Divider orientation="vertical" flexItem sx={{ mx: 1, height: 24, alignSelf: "center" }} />
 

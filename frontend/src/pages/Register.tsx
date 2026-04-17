@@ -12,7 +12,6 @@ import { type Dayjs } from "dayjs";
 import { gradients, colors } from "../theme/gradients.ts";
 
 import { useAxios } from "../api/AxiosContext.tsx";
-import type {AxiosError} from "axios";   // ← important
 
 const Register = () => {
     const navigate = useNavigate();
@@ -71,8 +70,9 @@ const Register = () => {
             await axios.post("/auth/register", payload);
 
             navigate("/login");
-        } catch (err: AxiosError<{ message?: string }>) {
-            const message = err?.response?.data?.message || err?.message || "A apărut o eroare la înregistrare";
+        } catch (err: unknown) {
+            const axiosErr = err as import("axios").AxiosError<{ message?: string }>;
+            const message = axiosErr?.response?.data?.message || axiosErr?.message || "A apărut o eroare la înregistrare";
             setError(message);
         } finally {
             setLoading(false);

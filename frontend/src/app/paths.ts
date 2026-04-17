@@ -14,4 +14,5 @@
     createListing: "/createListing",
     settings: "/settings",
     serverError: "/500",
+    admin: "/admin",
 } as const;
