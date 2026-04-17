@@ -11,6 +11,7 @@ import PaymentPage from "../pages/Payment";
 import CreateListing from "../pages/CreateListing";
 import Settings from "../pages/Settings";
 import ServerError from "../pages/ServerError";
+import AdminDashboard from "../pages/AdminDashboard";
 
 // Trebuie de introdus rolul de chirias si de proprietar asa incat path-s sa se afiseze in dependenta de rol
 export const publicRoutes = [
@@ -32,6 +33,10 @@ export const privateRoutes = [
     { path: paths.createListing, element: <CreateListing /> },
     { path: paths.settings, element: <Settings /> },
 
+];
+
+export const adminRoutes = [
+    { path: paths.admin, element: <AdminDashboard /> },
 ];
 
 export const notAuthRoutes = [

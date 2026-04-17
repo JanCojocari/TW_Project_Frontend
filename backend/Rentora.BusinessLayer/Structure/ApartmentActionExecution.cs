@@ -30,4 +30,13 @@ public class ApartmentActionExecution : ApartmentActions, IApartmentAction
 
     public ActionResponse RemoveRenter(int apartmentId)
         => RemoveRenterExecution(apartmentId);
+
+    public List<ApartmentDto> GetPending()
+        => GetPendingExecution();
+
+    public ActionResponse Approve(int id)
+        => ApproveExecution(id);
+
+    public ActionResponse Decline(int id)
+        => DeclineExecution(id);
 }

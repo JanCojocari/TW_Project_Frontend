@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using Rentora.Domain.Enums;
 using Rentora.Domain.OwnedTypes;
 
+
 public class Apartment
 {
     [Key]
@@ -23,6 +24,8 @@ public class Apartment
     public decimal CostPerInterval { get; set; }
     
     public RentMode RentMode { get; set; }
+
+    public ApartmentStatus Status { get; set; } = ApartmentStatus.Pending;
 
     public MapLocation Location { get; set; } = new MapLocation();
     public Facilities Facilities { get; set; } = new Facilities();

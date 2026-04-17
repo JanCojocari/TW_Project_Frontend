@@ -72,7 +72,7 @@ public class SupportRequestActions
 
         // parseaza string-ul in enum
         if (!Enum.TryParse<SupportStatus>(status, ignoreCase: true, out var newStatus))
-            return new ActionResponse { IsSuccess = false, Message = "Invalid status. Use: Open, InProgress, Closed." };
+            return new ActionResponse { IsSuccess = false, Message = "Invalid status. Use: Open, InProgress, Resolved, Closed." };
 
         request.Status = newStatus;
         db.SupportRequests.Update(request);

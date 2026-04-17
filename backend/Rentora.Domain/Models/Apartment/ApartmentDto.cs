@@ -13,6 +13,7 @@ public class ApartmentDto
     public RentInterval Interval { get; set; }
     public decimal CostPerInterval { get; set; }
     public RentMode RentMode { get; set; }
+    public ApartmentStatus Status { get; set; }
     public MapLocation Location { get; set; } = new MapLocation();
     public AdditionalInfo AdditionalInfo { get; set; } = new AdditionalInfo();
 }

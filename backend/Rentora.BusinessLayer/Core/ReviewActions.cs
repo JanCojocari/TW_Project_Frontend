@@ -9,6 +9,15 @@ public class ReviewActions
 {
     protected ReviewActions() { }
 
+    protected List<ReviewDto> GetAllExecution()
+    {
+        using var db = new AppDbContext();
+        return db.Reviews
+            .OrderByDescending(r => r.CreatedAt)
+            .Select(r => MapToDto(r))
+            .ToList();
+    }
+
     protected List<ReviewDto> GetByApartmentExecution(int apartmentId)
     {
         using var db = new AppDbContext();

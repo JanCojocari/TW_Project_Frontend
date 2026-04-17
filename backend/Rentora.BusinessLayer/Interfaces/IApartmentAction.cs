@@ -13,5 +13,8 @@ namespace Rentora.BusinessLayer.Interfaces
         ActionResponse Delete(int id);
         ActionResponse AssignRenter(int apartmentId, int renterId);
         ActionResponse RemoveRenter(int apartmentId);
+        List<ApartmentDto> GetPending();
+        ActionResponse Approve(int id);
+        ActionResponse Decline(int id);
     }
 }

@@ -1,0 +1,89 @@
+// pages/AdminDashboard.tsx
+import { useState } from "react";
+import { Box, Container, Paper, Tab, Tabs, Typography, Chip } from "@mui/material";
+import {
+    People as PeopleIcon,
+    Apartment as ApartmentIcon,
+    Support as SupportIcon,
+    Star as StarIcon,
+    Payment as PaymentIcon,
+    BarChart as StatsIcon,
+} from "@mui/icons-material";
+import { gradients, colors } from "../theme/gradients";
+import UsersTab    from "../components/admin/UsersTab";
+import ListingsTab from "../components/admin/ListingsTab";
+import SupportTab  from "../components/admin/SupportTab";
+import ReviewsTab  from "../components/admin/ReviewsTab";
+import PaymentsTab from "../components/admin/PaymentsTab";
+import PlatformTab from "../components/admin/PlatformTab";
+
+type AdminTab = 0 | 1 | 2 | 3 | 4 | 5;
+
+const tabConfig = [
+    { label: "Users",    icon: <PeopleIcon    sx={{ fontSize: 18 }} /> },
+    { label: "Listings", icon: <ApartmentIcon sx={{ fontSize: 18 }} /> },
+    { label: "Support",  icon: <SupportIcon   sx={{ fontSize: 18 }} /> },
+    { label: "Reviews",  icon: <StarIcon       sx={{ fontSize: 18 }} /> },
+    { label: "Payments", icon: <PaymentIcon   sx={{ fontSize: 18 }} /> },
+    { label: "Platform", icon: <StatsIcon     sx={{ fontSize: 18 }} /> },
+];
+
+export default function AdminDashboard() {
+    const [tab, setTab] = useState<AdminTab>(0);
+
+    return (
+        <Container maxWidth="xl" sx={{ py: { xs: 4, md: 6 }, minHeight: "100vh", mt: 10 }}>
+            <Paper elevation={1} sx={{ p: { xs: 3, md: 5 }, borderRadius: 4, border: `1px solid ${colors.border}` }}>
+
+                <Box sx={{ mb: 5, display: "flex", alignItems: "center", gap: 2 }}>
+                    <Box>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 0.5 }}>
+                            <Typography variant="h4" fontWeight={900} sx={{ letterSpacing: "-1px" }}>
+                                Admin{" "}
+                                <Box component="span" sx={{ background: gradients.textPrimary, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                                    Dashboard
+                                </Box>
+                            </Typography>
+                            <Chip label="Admin" size="small" color="warning" sx={{ fontWeight: 700 }} />
+                        </Box>
+                        <Typography color="text.secondary">
+                            Manage users, listings, support requests, reviews and payments.
+                        </Typography>
+                    </Box>
+                </Box>
+
+                <Tabs
+                    value={tab}
+                    onChange={(_, v) => setTab(v)}
+                    variant="scrollable"
+                    scrollButtons="auto"
+                    sx={{ mb: 4, borderBottom: `1px solid ${colors.border}` }}
+                >
+                    {tabConfig.map((t, idx) => (
+                        <Tab
+                            key={t.label}
+                            label={
+                                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                    <Box sx={{ color: tab === idx ? "primary.main" : "text.secondary", display: "flex", alignItems: "center" }}>
+                                        {t.icon}
+                                    </Box>
+                                    <span>{t.label}</span>
+                                </Box>
+                            }
+                        />
+                    ))}
+                </Tabs>
+
+                <Box>
+                    {tab === 0 && <UsersTab />}
+                    {tab === 1 && <ListingsTab />}
+                    {tab === 2 && <SupportTab />}
+                    {tab === 3 && <ReviewsTab />}
+                    {tab === 4 && <PaymentsTab />}
+                    {tab === 5 && <PlatformTab />}
+                </Box>
+
+            </Paper>
+        </Container>
+    );
+}

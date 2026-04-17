@@ -90,4 +90,31 @@ public class ApartmentController : ControllerBase
             return NotFound(result.Message);
         return Ok(result.Message);
     }
+
+    [HttpGet("pending")]
+    public IActionResult GetPending()
+    {
+        var apartments = _apartmentAction.GetPending();
+        return Ok(apartments);
+    }
+
+    [Authorize]
+    [HttpPatch("{id}/approve")]
+    public IActionResult Approve(int id)
+    {
+        var result = _apartmentAction.Approve(id);
+        if (!result.IsSuccess)
+            return NotFound(result.Message);
+        return Ok(result.Message);
+    }
+
+    [Authorize]
+    [HttpPatch("{id}/decline")]
+    public IActionResult Decline(int id)
+    {
+        var result = _apartmentAction.Decline(id);
+        if (!result.IsSuccess)
+            return NotFound(result.Message);
+        return Ok(result.Message);
+    }
 }
