@@ -1,4 +1,7 @@
-﻿namespace Rentora.BusinessLayer.Core;
+﻿using Rentora.BusinessLayer.Helpers;
+using Rentora.Domain.Models.LoginResponse;
+
+namespace Rentora.BusinessLayer.Core;
 
 using Rentora.DataAccess;
 using Rentora.Domain.Entities;
@@ -45,13 +48,19 @@ public class UserActions
             u.PasswordHash == HashPassword(data.Password));
 
         if (user == null)
-            return new ActionResponse { IsSuccess = false, Message = "Invalid email or password." };
+            return new ActionResponse 
+            { 
+                IsSuccess = false, 
+                Message = "Invalid email or password." 
+            };
+        
+        var jwtHelper = new JwtHelper();
+        var token = jwtHelper.GenerateToken(user);
 
-        // token simplu pentru acum, JWT se va adauga ulterior
-        return new
+        return new AuthResponseDto()
         {
-            Token = Guid.NewGuid().ToString(),
-            User = MapToDto(user)
+            User = MapToDto(user),
+            AccessToken = token
         };
     }
 
