@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Rentora.BusinessLayer.Interfaces;
 using System.Security.Claims;
+using Microsoft.Extensions.Configuration;
 
 namespace Rentora.API.Controllers;
 

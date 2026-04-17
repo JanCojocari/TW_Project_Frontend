@@ -1,5 +1,6 @@
 ﻿using Rentora.BusinessLayer.Helpers;
 using Rentora.Domain.Models.LoginResponse;
+using Microsoft.Extensions.Configuration; 
 
 namespace Rentora.BusinessLayer.Core;
 
@@ -10,7 +11,12 @@ using Rentora.Domain.Models.Responses;
 
 public class UserActions
 {
-    protected UserActions() { }
+    private readonly IConfiguration _config;
+    
+    protected UserActions(IConfiguration config)
+    {
+        _config = config;
+    }
 
     protected ActionResponse RegisterExecution(UserRegisterDto data)
     {
@@ -54,7 +60,7 @@ public class UserActions
                 Message = "Invalid email or password." 
             };
         
-        var jwtHelper = new JwtHelper();
+        var jwtHelper = new JwtHelper(_config);
         var token = jwtHelper.GenerateToken(user);
 
         return new AuthResponseDto()
@@ -137,8 +143,7 @@ public class UserActions
         AccountBalance = user.AccountBalance,
         Role = user.Role
     };
-
-    // helper privat -- hash simplu, de inlocuit cu BCrypt ulterior
+    
     private static string HashPassword(string password) =>
         Convert.ToBase64String(
             System.Security.Cryptography.SHA256.HashData(

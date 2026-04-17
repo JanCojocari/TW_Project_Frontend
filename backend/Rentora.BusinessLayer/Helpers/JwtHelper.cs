@@ -3,13 +3,23 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Rentora.Domain.Entities;
+using Microsoft.Extensions.Configuration;
 
 namespace Rentora.BusinessLayer.Helpers;
 
 public class JwtHelper
 {
-    private readonly string _key = "Rentora_Super_Secret_Key_2026_Really_Long!";
-
+    private readonly string _key;
+    private readonly string _issuer;
+    private readonly string _audience;
+    
+    public JwtHelper(IConfiguration config)
+    {
+        _key      = config["Jwt:Key"]!;
+        _issuer   = config["Jwt:Issuer"]!;
+        _audience = config["Jwt:Audience"]!;
+    }
+    
     public string GenerateToken(User user)
     {
         var claims = new[]
@@ -23,10 +33,10 @@ public class JwtHelper
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: "rentora",
-            audience: "rentora",
-            claims: claims,
-            expires: DateTime.Now.AddHours(2),
+            issuer:            _issuer,
+            audience:          _audience,
+            claims:            claims,
+            expires:           DateTime.UtcNow.AddHours(2),
             signingCredentials: credentials
         );
 

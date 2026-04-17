@@ -1,13 +1,19 @@
 ﻿namespace Rentora.BusinessLayer;
 
+using Microsoft.Extensions.Configuration;
 using Rentora.BusinessLayer.Interfaces;
 using Rentora.BusinessLayer.Structure;
 
 public class BusinessLogic
 {
-    public BusinessLogic() { }
+    private readonly IConfiguration _config;
 
-    public IUserAction UserAction() => new UserActionExecution();
+    public BusinessLogic(IConfiguration config)
+    {
+        _config = config;
+    }
+
+    public IUserAction UserAction() => new UserActionExecution(_config);
     public ISupportRequestAction SupportRequestAction() => new SupportRequestExecution();
     public IApartmentAction ApartmentAction() => new ApartmentActionExecution();
     public IReviewAction ReviewAction() => new ReviewActionExecution();

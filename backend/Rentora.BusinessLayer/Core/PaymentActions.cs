@@ -72,9 +72,9 @@ public class PaymentActions
     private static PaymentDto MapToDto(Payment p) => new PaymentDto
     {
         Id          = p.Id,
-        OwnerId     = p.OwnerId,
-        RenterId    = p.RenterId,
-        ApartmentId = p.ApartmentId,
+        OwnerId     = p.OwnerId ?? 0,
+        RenterId    = p.RenterId ?? 0,
+        ApartmentId = p.ApartmentId ?? 0,
         TotalCost   = p.TotalCost,
         Currency    = p.Currency,
         CreatedAt   = p.CreatedAt,

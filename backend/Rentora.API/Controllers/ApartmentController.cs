@@ -1,5 +1,7 @@
 namespace Rentora.API.Controllers;
 
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Rentora.BusinessLayer;
 using Rentora.Domain.Models.Apartment;
@@ -10,9 +12,9 @@ public class ApartmentController : ControllerBase
 {
     private readonly Rentora.BusinessLayer.Interfaces.IApartmentAction _apartmentAction;
 
-    public ApartmentController()
+    public ApartmentController(IConfiguration config)
     {
-        var bl = new BusinessLogic();
+        var bl = new BusinessLogic(config);
         _apartmentAction = bl.ApartmentAction();
     }
 
@@ -38,7 +40,8 @@ public class ApartmentController : ControllerBase
         var apartments = _apartmentAction.GetByOwner(ownerId);
         return Ok(apartments);
     }
-
+    
+    [Authorize]
     [HttpPost("{ownerId}")]
     public IActionResult Create(int ownerId, [FromBody] ApartmentCreateDto data)
     {
@@ -47,7 +50,8 @@ public class ApartmentController : ControllerBase
             return BadRequest(result.Message);
         return Ok(result.Message);
     }
-
+    
+    [Authorize]
     [HttpPut]
     public IActionResult Update([FromBody] ApartmentUpdateDto data)
     {
@@ -56,7 +60,8 @@ public class ApartmentController : ControllerBase
             return NotFound(result.Message);
         return Ok(result.Message);
     }
-
+    
+    [Authorize]
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
@@ -65,7 +70,8 @@ public class ApartmentController : ControllerBase
             return NotFound(result.Message);
         return Ok(result.Message);
     }
-
+    
+    [Authorize]
     [HttpPatch("{apartmentId}/renter/{renterId}")]
     public IActionResult AssignRenter(int apartmentId, int renterId)
     {
@@ -74,7 +80,8 @@ public class ApartmentController : ControllerBase
             return BadRequest(result.Message);
         return Ok(result.Message);
     }
-
+    
+    [Authorize]
     [HttpPatch("{apartmentId}/renter/remove")]
     public IActionResult RemoveRenter(int apartmentId)
     {

@@ -94,7 +94,7 @@ public class ReviewActions
     {
         Id            = r.Id,
         ApartmentId   = r.ApartmentId,
-        UserId        = r.UserId,
+        UserId        = r.UserId ?? 0,
         Rating        = r.Rating,
         Comment       = r.Comment,
         OwnerResponse = r.OwnerResponse,

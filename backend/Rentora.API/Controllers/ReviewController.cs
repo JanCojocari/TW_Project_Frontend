@@ -1,5 +1,7 @@
 namespace Rentora.API.Controllers;
 
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Rentora.BusinessLayer;
 using Rentora.Domain.Models.Review;
@@ -10,9 +12,9 @@ public class ReviewController : ControllerBase
 {
     private readonly Rentora.BusinessLayer.Interfaces.IReviewAction _reviewAction;
 
-    public ReviewController()
+    public ReviewController(IConfiguration config)
     {
-        var bl = new BusinessLogic();
+        var bl = new BusinessLogic(config);
         _reviewAction = bl.ReviewAction();
     }
 
@@ -31,7 +33,8 @@ public class ReviewController : ControllerBase
             return NotFound($"Review with id {id} not found.");
         return Ok(review);
     }
-
+    
+    [Authorize]
     [HttpPost("{userId}")]
     public IActionResult Create(int userId, [FromBody] ReviewCreateDto data)
     {
@@ -40,7 +43,8 @@ public class ReviewController : ControllerBase
             return BadRequest(result.Message);
         return Ok(result.Message);
     }
-
+    
+    [Authorize]
     [HttpPatch("{id}/owner-response")]
     public IActionResult AddOwnerResponse(int id, [FromBody] string ownerResponse)
     {
@@ -49,7 +53,8 @@ public class ReviewController : ControllerBase
             return NotFound(result.Message);
         return Ok(result.Message);
     }
-
+    
+    [Authorize]
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
