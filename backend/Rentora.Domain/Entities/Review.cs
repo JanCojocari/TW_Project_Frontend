@@ -9,7 +9,7 @@ public class Review
 
     public int ApartmentId { get; set; }
 
-    public int UserId { get; set; }
+    public int? UserId { get; set; }
 
     public string? Comment { get; set; }
 
@@ -21,5 +21,5 @@ public class Review
 
     // Navigation
     public Apartment Apartment { get; set; } = null!;
-    public User User { get; set; } = null!;
+    public User? User { get; set; } = null!;
 }

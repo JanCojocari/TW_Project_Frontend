@@ -99,7 +99,7 @@ export const usePaymentForm = ({ summary, apartmentId, onPay, onSuccess, onError
     return {
         method, formState, errors, sameAddress, setSameAddress,
         promoInput, setPromoInput, appliedPromo, promoDiscount, promoMessage, promoLoading,
-        submitting, submitted, submitError, setSubmitError, snackOpen, setSnackOpen, summaryOpen, setSummaryOpen,
+        submitting, submitted, setSubmitted, submitError, setSubmitError, snackOpen, setSnackOpen, summaryOpen, setSummaryOpen,
         formRef, handleFieldChange, handleMethodChange, handlePromoApply, handlePromoRemove, handleSubmit, handleBack,
     };
 };

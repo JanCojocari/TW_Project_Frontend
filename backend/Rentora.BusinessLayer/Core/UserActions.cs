@@ -106,6 +106,18 @@ public class UserActions
         if (user == null)
             return new ActionResponse { IsSuccess = false, Message = "User not found." };
 
+        // nullifica payments unde userul e owner
+        var paymentsAsOwner = db.Payments.Where(p => p.OwnerId == id).ToList();
+        foreach (var p in paymentsAsOwner)
+            p.OwnerId = null;
+
+        // nullifica payments unde userul e renter
+        var paymentsAsRenter = db.Payments.Where(p => p.RenterId == id).ToList();
+        foreach (var p in paymentsAsRenter)
+            p.RenterId = null;
+
+        db.SaveChanges();
+
         db.Users.Remove(user);
         db.SaveChanges();
 
