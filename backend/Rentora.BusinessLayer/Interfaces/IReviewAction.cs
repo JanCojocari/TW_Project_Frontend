@@ -5,6 +5,7 @@ namespace Rentora.BusinessLayer.Interfaces
 {
     public interface IReviewAction
     {
+        List<ReviewDto> GetAll();
         List<ReviewDto> GetByApartment(int apartmentId);
         ReviewDto? GetById(int id);
         ActionResponse Create(int userId, ReviewCreateDto data);

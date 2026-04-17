@@ -3,7 +3,8 @@
 //statutul unei cereri de suport trimise de user
 public enum SupportStatus
 {
-    Open, 
+    Open,
     InProgress,
+    Resolved,
     Closed
 }

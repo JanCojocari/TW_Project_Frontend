@@ -7,6 +7,9 @@ using Rentora.Domain.Models.Responses;
 
 public class ReviewActionExecution : ReviewActions, IReviewAction
 {
+    public List<ReviewDto> GetAll()
+        => GetAllExecution();
+
     public List<ReviewDto> GetByApartment(int apartmentId)
         => GetByApartmentExecution(apartmentId);
 

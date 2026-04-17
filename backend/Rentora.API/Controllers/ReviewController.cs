@@ -18,6 +18,14 @@ public class ReviewController : ControllerBase
         _reviewAction = bl.ReviewAction();
     }
 
+    [Authorize]
+    [HttpGet]
+    public IActionResult GetAll()
+    {
+        var reviews = _reviewAction.GetAll();
+        return Ok(reviews);
+    }
+
     [HttpGet("apartment/{apartmentId}")]
     public IActionResult GetByApartment(int apartmentId)
     {

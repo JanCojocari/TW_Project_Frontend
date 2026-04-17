@@ -140,6 +140,41 @@ public class ApartmentActions
         return new ActionResponse { IsSuccess = true, Message = "Renter removed." };
     }
 
+    protected List<ApartmentDto> GetPendingExecution()
+    {
+        using var db = new AppDbContext();
+        return db.Apartments
+            .Where(a => a.Status == Rentora.Domain.Enums.ApartmentStatus.Pending)
+            .Select(a => MapToDto(a))
+            .ToList();
+    }
+
+    protected ActionResponse ApproveExecution(int id)
+    {
+        using var db = new AppDbContext();
+        var apartment = db.Apartments.FirstOrDefault(a => a.Id == id);
+        if (apartment == null)
+            return new ActionResponse { IsSuccess = false, Message = "Apartment not found." };
+
+        apartment.Status = Rentora.Domain.Enums.ApartmentStatus.Approved;
+        db.Apartments.Update(apartment);
+        db.SaveChanges();
+        return new ActionResponse { IsSuccess = true, Message = "Apartment approved." };
+    }
+
+    protected ActionResponse DeclineExecution(int id)
+    {
+        using var db = new AppDbContext();
+        var apartment = db.Apartments.FirstOrDefault(a => a.Id == id);
+        if (apartment == null)
+            return new ActionResponse { IsSuccess = false, Message = "Apartment not found." };
+
+        apartment.Status = Rentora.Domain.Enums.ApartmentStatus.Declined;
+        db.Apartments.Update(apartment);
+        db.SaveChanges();
+        return new ActionResponse { IsSuccess = true, Message = "Apartment declined." };
+    }
+
     private static ApartmentDto MapToDto(Apartment a) => new ApartmentDto
     {
         Id = a.Id,
@@ -150,6 +185,7 @@ public class ApartmentActions
         Interval = a.Interval,
         CostPerInterval = a.CostPerInterval,
         RentMode = a.RentMode,
+        Status = a.Status,
         Location = a.Location,
         AdditionalInfo = a.AdditionlaInfo
     };
