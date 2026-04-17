@@ -142,7 +142,7 @@ namespace Rentora.DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ApartmentId")
+                    b.Property<int?>("ApartmentId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -154,13 +154,13 @@ namespace Rentora.DataAccess.Migrations
                     b.Property<string>("InvoiceUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OwnerId")
+                    b.Property<int?>("OwnerId")
                         .HasColumnType("int");
 
                     b.Property<string>("PaymentMethod")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RenterId")
+                    b.Property<int?>("RenterId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalCost")
@@ -229,7 +229,7 @@ namespace Rentora.DataAccess.Migrations
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -471,7 +471,7 @@ namespace Rentora.DataAccess.Migrations
                     b.HasOne("Rentora.Domain.Entities.User", "User")
                         .WithMany("Favorites")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Apartment");
@@ -484,20 +484,17 @@ namespace Rentora.DataAccess.Migrations
                     b.HasOne("Rentora.Domain.Entities.Apartment", "Apartment")
                         .WithMany()
                         .HasForeignKey("ApartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Rentora.Domain.Entities.User", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Rentora.Domain.Entities.User", "Renter")
                         .WithMany()
                         .HasForeignKey("RenterId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Apartment");
 
@@ -517,7 +514,7 @@ namespace Rentora.DataAccess.Migrations
                     b.HasOne("Rentora.Domain.Entities.User", "User")
                         .WithMany("RecentViews")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Apartment");
@@ -536,8 +533,7 @@ namespace Rentora.DataAccess.Migrations
                     b.HasOne("Rentora.Domain.Entities.User", "User")
                         .WithMany("Reviews")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Apartment");
 

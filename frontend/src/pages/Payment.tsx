@@ -33,7 +33,7 @@ const PaymentPage = ({ summary: summaryProp, defaultPaymentMethod = "card", onPa
     const {
         method, formState, errors, sameAddress, setSameAddress,
         promoInput, setPromoInput, appliedPromo, promoDiscount, promoMessage, promoLoading,
-        submitting, submitted, submitError, setSubmitError, snackOpen, setSnackOpen, summaryOpen, setSummaryOpen,
+        submitting, submitted, setSubmitted, submitError, setSubmitError, snackOpen, setSnackOpen, summaryOpen, setSummaryOpen,
         formRef, handleFieldChange, handleMethodChange, handlePromoApply, handlePromoRemove, handleSubmit, handleBack,
     } = usePaymentForm({ summary, apartmentId, onPay, onBack, onSuccess, onError, defaultMethod: defaultPaymentMethod });
 
@@ -91,9 +91,10 @@ const PaymentPage = ({ summary: summaryProp, defaultPaymentMethod = "card", onPa
                                         currency={summary.currency}
                                         apartmentId={apartmentId ? Number(apartmentId) : 0}
                                         onSuccess={(transactionId) => {
+                                            setSubmitted(true);
                                             setSnackOpen(true);
                                             onSuccess?.({ success: true, transactionId });
-                                            setTimeout(() => navigate("/dashboard"), 2500);
+                                            setTimeout(() => navigate("/dashboard"), 3500);
                                         }}
                                         onError={(msg) => setSubmitError(msg)}
                                     />

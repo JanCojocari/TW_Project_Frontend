@@ -63,49 +63,60 @@ public class AppDbContext : DbContext
             .HasOne(r => r.User)
             .WithMany(u => u.Reviews)
             .HasForeignKey(r => r.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.SetNull);
 
         // Favorite (cheie compusa)
         modelBuilder.Entity<Favorite>()
             .HasKey(f => new { f.UserId, f.ApartmentId });
 
+        // Favorite -> User (Cascade - favoritele se sterg odata cu userul)
         modelBuilder.Entity<Favorite>()
             .HasOne(f => f.User)
             .WithMany(u => u.Favorites)
             .HasForeignKey(f => f.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
-
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        // Favorite -> Apartment (Cascade - favoritele se sterg odata cu apartmentul)
         modelBuilder.Entity<Favorite>()
             .HasOne(f => f.Apartment)
             .WithMany(a => a.Favorites)
             .HasForeignKey(f => f.ApartmentId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // RecentView
+        // RecentView -> User (Cascade - recentviews se sterg odata cu userul)
         modelBuilder.Entity<RecentView>()
             .HasOne(r => r.User)
             .WithMany(u => u.RecentViews)
             .HasForeignKey(r => r.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
+        // RecentView -> Apartment (Cascade - recentviews se sterg odata cu apartmentul)
         modelBuilder.Entity<RecentView>()
             .HasOne(r => r.Apartment)
             .WithMany()
             .HasForeignKey(r => r.ApartmentId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Payment -> Owner si Renter (doua FK spre User, fara cascade)
+        // Payment -> Owner (SetNull - plata ramane daca ownerul e sters)
         modelBuilder.Entity<Payment>()
             .HasOne(p => p.Owner)
             .WithMany()
             .HasForeignKey(p => p.OwnerId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction);
 
+        // Payment -> Renter (SetNull - plata ramane daca rentearul e sters)
         modelBuilder.Entity<Payment>()
             .HasOne(p => p.Renter)
             .WithMany()
             .HasForeignKey(p => p.RenterId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction);
+        
+        // Payment -> Apartment (SetNull - plata ramane daca apartamentul e sters)
+        modelBuilder.Entity<Payment>()
+            .HasOne(p => p.Apartment)
+            .WithMany()
+            .HasForeignKey(p => p.ApartmentId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         // SupportRequest -> User (optional, userul poate fi anonim)
         modelBuilder.Entity<SupportRequest>()
@@ -132,5 +143,18 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<User>()
             .HasIndex(u => u.Email)
             .IsUnique();
+        
+        // Precizie decimal
+        modelBuilder.Entity<Apartment>()
+            .Property(a => a.CostPerInterval)
+            .HasColumnType("decimal(18,2)");
+
+        modelBuilder.Entity<Payment>()
+            .Property(p => p.TotalCost)
+            .HasColumnType("decimal(18,2)");
+
+        modelBuilder.Entity<User>()
+            .Property(u => u.AccountBalance)
+            .HasColumnType("decimal(18,2)");
     }
 }

@@ -8,11 +8,11 @@ public class Payment
     [Key]
     public int Id { get; set; }
 
-    public int OwnerId { get; set; }
+    public int? OwnerId { get; set; }
 
-    public int RenterId { get; set; }
+    public int? RenterId { get; set; }
 
-    public int ApartmentId { get; set; }
+    public int? ApartmentId { get; set; }
 
     public decimal TotalCost { get; set; }
 
@@ -26,7 +26,7 @@ public class Payment
     public string? PaymentMethod { get; set; }   // "card" | "paypal" | "bank_transfer"
 
     // Navigation
-    public User Owner { get; set; } = null!;
-    public User Renter { get; set; } = null!;
-    public Apartment Apartment { get; set; } = null!;
+    public User? Owner { get; set; } = null!;
+    public User? Renter { get; set; } = null!;
+    public Apartment? Apartment { get; set; } = null!;
 }
