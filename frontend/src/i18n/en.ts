@@ -365,6 +365,11 @@ export default {
             successMessage: "Your review has been submitted successfully!",
             submit:         "Submit review",
             submitting:     "Submitting...",
+            ownerResponseLabel: "Owner response",
+            replyButton:        "Reply",
+            replyPlaceholder:   "Write a response to this review...",
+            replySubmit:        "Submit response",
+            replyCancel:        "Cancel",
         },
         locationTab: { nearbyLandmarks: "Nearby points of interest" },
         steps: {

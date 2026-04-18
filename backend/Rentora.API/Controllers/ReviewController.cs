@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Rentora.BusinessLayer;
 using Rentora.Domain.Models.Review;
+using System.Security.Claims;
 
 [Route("api/reviews")]
 [ApiController]
@@ -56,9 +57,9 @@ public class ReviewController : ControllerBase
     [HttpPatch("{id}/owner-response")]
     public IActionResult AddOwnerResponse(int id, [FromBody] string ownerResponse)
     {
-        var result = _reviewAction.AddOwnerResponse(id, ownerResponse);
-        if (!result.IsSuccess)
-            return NotFound(result.Message);
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var result = _reviewAction.AddOwnerResponse(id, userId, ownerResponse);
+        if (!result.IsSuccess) return BadRequest(result.Message);
         return Ok(result.Message);
     }
     

@@ -11,4 +11,6 @@ public class ReviewDto
     public string? OwnerResponse { get; set; }
     public int Rating { get; set; }
     public DateTime CreatedAt { get; set; }
+    public DateTime? StayStartDate { get; set; }
+    public DateTime? StayEndDate { get; set; }
 }

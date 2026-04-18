@@ -9,7 +9,7 @@ namespace Rentora.BusinessLayer.Interfaces
         List<ReviewDto> GetByApartment(int apartmentId);
         ReviewDto? GetById(int id);
         ActionResponse Create(int userId, ReviewCreateDto data);
-        ActionResponse AddOwnerResponse(int reviewId, string ownerResponse);
+        ActionResponse AddOwnerResponse(int reviewId, int userId, string ownerResponse);
         ActionResponse Delete(int id);
     }
 }

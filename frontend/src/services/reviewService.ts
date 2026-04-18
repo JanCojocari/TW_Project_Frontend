@@ -12,6 +12,8 @@ export interface ReviewApiDto {
     ownerResponse?: string;
     rating: number;
     createdAt: string;
+    stayStartDate?: string;
+    stayEndDate?:   string;
 }
 
 export interface ReviewCreateDto {
