@@ -19,4 +19,6 @@ public class BusinessLogic
     public IReviewAction ReviewAction() => new ReviewActionExecution();
     public IRecentViewAction RecentViewAction() => new RecentViewActionExecution();
     public IPaymentAction PaymentAction() => new PaymentActionExecution();
+    public IFavoriteAction FavoriteAction() => new FavoriteActionExecution();
+
 }

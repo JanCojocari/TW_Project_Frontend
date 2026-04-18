@@ -11,7 +11,7 @@ using Rentora.Domain.Models.User;
 
 [Route("api/admin")]
 [ApiController]
-[Authorize]
+[Authorize(Roles = "Admin")]
 public class AdminController : ControllerBase
 {
     private readonly BusinessLogic _bl;
@@ -77,15 +77,10 @@ public class AdminController : ControllerBase
     [HttpPatch("users/{id}/role")]
     public IActionResult UpdateUserRole(int id, [FromBody] int role)
     {
-        using var db = new AppDbContext();
-        var user = db.Users.FirstOrDefault(u => u.Id == id);
-        if (user == null) return NotFound($"User {id} not found.");
-        if (!Enum.IsDefined(typeof(Role), role)) return BadRequest("Invalid role value.");
-        user.Role = (Role)role;
-        db.SaveChanges();
-        return Ok($"User {id} role updated to {(Role)role}.");
+        var result = _bl.UserAction().UpdateRole(id, role);
+        if (!result.IsSuccess) return BadRequest(result.Message);
+        return Ok(result.Message);
     }
-
     // ── LISTING MANAGEMENT ───────────────────────────────────────────────────
 
     [HttpGet("apartments")]
@@ -193,32 +188,25 @@ public class AdminController : ControllerBase
     }
 
     // ── PAYMENT MANAGEMENT ───────────────────────────────────────────────────
-
+    
     [HttpGet("payments")]
     public IActionResult GetAllPayments()
     {
-        using var db = new AppDbContext();
-        var payments = db.Payments
-            .OrderByDescending(p => p.CreatedAt)
-            .Select(p => new {
-                p.Id, p.OwnerId, p.RenterId, p.ApartmentId,
-                p.TotalCost, p.Currency, p.CreatedAt, p.InvoiceUrl
-            })
-            .ToList();
+        var payments = _bl.PaymentAction().GetAll();
         return Ok(payments);
     }
-
+    
     [HttpGet("payments/owner/{ownerId}")]
     public IActionResult GetPaymentsByOwner(int ownerId)
     {
-        var payments = _bl.PaymentAction().GetByUser(ownerId);
+        var payments = _bl.PaymentAction().GetByOwner(ownerId);
         return Ok(payments);
     }
 
     [HttpGet("payments/renter/{renterId}")]
     public IActionResult GetPaymentsByRenter(int renterId)
     {
-        var payments = _bl.PaymentAction().GetByUser(renterId);
+        var payments = _bl.PaymentAction().GetByRenter(renterId);
         return Ok(payments);
     }
 

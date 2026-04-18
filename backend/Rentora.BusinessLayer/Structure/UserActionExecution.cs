@@ -26,4 +26,7 @@ public class UserActionExecution : UserActions, IUserAction
 
     public ActionResponse Delete(int id)
         => DeleteExecution(id);
+    
+    public ActionResponse UpdateRole(int id, int role)
+        => UpdateRoleExecution(id, role);
 }

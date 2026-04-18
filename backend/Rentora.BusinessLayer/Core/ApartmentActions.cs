@@ -67,7 +67,7 @@ public class ApartmentActions
         db.Facilities.Add(facilities);
         db.SaveChanges();
 
-        return new ActionResponse { IsSuccess = true, Message = "Apartment created." };
+        return new ActionResponse { IsSuccess = true, Message = "Apartment created.", Id = apartment.Id };
     }
 
     protected ActionResponse UpdateExecution(ApartmentUpdateDto data)
