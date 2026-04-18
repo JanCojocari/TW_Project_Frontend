@@ -24,6 +24,7 @@ export interface PaymentMethod {
     label: string;
     icon: string;
     description: string;
+    
 }
 
 export interface PaymentPayload {
@@ -32,6 +33,9 @@ export interface PaymentPayload {
     summary: OrderSummary;
     promoCode?: string;
     apartmentId?: number;
+    startDate?: Date;
+    endDate?:   Date;
+
 }
 
 export interface PaymentResult {

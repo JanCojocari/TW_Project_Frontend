@@ -72,6 +72,29 @@ public class PaymentActions
         var apartment = db.Apartments.FirstOrDefault(a => a.Id == data.ApartmentId);
         if (apartment == null)
             return new ActionResponse { IsSuccess = false, Message = "Apartment not found." };
+        
+        decimal totalCost = apartment.CostPerInterval;
+
+        if (data.StartDate.HasValue && data.EndDate.HasValue)
+        {
+            var start = data.StartDate.Value;
+            var end   = data.EndDate.Value;
+
+            if (end <= start)
+                return new ActionResponse { IsSuccess = false, Message = "End date must be after start date." };
+
+            var diff = end - start;
+
+            totalCost = apartment.Interval switch
+            {
+                Rentora.Domain.Enums.RentInterval.Hour  => apartment.CostPerInterval * (decimal)diff.TotalHours,
+                Rentora.Domain.Enums.RentInterval.Day   => apartment.CostPerInterval * (decimal)diff.TotalDays,
+                Rentora.Domain.Enums.RentInterval.Month => apartment.CostPerInterval * (decimal)(diff.TotalDays / 30.0),
+                _ => apartment.CostPerInterval
+            };
+
+            totalCost = Math.Round(totalCost, 2);
+        }
 
         var payment = new Payment
         {
@@ -80,6 +103,8 @@ public class PaymentActions
             ApartmentId = data.ApartmentId,
             TotalCost   = apartment.CostPerInterval,
             Currency    = data.Currency,
+            StartDate   = data.StartDate,
+            EndDate     = data.EndDate,
             CreatedAt   = DateTime.UtcNow
         };
 
@@ -104,6 +129,8 @@ public class PaymentActions
         OwnerId     = p.OwnerId ?? 0,
         RenterId    = p.RenterId ?? 0,
         ApartmentId = p.ApartmentId ?? 0,
+        StartDate = p.StartDate,
+        EndDate   = p.EndDate,
         TotalCost   = p.TotalCost,
         Currency    = p.Currency,
         CreatedAt   = p.CreatedAt,

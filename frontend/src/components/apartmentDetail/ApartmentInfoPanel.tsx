@@ -77,7 +77,7 @@ const ApartmentInfoPanel = ({ apartment, owner, renter, isAvailable }: Props) =>
             {!isAvailable && renter && <UserCard user={renter} label={t("apartment.renter")} color="error.main" />}
 
             <Button variant="contained" fullWidth size="large"
-                    onClick={() => navigate(`/payments?apartmentId=${apartment.Id_Apartment}`)}
+                    onClick={() => navigate(`/payments?apartmentId=${apartment.Id_Apartment}&interval=${apartment.Interval}`)}
                     disabled={!isAvailable}
                     sx={{ py: 1.8, borderRadius: 2, fontWeight: 700, fontSize: 16 }}>
                 {isAvailable ? t("apartment.rentNow") : t("apartment.unavailable")}
