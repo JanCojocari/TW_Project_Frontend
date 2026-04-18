@@ -45,4 +45,8 @@ export const paymentHistoryService = {
     getByApartment: (apartmentId: number): Promise<PaymentDto[]> =>
         axiosInstance.get<PaymentApiDto[]>(`${BASE}/apartment/${apartmentId}`)
             .then(r => r.data.map(mapToPaymentDto)),
+
+    hasPaid: (apartmentId: number): Promise<boolean> =>
+        axiosInstance.get<{ hasPaid: boolean }>(`${BASE}/has-paid/${apartmentId}`)
+            .then(r => r.data.hasPaid),
 };

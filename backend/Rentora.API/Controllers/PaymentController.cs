@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Rentora.BusinessLayer;
 using Rentora.Domain.Models.Payment;
+using System.Security.Claims;
+using Rentora.DataAccess;
 
 [Route("api/payments")]
 [ApiController]
@@ -52,5 +54,15 @@ public class PaymentController : ControllerBase
         if (!result.IsSuccess)
             return BadRequest(result.Message);
         return Ok(result.Message);
+    }
+    
+    [Authorize]
+    [HttpGet("has-paid/{apartmentId}")]
+    public IActionResult HasPaid(int apartmentId)
+    {
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        using var db = new AppDbContext();
+        var hasPaid = db.Payments.Any(p => p.ApartmentId == apartmentId && p.RenterId == userId);
+        return Ok(new { hasPaid });
     }
 }

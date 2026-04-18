@@ -162,7 +162,7 @@ export default {
         perDay:      "zi",
         perMonth:    "lună",
     },
-
+    
     // ── Dashboard ─────────────────────────────────────────────────────────────
     dashboard: {
         title:        "Dashboard",
@@ -367,17 +367,18 @@ export default {
             address: "Adresă", price: "Preț", name: "Nume", email: "Email", phone: "Telefon",
         },
         reviews: {
-            noReviews: "Nu există recenzii încă.", outOf: "din 10",
-            ownerResponse: "Răspuns proprietar",
-            day: "zi", days: "zile", review: "recenzie", reviews: "recenzii",
-            categories: {
-                cleanliness:   "Curățenie",
-                location:      "Locație",
-                valueForMoney: "Raport calitate-preț",
-                comfort:       "Confort",
-                facilities:    "Facilități",
-                communication: "Comunicare",
-            },
+                noReviews:      "Nu există recenzii încă.",
+                review:         "recenzie",
+                reviews:        "recenzii",
+                outOf:          "din 5",
+                formTitle:      "Lasă o recenzie",
+                ratingLabel:    "Rating",
+                placeholder:    "Spune-ne cum a fost sejurul tău...",
+                errorRating:    "Te rugăm să selectezi un rating.",
+                errorSubmit:    "A apărut o eroare. Încearcă din nou.",
+                successMessage: "Recenzia ta a fost trimisă cu succes!",
+                submit:         "Trimite recenzia",
+                submitting:     "Se trimite...",
         },
         locationTab: { nearbyLandmarks: "Puncte de interes apropiate" },
         steps: {

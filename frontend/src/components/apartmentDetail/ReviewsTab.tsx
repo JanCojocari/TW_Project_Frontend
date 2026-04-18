@@ -1,13 +1,24 @@
 // components/apartmentDetail/ReviewsTab.tsx
-import { Box, Paper, Typography, Avatar } from "@mui/material";
-import { Star as StarIcon }   from "@mui/icons-material";
-import { useTranslation }     from "react-i18next";
-import { gradients, colors }  from "../../theme/gradients.ts";
-import type { ReviewApiDto }  from "../../services/reviewService.ts";
+import { useState } from "react";
+import {
+    Box, Paper, Typography, Avatar, Rating,
+    TextField, Button, Alert, Collapse, IconButton
+} from "@mui/material";
+import { Star as StarIcon, EmojiEmotions as EmojiIcon } from "@mui/icons-material";
+import EmojiPicker, { type EmojiClickData, Theme } from "emoji-picker-react";
+import { useTranslation }    from "react-i18next";
+import { gradients, colors } from "../../theme/gradients.ts";
+import { reviewService }     from "../../services/reviewService.ts";
+import { paymentHistoryService } from "../../services/paymentHistoryService.ts";
+import { useAuth }           from "../../auth/AuthContext.tsx";
+import type { ReviewApiDto } from "../../services/reviewService.ts";
+import { useEffect } from "react";
+
+// ── ReviewCard ────────────────────────────────────────────────────────────────
 
 const ReviewCard = ({ review }: { review: ReviewApiDto }) => {
     const { i18n } = useTranslation();
-    const initials = `U${review.userId}`;
+    const initials = review.userName ? `${review.userName[0]}${review.userSurname?.[0] ?? ""}` : `U${review.userId}`;
     const date     = new Date(review.createdAt).toLocaleDateString(
         i18n.language === "en" ? "en-GB" : "ro-RO",
         { year: "numeric", month: "long" }
@@ -19,15 +30,20 @@ const ReviewCard = ({ review }: { review: ReviewApiDto }) => {
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                     <Avatar sx={{ background: gradients.primary, fontWeight: 700, width: 42, height: 42 }}>{initials}</Avatar>
                     <Box>
-                        <Typography variant="subtitle2" fontWeight={700}>User #{review.userId}</Typography>
+                        <Typography variant="subtitle2" fontWeight={700}>
+                            {review.userName ? `${review.userName} ${review.userSurname ?? ""}` : `User #${review.userId}`}
+                        </Typography>
                         <Typography variant="caption" color="text.secondary">{date}</Typography>
                     </Box>
                 </Box>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, bgcolor: colors.primaryAlpha10, px: 1.5, py: 0.5, borderRadius: 2 }}>
                     <StarIcon sx={{ fontSize: 16, color: "#F59E0B" }} />
-                    <Typography variant="subtitle2" fontWeight={800} color="primary.main">{review.rating}/10</Typography>
+                    <Typography variant="subtitle2" fontWeight={800} color="primary.main">{review.rating}/5</Typography>
                 </Box>
             </Box>
+
+            <Rating value={review.rating} max={5} readOnly size="small" sx={{ mb: 1 }} />
+
             {review.comment && (
                 <Typography variant="body2" color="text.secondary" lineHeight={1.8} sx={{ mb: review.ownerResponse ? 2 : 0 }}>
                     "{review.comment}"
@@ -45,37 +61,198 @@ const ReviewCard = ({ review }: { review: ReviewApiDto }) => {
     );
 };
 
-const ReviewsTab = ({ reviews }: { reviews: ReviewApiDto[] }) => {
-    const { t } = useTranslation();
+// ── ReviewForm ────────────────────────────────────────────────────────────────
 
-    if (reviews.length === 0) return (
-        <Box sx={{ py: 6, textAlign: "center" }}>
-            <StarIcon sx={{ fontSize: 48, color: colors.primaryAlpha25, mb: 2 }} />
-            <Typography variant="h6" color="text.secondary">{t("components.reviews.noReviews")}</Typography>
-        </Box>
+const ReviewForm = ({ apartmentId, onSubmitted }: { apartmentId: number; onSubmitted: () => void }) => {
+    const { t }           = useTranslation();
+    const { currentUser } = useAuth();
+
+    const [rating, setRating]         = useState<number | null>(null);
+    const [comment, setComment]       = useState("");
+    const [showEmoji, setShowEmoji]   = useState(false);
+    const [loading, setLoading]       = useState(false);
+    const [error, setError]           = useState<string | null>(null);
+    const [success, setSuccess]       = useState(false);
+
+    const handleEmoji = (emojiData: EmojiClickData) => {
+        setComment(prev => prev + emojiData.emoji);
+        setShowEmoji(false);
+    };
+
+    const handleSubmit = async () => {
+        if (!rating) {
+            setError(t("components.reviews.errorRating"));
+            return;
+        }
+        if (!currentUser) return;
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            await reviewService.create(currentUser.id, {
+                apartmentId,
+                rating,
+                comment: comment.trim() || undefined,
+            });
+            setSuccess(true);
+            setTimeout(() => {
+                onSubmitted();
+            }, 1500);
+        } catch {
+            setError(t("components.reviews.errorSubmit"));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (success) return (
+        <Alert severity="success" sx={{ borderRadius: 3 }}>
+            {t("components.reviews.successMessage")}
+        </Alert>
     );
 
-    const avgRating   = reviews.reduce((s, r) => s + r.rating, 0) / reviews.length;
+    return (
+        <Paper variant="outlined" sx={{ p: 3, borderRadius: 3, border: `1px solid ${colors.primary}`, mb: 3 }}>
+            <Typography variant="h6" fontWeight={800} mb={2}>
+                {t("components.reviews.formTitle")}
+            </Typography>
+
+            {/* Rating */}
+            <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" color="text.secondary" mb={0.5}>
+                    {t("components.reviews.ratingLabel")}
+                </Typography>
+                <Rating
+                    value={rating}
+                    onChange={(_, val) => setRating(val)}
+                    max={5}
+                    size="large"
+                />
+            </Box>
+
+            {/* Comment + Emoji */}
+            <Box sx={{ position: "relative", mb: 2 }}>
+                <TextField
+                    fullWidth
+                    multiline
+                    rows={3}
+                    placeholder={t("components.reviews.placeholder")}
+                    value={comment}
+                    onChange={e => setComment(e.target.value)}
+                    InputProps={{
+                        endAdornment: (
+                            <IconButton
+                                onClick={() => setShowEmoji(prev => !prev)}
+                                sx={{ alignSelf: "flex-end", mb: 0.5 }}
+                            >
+                                <EmojiIcon sx={{ color: showEmoji ? "primary.main" : "text.secondary" }} />
+                            </IconButton>
+                        )
+                    }}
+                />
+                <Collapse in={showEmoji}>
+                    <Box sx={{ position: "absolute", zIndex: 100, mt: 1, right: 0 }}>
+                        <EmojiPicker
+                            onEmojiClick={handleEmoji}
+                            theme={Theme.DARK}
+                            height={350}
+                            width={300}
+                        />
+                    </Box>
+                </Collapse>
+            </Box>
+
+            {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>}
+
+            <Button
+                variant="contained"
+                onClick={handleSubmit}
+                disabled={loading}
+                sx={{ borderRadius: 2.5, fontWeight: 700, px: 4 }}
+            >
+                {loading ? t("components.reviews.submitting") : t("components.reviews.submit")}
+            </Button>
+        </Paper>
+    );
+};
+
+// ── ReviewsTab ────────────────────────────────────────────────────────────────
+
+const ReviewsTab = ({ reviews: initialReviews, apartmentId }: { reviews: ReviewApiDto[]; apartmentId: number }) => {
+    const { t }           = useTranslation();
+    const { currentUser, isAuthenticated } = useAuth();
+
+    const [reviews, setReviews]       = useState<ReviewApiDto[]>(initialReviews);
+    const [canReview, setCanReview]   = useState(false);
+    const [hasReviewed, setHasReviewed] = useState(false);
+
+    useEffect(() => {
+        if (!currentUser) return;
+
+        // verifica daca userul a platit pentru acest apartament
+        paymentHistoryService.hasPaid(apartmentId)
+            .then(paid => setCanReview(paid))
+            .catch(() => {});
+
+        // verifica daca userul a lasat deja review
+        const alreadyReviewed = initialReviews.some(r => r.userId === currentUser.id);
+        setHasReviewed(alreadyReviewed);
+    }, [currentUser, apartmentId, initialReviews]);
+
+    const handleSubmitted = () => {
+        // reincarca review-urile dupa submit
+        reviewService.getByApartment(apartmentId)
+            .then(setReviews)
+            .catch(() => {});
+        setHasReviewed(true);
+        setCanReview(false);
+    };
+
+    const avgRating   = reviews.length > 0 ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
     const reviewCount = reviews.length;
     const reviewLabel = reviewCount === 1 ? t("components.reviews.review") : t("components.reviews.reviews");
 
     return (
         <Box>
-            <Paper variant="outlined" sx={{ p: 3, borderRadius: 3, mb: 3, border: `1px solid ${colors.border}` }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
-                    <Box sx={{ textAlign: "center", minWidth: 120 }}>
-                        <Typography variant="h2" fontWeight={900} color="primary.main" lineHeight={1}>{avgRating.toFixed(1)}</Typography>
-                        <Typography variant="body2" color="text.secondary" fontWeight={600} sx={{ mt: 0.5 }}>{t("components.reviews.outOf")}</Typography>
-                        <Box sx={{ display: "flex", justifyContent: "center", gap: 0.3, mt: 1 }}>
-                            {[1,2,3,4,5].map(i => <StarIcon key={i} sx={{ fontSize: 16, color: i <= Math.round(avgRating / 2) ? "#F59E0B" : colors.primaryAlpha25 }} />)}
+            {/* Summary */}
+            {reviews.length > 0 && (
+                <Paper variant="outlined" sx={{ p: 3, borderRadius: 3, mb: 3, border: `1px solid ${colors.border}` }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
+                        <Box sx={{ textAlign: "center", minWidth: 120 }}>
+                            <Typography variant="h2" fontWeight={900} color="primary.main" lineHeight={1}>
+                                {avgRating.toFixed(1)}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" fontWeight={600} sx={{ mt: 0.5 }}>
+                                {t("components.reviews.outOf")}
+                            </Typography>
+                            <Rating value={avgRating} max={5} readOnly precision={0.5} sx={{ mt: 1 }} />
+                            <Typography variant="caption" color="text.secondary">
+                                {reviewCount} {reviewLabel}
+                            </Typography>
                         </Box>
-                        <Typography variant="caption" color="text.secondary">{reviewCount} {reviewLabel}</Typography>
                     </Box>
+                </Paper>
+            )}
+
+            {/* Formular conditionat */}
+            {isAuthenticated && canReview && !hasReviewed && (
+                <ReviewForm apartmentId={apartmentId} onSubmitted={handleSubmitted} />
+            )}
+
+            {/* Review-urile existente */}
+            {reviews.length === 0 ? (
+                <Box sx={{ py: 6, textAlign: "center" }}>
+                    <StarIcon sx={{ fontSize: 48, color: colors.primaryAlpha25, mb: 2 }} />
+                    <Typography variant="h6" color="text.secondary">
+                        {t("components.reviews.noReviews")}
+                    </Typography>
                 </Box>
-            </Paper>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                {reviews.map(r => <ReviewCard key={r.id} review={r} />)}
-            </Box>
+            ) : (
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                    {reviews.map(r => <ReviewCard key={r.id} review={r} />)}
+                </Box>
+            )}
         </Box>
     );
 };
