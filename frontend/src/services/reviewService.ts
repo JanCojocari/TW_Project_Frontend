@@ -6,6 +6,8 @@ export interface ReviewApiDto {
     id: number;
     apartmentId: number;
     userId: number;
+    userName?: string;
+    userSurname?: string;
     comment?: string;
     ownerResponse?: string;
     rating: number;

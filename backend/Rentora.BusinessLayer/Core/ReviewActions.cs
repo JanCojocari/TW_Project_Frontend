@@ -4,6 +4,7 @@ using Rentora.DataAccess;
 using Rentora.Domain.Entities;
 using Rentora.Domain.Models.Review;
 using Rentora.Domain.Models.Responses;
+using Microsoft.EntityFrameworkCore;
 
 public class ReviewActions
 {
@@ -13,6 +14,7 @@ public class ReviewActions
     {
         using var db = new AppDbContext();
         return db.Reviews
+            .Include(r => r.User)
             .OrderByDescending(r => r.CreatedAt)
             .Select(r => MapToDto(r))
             .ToList();
@@ -23,6 +25,7 @@ public class ReviewActions
         using var db = new AppDbContext();
 
         return db.Reviews
+            .Include(r => r.User)
             .Where(r => r.ApartmentId == apartmentId)
             .OrderByDescending(r => r.CreatedAt)
             .Select(r => MapToDto(r))
@@ -51,9 +54,18 @@ public class ReviewActions
         if (!userExists)
             return new ActionResponse { IsSuccess = false, Message = "User not found." };
 
+        // validare ca userul a avut un stay platit
+        var hasPayment = db.Payments.Any(p => p.ApartmentId == data.ApartmentId && p.RenterId == userId);
+        if (!hasPayment)
+            return new ActionResponse { IsSuccess = false, Message = "You must have completed a stay to leave a review." };
+
         var alreadyReviewed = db.Reviews.Any(r => r.ApartmentId == data.ApartmentId && r.UserId == userId);
         if (alreadyReviewed)
             return new ActionResponse { IsSuccess = false, Message = "You have already reviewed this apartment." };
+
+        // validare rating
+        if (data.Rating < 1 || data.Rating > 5)
+            return new ActionResponse { IsSuccess = false, Message = "Rating must be between 1 and 5." };
 
         var review = new Review
         {
@@ -104,6 +116,8 @@ public class ReviewActions
         Id            = r.Id,
         ApartmentId   = r.ApartmentId,
         UserId        = r.UserId ?? 0,
+        UserName      = r.User?.Name,
+        UserSurname   = r.User?.Surname,
         Rating        = r.Rating,
         Comment       = r.Comment,
         OwnerResponse = r.OwnerResponse,

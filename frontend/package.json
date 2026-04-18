@@ -19,6 +19,7 @@
     "@tailwindcss/vite": "^4.1.18",
     "axios": "^1.13.6",
     "dayjs": "^1.11.20",
+    "emoji-picker-react": "^4.18.0",
     "html2canvas": "^1.4.1",
     "i18next": "^25.8.18",
     "jspdf": "^4.2.0",
