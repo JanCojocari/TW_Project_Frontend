@@ -129,6 +129,23 @@ public class UserActions
 
         return new ActionResponse { IsSuccess = true, Message = "User deleted successfully." };
     }
+    
+    protected ActionResponse UpdateRoleExecution(int id, int role)
+    {
+        using var db = new AppDbContext();
+
+        var user = db.Users.FirstOrDefault(u => u.Id == id);
+        if (user == null)
+            return new ActionResponse { IsSuccess = false, Message = "User not found." };
+
+        if (!Enum.IsDefined(typeof(Rentora.Domain.Enums.Role), role))
+            return new ActionResponse { IsSuccess = false, Message = "Invalid role value." };
+
+        user.Role = (Rentora.Domain.Enums.Role)role;
+        db.SaveChanges();
+
+        return new ActionResponse { IsSuccess = true, Message = $"Role updated to {(Rentora.Domain.Enums.Role)role}." };
+    }
 
     // helper privat -- mapare Entity -> DTO
     private static UserDto MapToDto(User user) => new UserDto

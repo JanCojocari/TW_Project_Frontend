@@ -4,6 +4,6 @@ namespace Rentora.Domain.Models.LoginResponse;
 
 public class AuthResponseDto
 {
-    public UserDto User { get; set; }
-    public string AccessToken { get; set; }
+    public required UserDto User { get; set; }
+    public required string AccessToken { get; set; }
 }

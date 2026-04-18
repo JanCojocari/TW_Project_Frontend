@@ -19,6 +19,26 @@ public class PaymentActions
             .Select(p => MapToDto(p))
             .ToList();
     }
+    
+    protected List<PaymentDto> GetByOwnerExecution(int ownerId)
+    {
+        using var db = new AppDbContext();
+        return db.Payments
+            .Where(p => p.OwnerId == ownerId)
+            .OrderByDescending(p => p.CreatedAt)
+            .Select(p => MapToDto(p))
+            .ToList();
+    }
+
+    protected List<PaymentDto> GetByRenterExecution(int renterId)
+    {
+        using var db = new AppDbContext();
+        return db.Payments
+            .Where(p => p.RenterId == renterId)
+            .OrderByDescending(p => p.CreatedAt)
+            .Select(p => MapToDto(p))
+            .ToList();
+    }
 
     protected List<PaymentDto> GetByApartmentExecution(int apartmentId)
     {
@@ -67,6 +87,15 @@ public class PaymentActions
         db.SaveChanges();
 
         return new ActionResponse { IsSuccess = true, Message = "Payment recorded." };
+    }
+    
+    protected List<PaymentDto> GetAllExecution()
+    {
+        using var db = new AppDbContext();
+        return db.Payments
+            .OrderByDescending(p => p.CreatedAt)
+            .Select(p => MapToDto(p))
+            .ToList();
     }
 
     private static PaymentDto MapToDto(Payment p) => new PaymentDto

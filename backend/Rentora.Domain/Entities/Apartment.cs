@@ -31,7 +31,7 @@ public class Apartment
     public Facilities Facilities { get; set; } = new Facilities();
     public AdditionalInfo AdditionlaInfo { get; set; } = new AdditionalInfo();
 
-    public User Owner { get; set; } = null;
+    public User Owner { get; set; } = null!;
     public User? Renter { get; set; } = null;
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
     public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
