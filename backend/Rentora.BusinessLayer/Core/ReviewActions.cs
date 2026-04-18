@@ -23,12 +23,32 @@ public class ReviewActions
     protected List<ReviewDto> GetByApartmentExecution(int apartmentId)
     {
         using var db = new AppDbContext();
-
         return db.Reviews
             .Include(r => r.User)
             .Where(r => r.ApartmentId == apartmentId)
             .OrderByDescending(r => r.CreatedAt)
-            .Select(r => MapToDto(r))
+            .Select(r => new ReviewDto
+            {
+                Id            = r.Id,
+                ApartmentId   = r.ApartmentId,
+                UserId        = r.UserId ?? 0,
+                UserName      = r.User != null ? r.User.Name : null,
+                UserSurname   = r.User != null ? r.User.Surname : null,
+                Rating        = r.Rating,
+                Comment       = r.Comment,
+                OwnerResponse = r.OwnerResponse,
+                CreatedAt     = r.CreatedAt,
+                StayStartDate = db.Payments
+                    .Where(p => p.ApartmentId == apartmentId && p.RenterId == r.UserId)
+                    .OrderByDescending(p => p.CreatedAt)
+                    .Select(p => p.StartDate)
+                    .FirstOrDefault(),
+                StayEndDate = db.Payments
+                    .Where(p => p.ApartmentId == apartmentId && p.RenterId == r.UserId)
+                    .OrderByDescending(p => p.CreatedAt)
+                    .Select(p => p.EndDate)
+                    .FirstOrDefault(),
+            })
             .ToList();
     }
 
@@ -82,13 +102,19 @@ public class ReviewActions
         return new ActionResponse { IsSuccess = true, Message = "Review submitted." };
     }
 
-    protected ActionResponse AddOwnerResponseExecution(int reviewId, string ownerResponse)
+    protected ActionResponse AddOwnerResponseExecution(int reviewId, int userId, string ownerResponse)
     {
         using var db = new AppDbContext();
 
-        var review = db.Reviews.FirstOrDefault(r => r.Id == reviewId);
+        var review = db.Reviews
+            .Include(r => r.Apartment)
+            .FirstOrDefault(r => r.Id == reviewId);
+
         if (review == null)
             return new ActionResponse { IsSuccess = false, Message = "Review not found." };
+
+        if (review.Apartment.OwnedId != userId)
+            return new ActionResponse { IsSuccess = false, Message = "Only the apartment owner can respond." };
 
         review.OwnerResponse = ownerResponse;
         db.Reviews.Update(review);

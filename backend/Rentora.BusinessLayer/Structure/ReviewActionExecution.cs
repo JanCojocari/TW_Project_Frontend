@@ -19,8 +19,8 @@ public class ReviewActionExecution : ReviewActions, IReviewAction
     public ActionResponse Create(int userId, ReviewCreateDto data)
         => CreateExecution(userId, data);
 
-    public ActionResponse AddOwnerResponse(int reviewId, string ownerResponse)
-        => AddOwnerResponseExecution(reviewId, ownerResponse);
+    public ActionResponse AddOwnerResponse(int reviewId, int userId, string ownerResponse)
+        => AddOwnerResponseExecution(reviewId, userId, ownerResponse);
 
     public ActionResponse Delete(int id)
         => DeleteExecution(id);

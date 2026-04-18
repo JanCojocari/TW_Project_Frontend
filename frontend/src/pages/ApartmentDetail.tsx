@@ -125,7 +125,11 @@ const ApartmentDetail = () => {
                         <TabPanel value={activeTab} index={0}>{location   && <LocationTab location={location} />}</TabPanel>
                         <TabPanel value={activeTab} index={1}>{facilities && <FacilitiesTab facilities={facilities} />}</TabPanel>
                         <TabPanel value={activeTab} index={2}>{addInfo    && <AdditionalInfoTab info={addInfo} />}</TabPanel>
-                        <TabPanel value={activeTab} index={3}><ReviewsTab reviews={reviews} apartmentId={Number(id)} /></TabPanel>
+                        <TabPanel value={activeTab} index={3}><ReviewsTab
+                            reviews={reviews}
+                            apartmentId={Number(id)}
+                            ownerId={apartment.Id_Owner}
+                        /></TabPanel>
                     </Box>
                 </Paper>
             </Container>

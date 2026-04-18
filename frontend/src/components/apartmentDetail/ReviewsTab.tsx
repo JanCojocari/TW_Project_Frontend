@@ -5,7 +5,6 @@ import {
     TextField, Button, Alert, Collapse, IconButton
 } from "@mui/material";
 import { Star as StarIcon, EmojiEmotions as EmojiIcon } from "@mui/icons-material";
-import EmojiPicker, { type EmojiClickData, Theme } from "emoji-picker-react";
 import { useTranslation }    from "react-i18next";
 import { gradients, colors } from "../../theme/gradients.ts";
 import { reviewService }     from "../../services/reviewService.ts";
@@ -13,16 +12,57 @@ import { paymentHistoryService } from "../../services/paymentHistoryService.ts";
 import { useAuth }           from "../../auth/AuthContext.tsx";
 import type { ReviewApiDto } from "../../services/reviewService.ts";
 import { useEffect } from "react";
+import { useThemeMode } from "../../theme/ThemeContext";
+import EmojiPicker, { type EmojiClickData, Theme } from "emoji-picker-react";
+
 
 // ── ReviewCard ────────────────────────────────────────────────────────────────
 
-const ReviewCard = ({ review }: { review: ReviewApiDto }) => {
-    const { i18n } = useTranslation();
-    const initials = review.userName ? `${review.userName[0]}${review.userSurname?.[0] ?? ""}` : `U${review.userId}`;
-    const date     = new Date(review.createdAt).toLocaleDateString(
+const ReviewCard = ({ review, isOwner, onResponseSubmitted }: {
+    review: ReviewApiDto;
+    isOwner: boolean;
+    onResponseSubmitted: () => void;
+}) => {
+    const { t, i18n } = useTranslation();
+    const [showForm, setShowForm]     = useState(false);
+    const [response, setResponse]     = useState("");
+    const [loading, setLoading]       = useState(false);
+    const [error, setError]           = useState<string | null>(null);
+    const [showEmoji, setShowEmoji]   = useState(false);
+    const { isDark }                  = useThemeMode();
+    const stayDuration = review.stayStartDate && review.stayEndDate
+        ? (() => {
+            const start = new Date(review.stayStartDate);
+            const end   = new Date(review.stayEndDate);
+            const days  = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+            const startStr = start.toLocaleDateString(i18n.language === "en" ? "en-GB" : "ro-RO", { day: "numeric", month: "short" });
+            const endStr   = end.toLocaleDateString(i18n.language === "en" ? "en-GB" : "ro-RO", { day: "numeric", month: "short", year: "numeric" });
+            return `${startStr} - ${endStr} (${days} ${days === 1 ? "zi" : "zile"})`;
+        })()
+        : null;
+
+    const initials = review.userName
+        ? `${review.userName[0]}${review.userSurname?.[0] ?? ""}`
+        : `U${review.userId}`;
+    const date = new Date(review.createdAt).toLocaleDateString(
         i18n.language === "en" ? "en-GB" : "ro-RO",
         { year: "numeric", month: "long" }
     );
+
+    const handleSubmitResponse = async () => {
+        if (!response.trim()) return;
+        setLoading(true);
+        setError(null);
+        try {
+            await reviewService.addOwnerResponse(review.id, response.trim());
+            onResponseSubmitted();
+            setShowForm(false);
+        } catch {
+            setError(t("components.reviews.errorSubmit"));
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <Paper variant="outlined" sx={{ p: 3, borderRadius: 3, border: `1px solid ${colors.border}`, transition: "all 0.2s ease", "&:hover": { borderColor: colors.primary, boxShadow: `0 4px 16px ${colors.primaryAlpha10}` } }}>
@@ -34,6 +74,10 @@ const ReviewCard = ({ review }: { review: ReviewApiDto }) => {
                             {review.userName ? `${review.userName} ${review.userSurname ?? ""}` : `User #${review.userId}`}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">{date}</Typography>
+                        {stayDuration && (
+                            <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>
+                                {stayDuration}
+                            </Typography>)}
                     </Box>
                 </Box>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, bgcolor: colors.primaryAlpha10, px: 1.5, py: 0.5, borderRadius: 2 }}>
@@ -45,16 +89,93 @@ const ReviewCard = ({ review }: { review: ReviewApiDto }) => {
             <Rating value={review.rating} max={5} readOnly size="small" sx={{ mb: 1 }} />
 
             {review.comment && (
-                <Typography variant="body2" color="text.secondary" lineHeight={1.8} sx={{ mb: review.ownerResponse ? 2 : 0 }}>
+                <Typography variant="body2" color="text.secondary" lineHeight={1.8} sx={{ mb: 2 }}>
                     "{review.comment}"
                 </Typography>
             )}
+
+            {/* Owner response existenta */}
             {review.ownerResponse && (
                 <Box sx={{ mt: 2, p: 2, bgcolor: colors.primaryAlpha06, borderRadius: 2, borderLeft: `3px solid ${colors.primary}` }}>
                     <Typography variant="caption" fontWeight={700} color="primary.main" sx={{ display: "block", mb: 0.5 }}>
-                        Owner response
+                        {t("components.reviews.ownerResponseLabel")}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">{review.ownerResponse}</Typography>
+                </Box>
+            )}
+
+            {/* Buton raspunde -- doar pentru owner, doar daca nu a raspuns deja */}
+            {isOwner && !review.ownerResponse && (
+                <Box sx={{ mt: 2 }}>
+                    {!showForm ? (
+                        <Button
+                            size="small"
+                            variant="outlined"
+                            onClick={() => setShowForm(true)}
+                            sx={{ borderRadius: 2, fontWeight: 600 }}
+                        >
+                            {t("components.reviews.replyButton")}
+                        </Button>
+                    ) : (
+                        <Box>
+                            <Box sx={{ position: "relative" }}>
+                                <TextField
+                                    fullWidth
+                                    multiline
+                                    rows={2}
+                                    placeholder={t("components.reviews.replyPlaceholder")}
+                                    value={response}
+                                    onChange={e => setResponse(e.target.value)}
+                                    sx={{ mb: 1.5 }}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <IconButton
+                                                onClick={() => setShowEmoji(prev => !prev)}
+                                                sx={{ alignSelf: "flex-end", mb: 0.5 }}
+                                            >
+                                                <EmojiIcon sx={{ color: showEmoji ? "primary.main" : "text.secondary" }} />
+                                            </IconButton>
+                                        )
+                                    }}
+                                />
+                                {showEmoji && (
+                                    <Box sx={{ position: "absolute", zIndex: 100, mt: 0, right: 0, bottom: 60 }}>
+                                        <EmojiPicker
+                                            onEmojiClick={(emojiData) => {
+                                                setResponse(prev => prev + emojiData.emoji);
+                                                setShowEmoji(false);
+                                            }}
+                                            theme={isDark ? Theme.DARK : Theme.LIGHT}
+                                            height={350}
+                                            width={300}
+                                            lazyLoadEmojis
+                                        />
+                                    </Box>
+                                )}
+                            </Box>
+                            {error && <Alert severity="error" sx={{ mb: 1.5, borderRadius: 2 }}>{error}</Alert>}
+                            <Box sx={{ display: "flex", gap: 1 }}>
+                                <Button
+                                    variant="contained"
+                                    size="small"
+                                    onClick={handleSubmitResponse}
+                                    disabled={loading || !response.trim()}
+                                    sx={{ borderRadius: 2, fontWeight: 700 }}
+                                >
+                                    {loading ? t("components.reviews.submitting") : t("components.reviews.replySubmit")}
+                                </Button>
+                                <Button
+                                    variant="text"
+                                    size="small"
+                                    onClick={() => { setShowForm(false); setResponse(""); }}
+                                    disabled={loading}
+                                    sx={{ borderRadius: 2 }}
+                                >
+                                    {t("components.reviews.replyCancel")}
+                                </Button>
+                            </Box>
+                        </Box>
+                    )}
                 </Box>
             )}
         </Paper>
@@ -73,6 +194,8 @@ const ReviewForm = ({ apartmentId, onSubmitted }: { apartmentId: number; onSubmi
     const [loading, setLoading]       = useState(false);
     const [error, setError]           = useState<string | null>(null);
     const [success, setSuccess]       = useState(false);
+    const { isDark }                  = useThemeMode();
+
 
     const handleEmoji = (emojiData: EmojiClickData) => {
         setComment(prev => prev + emojiData.emoji);
@@ -155,7 +278,7 @@ const ReviewForm = ({ apartmentId, onSubmitted }: { apartmentId: number; onSubmi
                     <Box sx={{ position: "absolute", zIndex: 100, mt: 1, right: 0 }}>
                         <EmojiPicker
                             onEmojiClick={handleEmoji}
-                            theme={Theme.DARK}
+                            theme={isDark ? Theme.DARK : Theme.LIGHT}
                             height={350}
                             width={300}
                         />
@@ -179,8 +302,11 @@ const ReviewForm = ({ apartmentId, onSubmitted }: { apartmentId: number; onSubmi
 
 // ── ReviewsTab ────────────────────────────────────────────────────────────────
 
-const ReviewsTab = ({ reviews: initialReviews, apartmentId }: { reviews: ReviewApiDto[]; apartmentId: number }) => {
-    const { t }           = useTranslation();
+const ReviewsTab = ({ reviews: initialReviews, apartmentId, ownerId }: {
+    reviews: ReviewApiDto[];
+    apartmentId: number;
+    ownerId: number;
+}) => {    const { t }           = useTranslation();
     const { currentUser, isAuthenticated } = useAuth();
 
     const [reviews, setReviews]       = useState<ReviewApiDto[]>(initialReviews);
@@ -250,8 +376,14 @@ const ReviewsTab = ({ reviews: initialReviews, apartmentId }: { reviews: ReviewA
                 </Box>
             ) : (
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                    {reviews.map(r => <ReviewCard key={r.id} review={r} />)}
-                </Box>
+                    {reviews.map(r => (
+                        <ReviewCard
+                            key={r.id}
+                            review={r}
+                            isOwner={currentUser?.id === ownerId}
+                            onResponseSubmitted={handleSubmitted}
+                        />
+                    ))}                </Box>
             )}
         </Box>
     );
