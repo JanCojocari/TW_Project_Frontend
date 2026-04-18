@@ -14,6 +14,9 @@ import PaymentSuccessScreen         from "../components/payment/PaymentSuccessSc
 import MobileSummaryAccordion       from "../components/payment/MobileSummaryAccordion.tsx";
 import PayPalButton from "../components/payment/PayPalButton.tsx";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import StayPeriodSelector from "../components/payment/StayPeriodSelector";
+import type { Dayjs } from "dayjs";
 
 interface Props {
     summary?:              OrderSummary;
@@ -25,17 +28,47 @@ interface Props {
 }
 
 const PaymentPage = ({ summary: summaryProp, defaultPaymentMethod = "card", onPay, onBack, onSuccess, onError }: Props) => {
+    const [startDate, setStartDate] = useState<Dayjs | null>(null);
+    const [endDate, setEndDate]     = useState<Dayjs | null>(null);
+    const [hours, setHours]         = useState<number>(1);
+    const [dateError, setDateError] = useState<string | null>(null);
     const [searchParams]  = useSearchParams();
+    const interval    = searchParams.get("interval") ?? "day"; // "hour" | "day" | "month"
+    const [months, setMonths] = useState<number>(1);
+    const [monthsInput, setMonthsInput] = useState<string>("1");
+    const [hoursInput, setHoursInput] = useState<string>("1");
     const navigate = useNavigate();
     const apartmentId     = searchParams.get("apartmentId");
-    const summary         = useOrderSummary(summaryProp, apartmentId);
+    const summary         = useOrderSummary(
+        summaryProp, 
+        apartmentId,
+        interval === "hour" ? null : startDate?.toDate() ?? null,
+        interval === "hour" ? null : endDate?.toDate()   ?? null,
+        interval === "hour" ? hours : undefined);
 
+    const validateDates = (): boolean => {
+        if (interval === "hour") {
+            if (hours < 1) { setDateError("Minim 1 ora."); return false; }
+        } else {
+            if (!startDate || !endDate) { setDateError("Selecteaza perioada sejurului."); return false; }
+            if (endDate.isBefore(startDate)) { setDateError("Data de sfarsit trebuie sa fie dupa data de inceput."); return false; }
+            if (interval === "month") {
+                const diffDays = endDate.diff(startDate, "day");
+                if (diffDays < 30) { setDateError("Pentru inchiriere lunara, perioada minima este 30 de zile."); return false; }
+            }
+        }
+        setDateError(null);
+        return true;
+    };
+    
     const {
         method, formState, errors, sameAddress, setSameAddress,
         promoInput, setPromoInput, appliedPromo, promoDiscount, promoMessage, promoLoading,
         submitting, submitted, setSubmitted, submitError, setSubmitError, snackOpen, setSnackOpen, summaryOpen, setSummaryOpen,
         formRef, handleFieldChange, handleMethodChange, handlePromoApply, handlePromoRemove, handleSubmit, handleBack,
-    } = usePaymentForm({ summary, apartmentId, onPay, onBack, onSuccess, onError, defaultMethod: defaultPaymentMethod });
+    } = usePaymentForm({ 
+        summary, apartmentId, onPay, onBack, onSuccess, onError, 
+        startDate: startDate?.toDate() ?? null,    endDate:   endDate?.toDate() ?? null, defaultMethod: defaultPaymentMethod,});
 
     const currentFields  = FIELDS_BY_METHOD[method];
     const sym            = CURRENCY_SYMBOLS[summary.currency] ?? summary.currency;
@@ -48,7 +81,6 @@ const PaymentPage = ({ summary: summaryProp, defaultPaymentMethod = "card", onPa
     return (
         <Box sx={{ minHeight: "100vh", bgcolor: "background.default", pt: { xs: 9, md: 11 }, pb: 8 }}>
             <Container maxWidth="lg">
-
                 {/* Header */}
                 <Box sx={{ mb: 4, display: "flex", alignItems: "center", gap: 2 }}>
                     <IconButton onClick={handleBack} aria-label={LABELS.back} sx={{ border: `1px solid ${colors.border}`, "&:hover": { borderColor: colors.primary } }}>
@@ -60,6 +92,27 @@ const PaymentPage = ({ summary: summaryProp, defaultPaymentMethod = "card", onPa
                     </Box>
                 </Box>
 
+                <StayPeriodSelector
+                    interval={interval}
+                    startDate={startDate}
+                    endDate={endDate}
+                    hours={hours}
+                    hoursInput={hoursInput}
+                    months={months}
+                    monthsInput={monthsInput}
+                    dateError={dateError}
+                    onStartChange={(val) => { setStartDate(val); setEndDate(null); setDateError(null); }}
+                    onEndChange={(val) => { setEndDate(val); setDateError(null); }}
+                    onHoursChange={(input, value) => { setHoursInput(input); setHours(value); }}
+                    onMonthsChange={(input, value) => {
+                        setMonthsInput(input);
+                        setMonths(value);
+                        if (startDate) setEndDate(startDate.add(value, "month"));
+                    }}
+                    onHoursBlur={() => { if (!hoursInput || parseInt(hoursInput) < 1) { setHoursInput("1"); setHours(1); } }}
+                    onMonthsBlur={() => { if (!monthsInput || parseInt(monthsInput) < 1) { setMonthsInput("1"); setMonths(1); if (startDate) setEndDate(startDate.add(1, "month")); } }}
+                />
+                
                 <MobileSummaryAccordion open={summaryOpen} onToggle={() => setSummaryOpen((v) => !v)} effectiveTotal={effectiveTotal} currency={summary.currency} summaryCardProps={summaryCardProps} />
 
                 <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 380px" }, gap: 4, alignItems: "start" }}>

@@ -16,9 +16,11 @@ interface Options {
     onError?:    (err: string) => void;
     onBack?:     () => void;
     defaultMethod: PaymentMethodId;
+    startDate: Date | null;
+    endDate:   Date | null;
 }
 
-export const usePaymentForm = ({ summary, apartmentId, onPay, onSuccess, onError, onBack, defaultMethod }: Options) => {
+export const usePaymentForm = ({ summary, apartmentId, onPay, onSuccess, onError, onBack, defaultMethod, startDate, endDate }: Options) => {
     const navigate = useNavigate();
 
     const [method, setMethod]           = useState<PaymentMethodId>(defaultMethod);
@@ -85,7 +87,13 @@ export const usePaymentForm = ({ summary, apartmentId, onPay, onSuccess, onError
         setSubmitError("");
         if (!validate()) return;
         setSubmitting(true);
-        const payload: PaymentPayload = { method, formValues: { ...formState, sameAddress }, summary, promoCode: appliedPromo || undefined, apartmentId: apartmentId ? Number(apartmentId) : undefined };
+        const payload: PaymentPayload = { 
+            method, formValues: { ...formState, sameAddress }, 
+            summary, promoCode: appliedPromo || undefined, 
+            apartmentId: apartmentId ? Number(apartmentId) : undefined,
+            startDate: startDate ?? undefined,
+            endDate:   endDate   ?? undefined,
+        };
         try {
             const result = onPay ? await onPay(payload) : await paymentService.createPayment(payload);
             if (result.success) { setSubmitted(true); setSnackOpen(true); onSuccess?.(result); setTimeout(() => navigate("/dashboard"), 2500); }
@@ -100,6 +108,6 @@ export const usePaymentForm = ({ summary, apartmentId, onPay, onSuccess, onError
         method, formState, errors, sameAddress, setSameAddress,
         promoInput, setPromoInput, appliedPromo, promoDiscount, promoMessage, promoLoading,
         submitting, submitted, setSubmitted, submitError, setSubmitError, snackOpen, setSnackOpen, summaryOpen, setSummaryOpen,
-        formRef, handleFieldChange, handleMethodChange, handlePromoApply, handlePromoRemove, handleSubmit, handleBack,
+        formRef, handleFieldChange, handleMethodChange, handlePromoApply, handlePromoRemove, handleSubmit, handleBack, startDate, endDate
     };
 };

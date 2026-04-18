@@ -24,6 +24,8 @@ public class Payment
     
     public string? TransactionId { get; set; }   // ID-ul returnat de PayPal
     public string? PaymentMethod { get; set; }   // "card" | "paypal" | "bank_transfer"
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
 
     // Navigation
     public User? Owner { get; set; } = null!;
