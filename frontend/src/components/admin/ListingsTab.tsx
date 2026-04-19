@@ -16,8 +16,9 @@ const statusConfig = (status: number) => {
     return             { label: "Declined", color: "error"    as const };
 };
 
-const intervalLabel = (v: number) => ["Daily", "Weekly", "Monthly"][v] ?? v;
-const rentModeLabel = (v: number) => ["Rent", "Shared"][v] ?? v;
+const intervalLabel = (v: number) => ["Hour", "Day", "Month"][v] ?? v;
+const rentModeLabel = (v: number) => ["Short-term", "Long-term"][v] ?? v;
+const currencyLabel = (v: number) => ["USD", "EUR", "MDL"][v] ?? "?";
 
 export default function ListingsTab() {
     const [apartments, setApartments] = useState<AdminApartment[]>([]);
@@ -100,7 +101,7 @@ export default function ListingsTab() {
                                         {apt.address}
                                     </TableCell>
                                     <TableCell>{apt.ownedId}</TableCell>
-                                    <TableCell>${apt.costPerInterval} / {intervalLabel(apt.interval)}</TableCell>
+                                    <TableCell>{apt.costPerInterval} {currencyLabel(apt.currency)} / {intervalLabel(apt.interval)}</TableCell>
                                     <TableCell>{rentModeLabel(apt.rentMode)}</TableCell>
                                     <TableCell>
                                         <Chip label={sc.label} color={sc.color} size="small" sx={{ fontWeight: 700 }} />

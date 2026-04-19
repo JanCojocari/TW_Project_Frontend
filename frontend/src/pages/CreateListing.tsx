@@ -98,7 +98,7 @@ const CreateListing = () => {
                     </Box>
                 </Box>
 
-                {Object.keys(errors).length > 0 && (
+                {Object.values(errors).some(Boolean) && (
                     <Alert severity="error" sx={{ mb: 3, borderRadius: 3 }}>
                         {t("createListing.errorsAlert")}
                     </Alert>

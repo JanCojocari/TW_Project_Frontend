@@ -12,6 +12,7 @@ public class ApartmentDto
     public string? ImageUrl { get; set; }
     public RentInterval Interval { get; set; }
     public decimal CostPerInterval { get; set; }
+    public Currency Currency { get; set; }
     public RentMode RentMode { get; set; }
     public ApartmentStatus Status { get; set; }
     public MapLocation Location { get; set; } = new MapLocation();

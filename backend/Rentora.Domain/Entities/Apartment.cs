@@ -23,6 +23,8 @@ public class Apartment
     
     public decimal CostPerInterval { get; set; }
     
+    public Currency Currency { get; set; } = Currency.EUR;
+    
     public RentMode RentMode { get; set; }
 
     public ApartmentStatus Status { get; set; } = ApartmentStatus.Pending;

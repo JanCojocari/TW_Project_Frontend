@@ -6,6 +6,9 @@ export type  RentIntervalApi = typeof RentIntervalApi[keyof typeof RentIntervalA
 export const RentModeApi = { ShortTerm: 0, LongTerm: 1 } as const;
 export type  RentModeApi = typeof RentModeApi[keyof typeof RentModeApi];
 
+export const CurrencyApi = { USD: 0, EUR: 1, MDL: 2 } as const;
+export type  CurrencyApi = typeof CurrencyApi[keyof typeof CurrencyApi];
+
 export const CancellationPolicyApi = { Flexible: 0, Moderate: 1, Strict: 2 } as const;
 export type  CancellationPolicyApi = typeof CancellationPolicyApi[keyof typeof CancellationPolicyApi];
 
@@ -39,6 +42,7 @@ export interface ApartmentApiDto {
     imageUrl:        string | null;
     interval:        RentIntervalApi;
     costPerInterval: number;
+    currency:        CurrencyApi;
     rentMode:        RentModeApi;
     status:          ApartmentStatusApi;
     location:        MapLocationApi;
@@ -50,6 +54,7 @@ export interface ApartmentCreateApiDto {
     imageUrl?:       string;
     interval:        RentIntervalApi;
     costPerInterval: number;
+    currency:        CurrencyApi;
     rentMode:        RentModeApi;
     location:        MapLocationApi;
     additionalInfo:  AdditionalInfoApi;
@@ -61,6 +66,7 @@ export interface ApartmentUpdateApiDto {
     imageUrl?:       string;
     interval:        RentIntervalApi;
     costPerInterval: number;
+    currency:        CurrencyApi;
     rentMode:        RentModeApi;
     location:        MapLocationApi;
     additionalInfo:  AdditionalInfoApi;
