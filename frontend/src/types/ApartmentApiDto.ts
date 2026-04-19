@@ -9,6 +9,9 @@ export type  RentModeApi = typeof RentModeApi[keyof typeof RentModeApi];
 export const CancellationPolicyApi = { Flexible: 0, Moderate: 1, Strict: 2 } as const;
 export type  CancellationPolicyApi = typeof CancellationPolicyApi[keyof typeof CancellationPolicyApi];
 
+export const ApartmentStatusApi = { Pending: 0, Approved: 1, Declined: 2 } as const;
+export type  ApartmentStatusApi = typeof ApartmentStatusApi[keyof typeof ApartmentStatusApi];
+
 export interface MapLocationApi {
     lat:         number;
     lng:         number;
@@ -37,6 +40,7 @@ export interface ApartmentApiDto {
     interval:        RentIntervalApi;
     costPerInterval: number;
     rentMode:        RentModeApi;
+    status:          ApartmentStatusApi;
     location:        MapLocationApi;
     additionalInfo:  AdditionalInfoApi;
 }

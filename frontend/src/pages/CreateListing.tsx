@@ -5,6 +5,7 @@ import { useAuth }        from "../auth/AuthContext.tsx";
 import { useTranslation } from "react-i18next";
 import { Box, Container, Typography, Button, Alert } from "@mui/material";
 import { apartmentService, buildCreatePayload } from "../services/apartmentService.ts";
+import { uploadService }  from "../services/uploadService.ts";
 import { ArrowBack as ArrowBackIcon, Home as HomeIcon } from "@mui/icons-material";
 import { gradients } from "../theme/gradients.ts";
 import { paths }     from "../app/paths.ts";
@@ -30,7 +31,7 @@ const CreateListing = () => {
         submit,
     } = useListingForm();
 
-    const handleAddImages = useCallback(
+    const handleAddImages   = useCallback(
         (files: FileList | null) => handleImages(files, form.images.length),
         [handleImages, form.images.length],
     );
@@ -42,19 +43,34 @@ const CreateListing = () => {
         () => addLandmark(form.landmarkInput),
         [addLandmark, form.landmarkInput],
     );
-    const [apiError, setApiError] = useState<string | null>(null);
+
+    const [apiError, setApiError]     = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSubmit = useCallback(
         () => submit(async (markDone) => {
+            if (isSubmitting) return;
             setApiError(null);
             try {
-                const result = await apartmentService.create(currentUser?.id ?? 0, buildCreatePayload(form));
+                // 1. Upload imagini — daca userul a selectat fisiere
+                let imageUrls: string[] = [];
+                if (form.images.length > 0) {
+                    imageUrls = await uploadService.images(form.images);
+                }
+
+                // 2. Creeaza apartamentul cu URL-urile rezultate
+                await apartmentService.create(
+                    currentUser?.id ?? 0,
+                    buildCreatePayload(form, imageUrls),
+                );
+
                 markDone();
-                // Redirect la pagina reala a apartamentului creat
-                const targetId = result.id ?? 0;
-                setTimeout(() => navigate(paths.apartmentDetail(targetId)), 1500);
+
+                // 3. Redirect la dashboard — anuntul e Pending, apare in "Proprietatile mele"
+                setTimeout(() => navigate(paths.dashboard), 1500);
             } catch {
                 setApiError("Eroare la salvarea anunțului. Verificați conexiunea și încercați din nou.");
+                setIsSubmitting(false);
             }
         }),
         [submit, navigate, form, currentUser],
@@ -157,9 +173,13 @@ const CreateListing = () => {
                             sx={{ py: 1.8, borderRadius: 2.5, fontWeight: 700 }}>
                         {t("createListing.cancel")}
                     </Button>
-                    <Button variant="contained" size="large" fullWidth onClick={handleSubmit}
-                            sx={{ py: 1.8, borderRadius: 2.5, fontWeight: 800, fontSize: 16 }}>
-                        {t("createListing.publish")}
+                    <Button
+                        variant="contained" size="large" fullWidth
+                        onClick={handleSubmit}
+                        disabled={isSubmitting}
+                        sx={{ py: 1.8, borderRadius: 2.5, fontWeight: 800, fontSize: 16 }}
+                    >
+                        {isSubmitting ? "Se publică..." : t("createListing.publish")}
                     </Button>
                 </Box>
 

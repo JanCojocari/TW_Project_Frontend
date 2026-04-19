@@ -16,35 +16,51 @@ interface Props {
     getStatus:      (apartment: Apartment) => string;
 }
 
-const ApartmentCard = ({ apartment, favorites, toggleFavorite, getUserName, getStatus }: Props) => {
-    const navigate   = useNavigate();
-    const { t, i18n } = useTranslation();
-    const isFav      = favorites.includes(apartment.Id_Apartment);
-    const isOccupied = apartment.Id_Renter !== null;
+// Culoarea chip-ului in functie de status si ocupare
+function getChipColor(apartment: Apartment): string {
+    if (apartment.status === "pending")  return "#b45309"; // portocaliu
+    if (apartment.status === "declined") return "#dc2626"; // rosu
+    if (apartment.Id_Renter !== null)    return "#dc2626"; // rosu — ocupat
+    return "#16a34a";                                      // verde — disponibil
+}
 
-    // Eticheta cost adaptată la interval
+const ApartmentCard = ({ apartment, favorites, toggleFavorite, getUserName, getStatus }: Props) => {
+    const navigate    = useNavigate();
+    const { t, i18n } = useTranslation();
+    const isFav       = favorites.includes(apartment.Id_Apartment);
+    const isOccupied  = apartment.Id_Renter !== null;
+
+    // Butonul de detalii e dezactivat daca anuntul nu e aprobat
+    const canViewDetails = apartment.status === "approved";
+
     const intervalLabelMap: Record<string, string> = i18n.language === "en"
-        ? { hour: "Hourly cost", day: "Daily cost", month: "Monthly cost" }
-        : { hour: "Cost orar",   day: "Cost zilnic", month: "Cost lunar"  };
+        ? { hour: "Hourly cost", day: "Daily cost",  month: "Monthly cost" }
+        : { hour: "Cost orar",   day: "Cost zilnic", month: "Cost lunar"   };
     const costLabel = intervalLabelMap[apartment.Interval] ?? (i18n.language === "en" ? "Monthly cost" : "Cost lunar");
+
+    // Imaginea de afisat pe card — prima din array sau fallback la image_url
+    const cardImage = apartment.image_urls[0] ?? apartment.image_url;
 
     return (
         <Card sx={{ borderRadius: 4, overflow: "hidden", height: "100%", display: "flex", flexDirection: "column", position: "relative", "&:hover": { transform: "translateY(-10px)" } }}>
 
             {/* Image */}
             <Box sx={{ position: "relative", height: 240, overflow: "hidden", bgcolor: "background.default" }}>
-                <img src={apartment.image_url} alt={apartment.Address}
+                <img src={cardImage} alt={apartment.Address}
                      style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1)" }} />
 
                 {/* Favorite */}
-                <Button onClick={() => toggleFavorite(apartment.Id_Apartment)} sx={{ position: "absolute", top: 14, right: 14, minWidth: "auto", width: 42, height: 42, borderRadius: "50%", bgcolor: "background.paper", color: isFav ? "error.main" : "text.secondary", border: `1px solid ${colors.border}`, backdropFilter: "blur(8px)", boxShadow: 1, "&:hover": { bgcolor: "background.paper", color: "error.main", transform: "scale(1.1)", boxShadow: 2 } }}>
+                <Button onClick={() => toggleFavorite(apartment.Id_Apartment)}
+                        sx={{ position: "absolute", top: 14, right: 14, minWidth: "auto", width: 42, height: 42, borderRadius: "50%", bgcolor: "background.paper", color: isFav ? "error.main" : "text.secondary", border: `1px solid ${colors.border}`, backdropFilter: "blur(8px)", boxShadow: 1, "&:hover": { bgcolor: "background.paper", color: "error.main", transform: "scale(1.1)", boxShadow: 2 } }}>
                     {isFav ? <FavoriteIcon sx={{ fontSize: 22 }} /> : <FavoriteBorderIcon sx={{ fontSize: 22 }} />}
                 </Button>
 
-                {/* Status */}
+                {/* Status chip */}
                 <Box sx={{ position: "absolute", bottom: 16, left: 16 }}>
-                    <Chip label={getStatus(apartment)} color={isOccupied ? "error" : "success"} size="small"
-                          sx={{ fontWeight: 800, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.5px", backdropFilter: "blur(8px)", bgcolor: isOccupied ? "#dc2626" : "#16a34a", color: "white" }} />
+                    <Chip label={getStatus(apartment)} size="small"
+                          sx={{ fontWeight: 800, fontSize: "11px", textTransform: "uppercase",
+                              letterSpacing: "0.5px", backdropFilter: "blur(8px)",
+                              bgcolor: getChipColor(apartment), color: "white" }} />
                 </Box>
             </Box>
 
@@ -97,9 +113,12 @@ const ApartmentCard = ({ apartment, favorites, toggleFavorite, getUserName, getS
                             </Typography>
                         </Box>
                     </Box>
-                    <Button variant="contained" disabled={isOccupied}
+                    <Button variant="contained"
+                            disabled={!canViewDetails || isOccupied}
                             onClick={() => navigate(paths.apartmentDetail(apartment.Id_Apartment))}
-                            sx={{ px: 3, color: isOccupied ? "#071A1D" : "#FFF", fontWeight: 800, textTransform: "none", borderRadius: 2, boxShadow: isOccupied ? "none" : "0 0 12px rgba(0,224,198,0.3)", "&:hover": { boxShadow: "0 0 20px rgba(0,224,198,0.4)" } }}>
+                            sx={{ px: 3, color: (!canViewDetails || isOccupied) ? "#071A1D" : "#FFF", fontWeight: 800, textTransform: "none", borderRadius: 2,
+                                boxShadow: (!canViewDetails || isOccupied) ? "none" : "0 0 12px rgba(0,224,198,0.3)",
+                                "&:hover": { boxShadow: "0 0 20px rgba(0,224,198,0.4)" } }}>
                         {isOccupied ? t("listings.occupied") : t("listings.details")}
                     </Button>
                 </Box>

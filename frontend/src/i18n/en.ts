@@ -190,6 +190,11 @@ export default {
         },
         myListings: {
             empty: "You haven't published any listings yet.",
+            status: {
+                pending:  "Pending",
+                approved: "Approved",
+                declined: "Declined",
+            },
         },
     },
 
@@ -416,8 +421,8 @@ export default {
             facilities: { selected: "facilities selected" },
         },
         successScreen: {
-            title:    "Listing created successfully!",
-            subtitle: "You are being redirected to your listing...",
+            title:    "Request submitted successfully!",
+            subtitle: "Administrators will review and validate your listing shortly.",
         },
     },
 } as const;

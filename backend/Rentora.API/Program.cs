@@ -75,7 +75,11 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseCors("AllowAll");
-app.UseAuthentication();   // inainte de Authorization
+
+// Serveste fisierele statice din wwwroot/ (inclusiv /uploads/)
+app.UseStaticFiles();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

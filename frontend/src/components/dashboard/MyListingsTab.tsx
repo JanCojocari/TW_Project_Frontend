@@ -31,9 +31,12 @@ export default function MyListingsTab({ myListings, favoriteIds, onToggleFavorit
                     favorites={favoriteIds}
                     toggleFavorite={onToggleFavorite}
                     getUserName={getUserName}
-                    getStatus={(apartment: Apartment) => apartment.Id_Renter
-                        ? t("listings.occupied")
-                        : t("listings.available")}
+                    getStatus={(a) => {
+                        // Pending si Declined au prioritate fata de ocupat/disponibil
+                        if (a.status === "pending")  return t("dashboard.myListings.status.pending");
+                        if (a.status === "declined") return t("dashboard.myListings.status.declined");
+                        return a.Id_Renter ? t("listings.occupied") : t("listings.available");
+                    }}
                 />
             ))}
         </Box>

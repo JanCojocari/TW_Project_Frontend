@@ -13,13 +13,13 @@ import { reviewService }     from "../services/reviewService.ts";
 import type { ReviewApiDto } from "../services/reviewService.ts";
 import { recentViewService } from "../services/recentViewService.ts";
 import { userService, mapUserApiToUser } from "../services/userService.ts";
-import ImageCarousel     from "../components/apartmentDetail/ImageCarousel.tsx";
-import AdditionalInfoTab from "../components/apartmentDetail/AdditionaInfoTab.tsx";
+import ImageCarousel      from "../components/apartmentDetail/ImageCarousel.tsx";
+import AdditionalInfoTab  from "../components/apartmentDetail/AdditionaInfoTab.tsx";
 import ApartmentInfoPanel from "../components/apartmentDetail/ApartmentInfoPanel.tsx";
-import TabPanel          from "../components/apartmentDetail/TabPanel.tsx";
-import FacilitiesTab     from "../components/apartmentDetail/FacilitiesTab.tsx";
-import LocationTab       from "../components/apartmentDetail/LocationTab.tsx";
-import ReviewsTab        from "../components/apartmentDetail/ReviewsTab.tsx";
+import TabPanel           from "../components/apartmentDetail/TabPanel.tsx";
+import FacilitiesTab      from "../components/apartmentDetail/FacilitiesTab.tsx";
+import LocationTab        from "../components/apartmentDetail/LocationTab.tsx";
+import ReviewsTab         from "../components/apartmentDetail/ReviewsTab.tsx";
 
 const ApartmentDetail = () => {
     const { id }       = useParams<{ id: string }>();
@@ -52,11 +52,11 @@ const ApartmentDetail = () => {
             .then(setReviews)
             .finally(() => setLoading(false));
     }, [id]);
-    const location   = apartment?.location   ?? null;
-    const facilities = apartment?.facilities ?? null;
+
+    const location   = apartment?.location      ?? null;
+    const facilities = apartment?.facilities    ?? null;
     const addInfo    = apartment?.additionalInfo ?? null;
 
-    // tabConfig în interiorul componentei — se re-evaluează la schimbarea limbii
     const tabConfig = [
         { label: t("apartment.tabs.location"),   icon: <LocationOnIcon sx={{ fontSize: 18 }} /> },
         { label: t("apartment.tabs.facilities"), icon: <WifiIcon sx={{ fontSize: 18 }} /> },
@@ -77,8 +77,15 @@ const ApartmentDetail = () => {
     );
 
     const isAvailable = apartment.Id_Renter === null;
-    const images      = apartment.image_url ? [apartment.image_url, apartment.image_url, apartment.image_url] : [];
-    const statusChip  = (
+
+    // Folosim image_urls (array) — fallback la image_url simplu daca exista
+    const images = apartment.image_urls.length > 0
+        ? apartment.image_urls
+        : apartment.image_url
+            ? [apartment.image_url]
+            : [];
+
+    const statusChip = (
         <Chip label={isAvailable ? t("listings.available") : t("listings.occupied")}
               sx={{ fontWeight: 700, fontSize: "14px", px: 2, py: 2.5, bgcolor: isAvailable ? "rgba(22,163,74,0.3)" : "rgba(220,38,38,0.3)", color: "white" }} />
     );
@@ -96,11 +103,16 @@ const ApartmentDetail = () => {
                     </Alert>
                 )}
 
-                <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 4 }}>
-                    <Box sx={{ flex: { xs: "1", md: "1 1 58%" } }}>
+                <Box sx={{
+                    display: "grid",
+                    gridTemplateColumns: { xs: "1fr", md: "58% 42%" },
+                    gap: 4,
+                    alignItems: "start",
+                }}>
+                    <Box sx={{ height: "100%" }}>
                         <ImageCarousel images={images} altBase={apartment.Address} statusChip={statusChip} />
                     </Box>
-                    <Box sx={{ flex: { xs: "1", md: "1 1 42%" } }}>
+                    <Box>
                         <ApartmentInfoPanel apartment={apartment} owner={owner} renter={renter} isAvailable={isAvailable} />
                     </Box>
                 </Box>
