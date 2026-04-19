@@ -84,23 +84,31 @@ export function buildCreatePayload(form: FormState): ApartmentCreateApiDto {
         costPerInterval: parseFloat(form.cost) || 0,
         rentMode:        RentModeApi.ShortTerm,
         location: {
-            lat:         parseFloat(form.latitude)  || 0,
-            lng:         parseFloat(form.longitude) || 0,
+            lat:         parseFloat(form.latitude)   || 0,
+            lng:         parseFloat(form.longitude)  || 0,
             city:        form.city,
             country:     "Moldova",
             fullAddress: form.address,
         },
         additionalInfo: {
-            rooms:              parseInt(form.rooms)      || 0,
-            bathrooms:          parseInt(form.bathrooms)  || 0,
-            floor:              parseInt(form.floor)      || 0,
-            totalFloors:        parseInt(form.totalFloors)|| 0,
+            rooms:              parseInt(form.rooms)       || 0,
+            bathrooms:          parseInt(form.bathrooms)   || 0,
+            floor:              parseInt(form.floor)       || 0,
+            totalFloors:        parseInt(form.totalFloors) || 0,
             area:               parseFloat(form.surfaceArea) || 0,
-            maxGuests:          parseInt(form.maxGuests)  || 0,
+            maxGuests:          parseInt(form.maxGuests)   || 0,
             description:        form.description,
             cancellationPolicy: CANCELLATION_TO_API[form.cancellationPolicy],
         },
     };
+}
+
+// ── Tipul raspunsului de la Create ───────────────────────────────────────────
+
+export interface ActionResponse {
+    isSuccess: boolean;
+    message:   string;
+    id:        number | null;
 }
 
 // ── API calls ─────────────────────────────────────────────────────────────────
@@ -119,8 +127,9 @@ export const apartmentService = {
         axiosInstance.get<ApartmentApiDto[]>(`/apartments/owner/${ownerId}`)
             .then(r => r.data.map(mapToApartment)),
 
-    create: (ownerId: number, data: ApartmentCreateApiDto): Promise<string> =>
-        axiosInstance.post<string>(`/apartments/${ownerId}`, data)
+    // Returneaza ActionResponse cu id-ul apartamentului creat
+    create: (ownerId: number, data: ApartmentCreateApiDto): Promise<ActionResponse> =>
+        axiosInstance.post<ActionResponse>(`/apartments/${ownerId}`, data)
             .then(r => r.data),
 
     update: (data: ApartmentUpdateApiDto): Promise<string> =>

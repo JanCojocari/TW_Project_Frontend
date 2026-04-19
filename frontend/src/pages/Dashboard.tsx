@@ -7,6 +7,7 @@ import type { Apartment }      from "../types/apartment.types";
 import { useAuth }             from "../auth/AuthContext";
 import { userService }         from "../services/userService";
 import { apartmentService }    from "../services/apartmentService";
+import { favoriteService }     from "../services/favoriteService";
 import { paths }               from "../app/paths";
 import { gradients, colors }   from "../theme/gradients";
 import ProfileTab              from "../components/dashboard/ProfileTab";
@@ -15,17 +16,6 @@ import PaymentsTab             from "../components/dashboard/paymentTab/Payments
 import FavoritesTab            from "../components/dashboard/FavoritesTab";
 
 type DashboardTab = 0 | 1 | 2 | 3;
-const FAVORITES_KEY = "rentora_favorites";
-
-function getFavorites(): number[] {
-    try {
-        const raw = localStorage.getItem(FAVORITES_KEY);
-        if (!raw) return [];
-        const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed.filter(Number.isFinite) : [];
-    } catch { return []; }
-}
-function setFavorites(ids: number[]) { localStorage.setItem(FAVORITES_KEY, JSON.stringify(ids)); }
 
 export default function Dashboard() {
     const navigate        = useNavigate();
@@ -33,19 +23,26 @@ export default function Dashboard() {
     const { currentUser } = useAuth();
     const [tab, setTab]   = useState<DashboardTab>(0);
 
-    const currentUserId = currentUser?.id ?? 1;
+    const currentUserId = currentUser?.id ?? 0;
 
     const [myListings, setMyListings]       = useState<Apartment[]>([]);
     const [allApartments, setAllApartments] = useState<Apartment[]>([]);
-    const [favoriteIds, setFavoriteIds]     = useState<number[]>(() => getFavorites());
+    const [favoriteIds, setFavoriteIds]     = useState<number[]>([]);
     const [usersMap, setUsersMap]           = useState<Record<number, string>>({});
 
     useEffect(() => {
+        if (!currentUserId) return;
+
         apartmentService.getByOwner(currentUserId).then(setMyListings).catch(() => setMyListings([]));
         apartmentService.getAll().then(setAllApartments).catch(() => setAllApartments([]));
         userService.getAll()
             .then(list => setUsersMap(Object.fromEntries(list.map(u => [u.id, u.name]))))
             .catch(() => {});
+
+        // Incarca favoritele din API
+        favoriteService.getByUser(currentUserId)
+            .then(favs => setFavoriteIds(favs.map(f => f.apartmentId)))
+            .catch(() => setFavoriteIds([]));
     }, [currentUserId]);
 
     const favoriteApartments = useMemo(() => {
@@ -53,12 +50,20 @@ export default function Dashboard() {
         return allApartments.filter((a) => set.has(a.Id_Apartment));
     }, [favoriteIds, allApartments]);
 
-    const toggleFavorite = (id: number) => {
-        setFavoriteIds((prev) => {
-            const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
-            setFavorites(next);
-            return next;
-        });
+    const toggleFavorite = async (id: number) => {
+        const isFav = favoriteIds.includes(id);
+        // Actualizare optimista
+        setFavoriteIds(prev => isFav ? prev.filter(x => x !== id) : [...prev, id]);
+        try {
+            if (isFav) {
+                await favoriteService.remove(currentUserId, id);
+            } else {
+                await favoriteService.add(currentUserId, id);
+            }
+        } catch {
+            // Rollback la eroare
+            setFavoriteIds(prev => isFav ? [...prev, id] : prev.filter(x => x !== id));
+        }
     };
 
     const getUserName = useCallback((id: number) => usersMap[id] ?? `User #${id}`, [usersMap]);

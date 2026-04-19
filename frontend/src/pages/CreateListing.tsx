@@ -48,14 +48,16 @@ const CreateListing = () => {
         () => submit(async (markDone) => {
             setApiError(null);
             try {
-                await apartmentService.create(currentUser?.id ?? 0, buildCreatePayload(form));
+                const result = await apartmentService.create(currentUser?.id ?? 0, buildCreatePayload(form));
                 markDone();
-                setTimeout(() => navigate(paths.apartmentDetail(1)), 1500);
+                // Redirect la pagina reala a apartamentului creat
+                const targetId = result.id ?? 0;
+                setTimeout(() => navigate(paths.apartmentDetail(targetId)), 1500);
             } catch {
                 setApiError("Eroare la salvarea anunțului. Verificați conexiunea și încercați din nou.");
             }
         }),
-        [submit, navigate, form],
+        [submit, navigate, form, currentUser],
     );
 
     if (submitted) return <SuccessScreen />;
@@ -91,7 +93,6 @@ const CreateListing = () => {
                     </Alert>
                 )}
 
-                {/* ✅ Props individuale — memo poate compara primitive, nu obiecte */}
                 <StepBasicInfo
                     address={form.address}
                     cost={form.cost}
