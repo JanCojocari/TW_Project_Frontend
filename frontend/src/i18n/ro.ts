@@ -162,7 +162,7 @@ export default {
         perDay:      "zi",
         perMonth:    "lună",
     },
-    
+
     // ── Dashboard ─────────────────────────────────────────────────────────────
     dashboard: {
         title:        "Dashboard",
@@ -199,6 +199,11 @@ export default {
         },
         myListings: {
             empty: "Nu ai publicat niciun anunț până în prezent.",
+            status: {
+                pending:  "În așteptare",
+                approved: "Aprobat",
+                declined: "Respins",
+            },
         },
     },
 
@@ -430,8 +435,8 @@ export default {
             facilities: { selected: "facilități selectate" },
         },
         successScreen: {
-            title:    "Anunț creat cu succes!",
-            subtitle: "Ești redirecționat către anunțul tău...",
+            title:    "Cerere trimisă cu succes!",
+            subtitle: "Administratorii vor verifica și valida anunțul tău în scurt timp.",
         },
     },
 } as const;

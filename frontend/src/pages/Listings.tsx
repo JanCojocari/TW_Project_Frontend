@@ -87,7 +87,7 @@ const Listings = () => {
             }
             return true;
         });
-    }, [searchQuery, appliedFilters]);
+    }, [searchQuery, appliedFilters, apartments]);
 
     // ── Pagination ───────────────────────────────────────────────────────────
     const totalPages = Math.ceil(filteredApartments.length / LISTINGS_PER_PAGE);

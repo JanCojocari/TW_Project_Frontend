@@ -1,17 +1,34 @@
 import axiosInstance from "../api/axiosInstance";
-import type { Apartment } from "../types/apartment.types";
+import type { Apartment, ApartmentStatus } from "../types/apartment.types";
 import { defaultFacilities } from "../types/CreateListingTypes";
 import type { FormState } from "../types/CreateListingTypes";
 import {
     RentIntervalApi,
     RentModeApi,
     CancellationPolicyApi,
+    ApartmentStatusApi,
     type ApartmentApiDto,
     type ApartmentCreateApiDto,
     type ApartmentUpdateApiDto,
 } from "../types/ApartmentApiDto";
 
-// ── Mapper API DTO → tip frontend ────────────────────────────────────────────
+// ── Helpers imagini ───────────────────────────────────────────────────────────
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace("/api", "") ?? "http://localhost:5231";
+
+function parseImageUrls(raw: string | null): string[] {
+    if (!raw) return [];
+    try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed))
+            return parsed.filter(Boolean).map(url => `${BASE_URL}${url}`);
+    } catch {
+        return raw.startsWith("http") ? [raw] : [`${BASE_URL}${raw}`];
+    }
+    return [];
+}
+
+// ── Mappere enum → tip frontend ───────────────────────────────────────────────
 
 const INTERVAL_MAP: Record<RentIntervalApi, Apartment["Interval"]> = {
     [RentIntervalApi.Hour]:  "hour",
@@ -25,6 +42,14 @@ const CANCELLATION_MAP: Record<CancellationPolicyApi, Apartment["additionalInfo"
     [CancellationPolicyApi.Strict]:   "strict",
 };
 
+const STATUS_MAP: Record<ApartmentStatusApi, ApartmentStatus> = {
+    [ApartmentStatusApi.Pending]:  "pending",
+    [ApartmentStatusApi.Approved]: "approved",
+    [ApartmentStatusApi.Declined]: "declined",
+};
+
+// ── Mapper API DTO → tip frontend ────────────────────────────────────────────
+
 export function mapToApartment(dto: ApartmentApiDto): Apartment {
     return {
         Id_Apartment:      dto.id,
@@ -32,6 +57,8 @@ export function mapToApartment(dto: ApartmentApiDto): Apartment {
         Id_Renter:         dto.renterId,
         Address:           dto.address,
         image_url:         dto.imageUrl ?? "",
+        image_urls:        parseImageUrls(dto.imageUrl),
+        status:            STATUS_MAP[dto.status] ?? "pending",
         Cost_per_interval: dto.costPerInterval,
         Currency:          "MDL",
         Interval:          INTERVAL_MAP[dto.interval] ?? "month",
@@ -77,33 +104,32 @@ const CANCELLATION_TO_API: Record<Apartment["additionalInfo"]["cancellationPolic
     strict:   CancellationPolicyApi.Strict,
 };
 
-export function buildCreatePayload(form: FormState): ApartmentCreateApiDto {
+export function buildCreatePayload(form: FormState, imageUrls: string[]): ApartmentCreateApiDto {
     return {
         address:         form.address,
+        imageUrl:        imageUrls.length > 0 ? JSON.stringify(imageUrls) : undefined,
         interval:        INTERVAL_TO_API[form.interval],
         costPerInterval: parseFloat(form.cost) || 0,
         rentMode:        RentModeApi.ShortTerm,
         location: {
-            lat:         parseFloat(form.latitude)   || 0,
-            lng:         parseFloat(form.longitude)  || 0,
+            lat:         parseFloat(form.latitude)    || 0,
+            lng:         parseFloat(form.longitude)   || 0,
             city:        form.city,
             country:     "Moldova",
             fullAddress: form.address,
         },
         additionalInfo: {
-            rooms:              parseInt(form.rooms)       || 0,
-            bathrooms:          parseInt(form.bathrooms)   || 0,
-            floor:              parseInt(form.floor)       || 0,
-            totalFloors:        parseInt(form.totalFloors) || 0,
+            rooms:              parseInt(form.rooms)        || 0,
+            bathrooms:          parseInt(form.bathrooms)    || 0,
+            floor:              parseInt(form.floor)        || 0,
+            totalFloors:        parseInt(form.totalFloors)  || 0,
             area:               parseFloat(form.surfaceArea) || 0,
-            maxGuests:          parseInt(form.maxGuests)   || 0,
+            maxGuests:          parseInt(form.maxGuests)    || 0,
             description:        form.description,
             cancellationPolicy: CANCELLATION_TO_API[form.cancellationPolicy],
         },
     };
 }
-
-// ── Tipul raspunsului de la Create ───────────────────────────────────────────
 
 export interface ActionResponse {
     isSuccess: boolean;
@@ -127,7 +153,6 @@ export const apartmentService = {
         axiosInstance.get<ApartmentApiDto[]>(`/apartments/owner/${ownerId}`)
             .then(r => r.data.map(mapToApartment)),
 
-    // Returneaza ActionResponse cu id-ul apartamentului creat
     create: (ownerId: number, data: ApartmentCreateApiDto): Promise<ActionResponse> =>
         axiosInstance.post<ActionResponse>(`/apartments/${ownerId}`, data)
             .then(r => r.data),

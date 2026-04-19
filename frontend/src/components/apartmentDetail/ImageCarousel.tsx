@@ -1,6 +1,6 @@
 ﻿import { useState, useCallback } from "react";
-import { Box, Paper, IconButton } from "@mui/material";
-import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from "@mui/icons-material";
+import { Box, Paper, IconButton, Typography } from "@mui/material";
+import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon, PhotoCamera as CameraIcon } from "@mui/icons-material";
 import { colors } from "../../theme/gradients.ts";
 
 interface Props { images: string[]; altBase: string; statusChip: React.ReactNode; }
@@ -23,8 +23,28 @@ const ImageCarousel = ({ images, altBase, statusChip }: Props) => {
         setTimeout(() => { setCurrent(idx); setAnimDir(null); }, 260);
     }, [current]);
 
+    // Guard — nu exista imagini
+    if (!images || images.length === 0) return (
+        <Paper elevation={2} sx={{
+            borderRadius: 4, overflow: "hidden", height: "100%", minHeight: 320,
+            display: "flex", flexDirection: "column", alignItems: "center",
+            justifyContent: "center", gap: 1, bgcolor: "background.paper",
+            border: `1px solid ${colors.border}`,
+        }}>
+            <Box sx={{ position: "absolute", top: 20, left: 20 }}>{statusChip}</Box>
+            <CameraIcon sx={{ fontSize: 48, color: "text.disabled" }} />
+            <Typography color="text.disabled" fontWeight={600}>Fără imagini</Typography>
+        </Paper>
+    );
+
     return (
-        <Paper elevation={2} sx={{ borderRadius: 4, overflow: "hidden", height: "100%", position: "relative" }}>
+        <Paper elevation={2} sx={{
+            borderRadius: 4,
+            overflow: "hidden",
+            position: "relative",
+            height: "100%",
+            maxHeight: 566,
+        }}>
             <img src={images[current]} alt={altBase} style={{
                 width: "100%", height: "100%", objectFit: "cover", display: "block",
                 transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.28s ease",
@@ -37,7 +57,6 @@ const ImageCarousel = ({ images, altBase, statusChip }: Props) => {
                 {current + 1} / {images.length}
             </Box>
 
-            {/* ── Butoane scroll — bgcolor din temă ── */}
             {(["prev", "next"] as const).map((dir) => (
                 <IconButton key={dir} onClick={() => go(dir)}
                             aria-label={dir === "prev" ? "Imaginea anterioară" : "Imaginea următoare"}
@@ -66,19 +85,21 @@ const ImageCarousel = ({ images, altBase, statusChip }: Props) => {
                 </IconButton>
             ))}
 
-            <Box sx={{ position: "absolute", bottom: 14, left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
-                <Box sx={{ display: "flex", gap: 1, px: 1.2, py: 0.8, bgcolor: "rgba(0,0,0,0.35)", backdropFilter: "blur(10px)", borderRadius: 2.5, border: "1px solid rgba(255,255,255,0.12)" }}>
-                    {images.map((url, idx) => (
-                        <Box key={idx} component="img" src={url} alt={`thumb-${idx + 1}`} onClick={() => goTo(idx)}
-                             sx={{ width: 48, height: 34, objectFit: "cover", borderRadius: 1.2, cursor: "pointer", border: idx === current ? "2px solid white" : "2px solid transparent", opacity: idx === current ? 1 : 0.55, transition: "all 0.2s ease", "&:hover": { opacity: 1, transform: "scale(1.06)" } }} />
-                    ))}
+            {images.length > 1 && (
+                <Box sx={{ position: "absolute", bottom: 14, left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
+                    <Box sx={{ display: "flex", gap: 1, px: 1.2, py: 0.8, bgcolor: "rgba(0,0,0,0.35)", backdropFilter: "blur(10px)", borderRadius: 2.5, border: "1px solid rgba(255,255,255,0.12)" }}>
+                        {images.map((url, idx) => (
+                            <Box key={idx} component="img" src={url} alt={`thumb-${idx + 1}`} onClick={() => goTo(idx)}
+                                 sx={{ width: 48, height: 34, objectFit: "cover", borderRadius: 1.2, cursor: "pointer", border: idx === current ? "2px solid white" : "2px solid transparent", opacity: idx === current ? 1 : 0.55, transition: "all 0.2s ease", "&:hover": { opacity: 1, transform: "scale(1.06)" } }} />
+                        ))}
+                    </Box>
+                    <Box sx={{ display: "flex", gap: 0.8 }}>
+                        {images.map((_, idx) => (
+                            <Box key={idx} onClick={() => goTo(idx)} sx={{ width: idx === current ? 20 : 7, height: 7, borderRadius: "100px", bgcolor: idx === current ? "white" : "rgba(255,255,255,0.45)", cursor: "pointer", transition: "all 0.3s cubic-bezier(0.34,1.56,0.64,1)", "&:hover": { bgcolor: "rgba(255,255,255,0.8)" } }} />
+                        ))}
+                    </Box>
                 </Box>
-                <Box sx={{ display: "flex", gap: 0.8 }}>
-                    {images.map((_, idx) => (
-                        <Box key={idx} onClick={() => goTo(idx)} sx={{ width: idx === current ? 20 : 7, height: 7, borderRadius: "100px", bgcolor: idx === current ? "white" : "rgba(255,255,255,0.45)", cursor: "pointer", transition: "all 0.3s cubic-bezier(0.34,1.56,0.64,1)", "&:hover": { bgcolor: "rgba(255,255,255,0.8)" } }} />
-                    ))}
-                </Box>
-            </Box>
+            )}
         </Paper>
     );
 };
