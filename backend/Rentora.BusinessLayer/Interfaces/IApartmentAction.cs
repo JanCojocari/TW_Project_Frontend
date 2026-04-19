@@ -16,5 +16,7 @@ namespace Rentora.BusinessLayer.Interfaces
         List<ApartmentDto> GetPending();
         ActionResponse Approve(int id);
         ActionResponse Decline(int id);
+        List<ApartmentDto> GetAllForAdmin();
+
     }
 }

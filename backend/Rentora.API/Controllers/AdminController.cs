@@ -82,11 +82,11 @@ public class AdminController : ControllerBase
         return Ok(result.Message);
     }
     // ── LISTING MANAGEMENT ───────────────────────────────────────────────────
-
+    
     [HttpGet("apartments")]
     public IActionResult GetAllApartments()
     {
-        var apartments = _bl.ApartmentAction().GetAll();
+        var apartments = _bl.ApartmentAction().GetAllForAdmin();
         return Ok(apartments);
     }
 

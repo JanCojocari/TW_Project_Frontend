@@ -49,7 +49,12 @@ const Listings = () => {
         if (filters.checkOut)               count++;
         if (filters.minRating !== null)     count++;
         if (filters.minReviews !== null)    count++;
-        const defaultRangeByCurrency: Record<string, number[]> = { ALL: [0,2000], USD: [0,1000], EUR: [0,1000], MDL: [0,5000] };
+        const defaultRangeByCurrency: Record<string, number[]> = {
+            ALL: [0, 50000],
+            USD: [0, 10000],
+            EUR: [0, 10000],
+            MDL: [0, 50000],
+        };        
         const [defaultMin, defaultMax] = defaultRangeByCurrency[filters.currency] ?? [0, 2000];
         if (filters.priceRange[0] !== defaultMin || filters.priceRange[1] !== defaultMax) count++;
         count += Object.values(filters.facilities).filter(Boolean).length;
@@ -117,6 +122,16 @@ const Listings = () => {
     const handleReset  = () => { setPendingFilters(defaultFilters); setAppliedFilters(defaultFilters); resetToFirstPage(); };
     const handleResetAll = () => { setSearchQuery(""); setAppliedFilters(defaultFilters); setPendingFilters(defaultFilters); resetToFirstPage(); };
 
+    useEffect(() => {
+        apartmentService.getAll()
+            .then(data => {
+                console.log("apartments loaded:", data.length, data);
+                setApartments(data);
+            })
+            .catch(() => setApartments([]));
+    }, []);
+    console.log("filteredApartments:", filteredApartments.length);
+    console.log("visibleApartments:", visibleApartments.length);
     return (
         <Box sx={{ minHeight: "100vh", bgcolor: "background.default", py: { xs: 4, md: 8 }, pt: 10 }}>
             <FilterDrawer
@@ -127,7 +142,7 @@ const Listings = () => {
                 onApply={handleApply}
                 onReset={handleReset}
             />
-
+            
             <Container maxWidth={false} sx={{ width: "100%", px: { xs: 2, sm: 3, md: 6, lg: 10 }, display: "flex", alignItems: "center", flexDirection: "column", mt: 10 }}>
                 {/* Hero */}
                 <Box sx={{ mb: 4, textAlign: "center" }}>

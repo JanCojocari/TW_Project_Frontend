@@ -82,5 +82,8 @@ app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Seed automat — ruleaza doar daca DB-ul nu are date seed
+DbInitializer.Seed();
+
 app.MapControllers();
 app.Run();

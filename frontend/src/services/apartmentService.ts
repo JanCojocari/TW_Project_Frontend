@@ -21,7 +21,9 @@ function parseImageUrls(raw: string | null): string[] {
     try {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed))
-            return parsed.filter(Boolean).map(url => `${BASE_URL}${url}`);
+            return parsed.filter(Boolean).map(url =>
+                url.startsWith("http") ? url : `${BASE_URL}${url}`
+            );
     } catch {
         return raw.startsWith("http") ? [raw] : [`${BASE_URL}${raw}`];
     }
