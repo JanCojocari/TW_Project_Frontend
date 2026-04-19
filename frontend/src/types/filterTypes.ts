@@ -17,7 +17,7 @@ export type FilterState = {
 };
 
 export const defaultFilters: FilterState = {
-    currency: "ALL", priceRange: [0, 2000], interval: "ALL",
+    currency: "ALL", priceRange: [0, 50000], interval: "ALL",
     facilities: {}, city: "", checkIn: "", checkOut: "",
     minRating: null, minReviews: null, availability: "ALL",
 };

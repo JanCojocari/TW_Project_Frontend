@@ -5,6 +5,7 @@ using Rentora.Domain.Entities;
 using Rentora.Domain.Models.Apartment;
 using Rentora.Domain.Models.Responses;
 using Rentora.Domain.OwnedTypes;
+using Rentora.Domain.Enums;
 
 public class ApartmentActions
 {
@@ -15,6 +16,8 @@ public class ApartmentActions
         using var db = new AppDbContext();
 
         return db.Apartments
+            .Where(a => a.Status == ApartmentStatus.Approved)
+            .Where(a => a.RenterId == null)
             .Select(a => MapToDto(a))
             .ToList();
     }
@@ -99,6 +102,9 @@ public class ApartmentActions
         var apartment = db.Apartments.FirstOrDefault(a => a.Id == id);
         if (apartment == null)
             return new ActionResponse { IsSuccess = false, Message = "Apartment not found." };
+
+        var payments = db.Payments.Where(p => p.ApartmentId == id).ToList();
+        foreach (var p in payments) p.ApartmentId = null;
 
         db.Apartments.Remove(apartment);
         db.SaveChanges();
