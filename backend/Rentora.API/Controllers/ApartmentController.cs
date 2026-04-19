@@ -40,7 +40,7 @@ public class ApartmentController : ControllerBase
         var apartments = _apartmentAction.GetByOwner(ownerId);
         return Ok(apartments);
     }
-    
+
     [Authorize]
     [HttpPost("{ownerId}")]
     public IActionResult Create(int ownerId, [FromBody] ApartmentCreateDto data)
@@ -48,9 +48,10 @@ public class ApartmentController : ControllerBase
         var result = _apartmentAction.Create(ownerId, data);
         if (!result.IsSuccess)
             return BadRequest(result.Message);
-        return Ok(result.Message);
+        // Returnam ActionResponse complet — frontend-ul are nevoie de result.id
+        return Ok(result);
     }
-    
+
     [Authorize]
     [HttpPut]
     public IActionResult Update([FromBody] ApartmentUpdateDto data)
@@ -60,7 +61,7 @@ public class ApartmentController : ControllerBase
             return NotFound(result.Message);
         return Ok(result.Message);
     }
-    
+
     [Authorize]
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
@@ -70,7 +71,7 @@ public class ApartmentController : ControllerBase
             return NotFound(result.Message);
         return Ok(result.Message);
     }
-    
+
     [Authorize]
     [HttpPatch("{apartmentId}/renter/{renterId}")]
     public IActionResult AssignRenter(int apartmentId, int renterId)
@@ -80,7 +81,7 @@ public class ApartmentController : ControllerBase
             return BadRequest(result.Message);
         return Ok(result.Message);
     }
-    
+
     [Authorize]
     [HttpPatch("{apartmentId}/renter/remove")]
     public IActionResult RemoveRenter(int apartmentId)

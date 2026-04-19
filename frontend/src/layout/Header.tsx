@@ -10,23 +10,22 @@ import CloseIcon     from "@mui/icons-material/Close";
 import LogoutIcon    from "@mui/icons-material/Logout";
 import DarkModeIcon  from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
-import { useNavigate }       from "react-router-dom";
-import { useState }          from "react";
-import { useTranslation }    from "react-i18next";
-import { paths }             from "../app/paths";
+import { useNavigate }        from "react-router-dom";
+import { useState }           from "react";
+import { useTranslation }     from "react-i18next";
+import { paths }              from "../app/paths";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
-import { useAuth }           from "../auth/AuthContext.tsx";
-import { useThemeMode }      from "../theme/ThemeContext.tsx";
-import { gradients, colors } from "../theme/gradients.ts";
-import LanguageSwitcher      from "../components/general/LanguageSwitcher.tsx";
+import { useAuth }            from "../auth/AuthContext.tsx";
+import { useThemeMode }       from "../theme/ThemeContext.tsx";
+import { gradients, colors }  from "../theme/gradients.ts";
+import LanguageSwitcher       from "../components/general/LanguageSwitcher.tsx";
 
 const Header = () => {
     const navigate = useNavigate();
-    const [mobileOpen, setMobileOpen]       = useState(false);
-    const { isAuthenticated, logout, currentUser } = useAuth();
-    const { isDark, toggleMode }            = useThemeMode();
-    const isAdmin = currentUser?.role === 0;
-    const { t }                        = useTranslation();
+    const [mobileOpen, setMobileOpen]              = useState(false);
+    const { isAuthenticated, isAdmin, logout }      = useAuth(); // isAdmin vine din context
+    const { isDark, toggleMode }                   = useThemeMode();
+    const { t }                                    = useTranslation();
 
     const menuItems = [
         !isAuthenticated ? { label: t("nav.home"),          path: paths.home          } : {},
@@ -128,7 +127,7 @@ const Header = () => {
                                     startIcon={<AdminPanelSettingsIcon />}
                                     onClick={() => navigate(paths.admin)}
                                     sx={{ color: "warning.main", fontWeight: 700, fontSize: "15px", border: "1px solid", borderColor: "warning.main", borderRadius: 2, px: 2,
-                                          "&:hover": { bgcolor: "rgba(237,108,2,0.08)" } }}>
+                                        "&:hover": { bgcolor: "rgba(237,108,2,0.08)" } }}>
                                     Admin
                                 </Button>
                             )}
