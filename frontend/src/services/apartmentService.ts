@@ -5,6 +5,7 @@ import type { FormState } from "../types/CreateListingTypes";
 import {
     RentIntervalApi,
     RentModeApi,
+    CurrencyApi,
     CancellationPolicyApi,
     ApartmentStatusApi,
     type ApartmentApiDto,
@@ -38,6 +39,18 @@ const INTERVAL_MAP: Record<RentIntervalApi, Apartment["Interval"]> = {
     [RentIntervalApi.Month]: "month",
 };
 
+const CURRENCY_MAP: Record<CurrencyApi, Apartment["Currency"]> = {
+    [CurrencyApi.USD]: "USD",
+    [CurrencyApi.EUR]: "EUR",
+    [CurrencyApi.MDL]: "MDL",
+};
+
+const CURRENCY_TO_API: Record<Apartment["Currency"], CurrencyApi> = {
+    USD: CurrencyApi.USD,
+    EUR: CurrencyApi.EUR,
+    MDL: CurrencyApi.MDL,
+};
+
 const CANCELLATION_MAP: Record<CancellationPolicyApi, Apartment["additionalInfo"]["cancellationPolicy"]> = {
     [CancellationPolicyApi.Flexible]: "flexible",
     [CancellationPolicyApi.Moderate]: "moderate",
@@ -62,7 +75,7 @@ export function mapToApartment(dto: ApartmentApiDto): Apartment {
         image_urls:        parseImageUrls(dto.imageUrl),
         status:            STATUS_MAP[dto.status] ?? "pending",
         Cost_per_interval: dto.costPerInterval,
-        Currency:          "MDL",
+        Currency:          CURRENCY_MAP[dto.currency] ?? "EUR",
         Interval:          INTERVAL_MAP[dto.interval] ?? "month",
         location: {
             latitude:  dto.location.lat,
@@ -112,6 +125,7 @@ export function buildCreatePayload(form: FormState, imageUrls: string[]): Apartm
         imageUrl:        imageUrls.length > 0 ? JSON.stringify(imageUrls) : undefined,
         interval:        INTERVAL_TO_API[form.interval],
         costPerInterval: parseFloat(form.cost) || 0,
+        currency:        CURRENCY_TO_API[form.currency],
         rentMode:        RentModeApi.ShortTerm,
         location: {
             lat:         parseFloat(form.latitude)    || 0,

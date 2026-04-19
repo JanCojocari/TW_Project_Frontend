@@ -65,6 +65,7 @@ public class ApartmentActions
             ImageUrl = data.ImageUrl,
             Interval = data.Interval,
             CostPerInterval = data.CostPerInterval,
+            Currency = data.Currency,
             RentMode = data.RentMode,
             Location = data.Location ?? new MapLocation(),
             AdditionlaInfo = data.AdditionalInfo ?? new AdditionalInfo()
@@ -93,6 +94,7 @@ public class ApartmentActions
         apartment.ImageUrl = data.ImageUrl;
         apartment.Interval = data.Interval;
         apartment.CostPerInterval = data.CostPerInterval;
+        apartment.Currency = data.Currency;
         apartment.RentMode = data.RentMode;
         apartment.Location = data.Location ?? new MapLocation();
         apartment.AdditionlaInfo = data.AdditionalInfo ?? new AdditionalInfo();
@@ -198,6 +200,7 @@ public class ApartmentActions
         ImageUrl = a.ImageUrl,
         Interval = a.Interval,
         CostPerInterval = a.CostPerInterval,
+        Currency = a.Currency,
         RentMode = a.RentMode,
         Status = a.Status,
         Location = a.Location,
