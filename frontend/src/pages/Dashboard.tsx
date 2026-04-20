@@ -1,5 +1,5 @@
 // pages/Dashboard.tsx — sidebar desktop + bottom nav mobile
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate }       from "react-router-dom";
 import { useTranslation }    from "react-i18next";
 import {
@@ -10,32 +10,34 @@ import PersonIcon    from "@mui/icons-material/Person";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import PaymentIcon   from "@mui/icons-material/Payment";
 import FavoriteIcon  from "@mui/icons-material/Favorite";
+import EventIcon     from "@mui/icons-material/Event";
 import type { Apartment }    from "../types/apartment.types";
 import { useAuth }           from "../auth/AuthContext";
-import { userService }       from "../services/userService";
 import { apartmentService }  from "../services/apartmentService";
 import { favoriteService }   from "../services/favoriteService";
 import { paths }             from "../app/paths";
 import { gradients, colors } from "../theme/gradients";
 import { resolveMediaUrl }   from "../utils/mediaUrl";
-import ProfileTab    from "../components/dashboard/ProfileTab";
-import MyListingsTab from "../components/dashboard/MyListingsTab";
-import PaymentsTab   from "../components/dashboard/paymentTab/PaymentsTab";
-import FavoritesTab  from "../components/dashboard/FavoritesTab";
+import ProfileTab       from "../components/dashboard/ProfileTab";
+import MyListingsTab    from "../components/dashboard/MyListingsTab";
+import PaymentsTab      from "../components/dashboard/paymentTab/PaymentsTab";
+import FavoritesTab     from "../components/dashboard/FavoritesTab";
+import UpcomingStaysTab from "../components/dashboard/UpcomingStaysTab";
 
 const SIDEBAR_W    = 130;
 const NAVBAR_H     = 64;
 const BOTTOM_NAV_H = 64;
 
-type NavKey = "profile" | "listings" | "payments" | "favorites";
+type NavKey = "profile" | "listings" | "payments" | "favorites" | "upcoming";
 
 interface NavItem { key: NavKey; labelKey: string; icon: React.ReactNode }
 
 const NAV: NavItem[] = [
-    { key: "profile",   labelKey: "dashboard.tabs.profile",    icon: <PersonIcon    sx={{ fontSize: 22 }} /> },
-    { key: "listings",  labelKey: "dashboard.tabs.apartments", icon: <ApartmentIcon sx={{ fontSize: 22 }} /> },
-    { key: "payments",  labelKey: "dashboard.tabs.payments",   icon: <PaymentIcon   sx={{ fontSize: 22 }} /> },
-    { key: "favorites", labelKey: "dashboard.tabs.favorites",  icon: <FavoriteIcon  sx={{ fontSize: 22 }} /> },
+    { key: "profile",  labelKey: "dashboard.tabs.profile",        icon: <PersonIcon    sx={{ fontSize: 22 }} /> },
+    { key: "listings", labelKey: "dashboard.tabs.apartments",      icon: <ApartmentIcon sx={{ fontSize: 22 }} /> },
+    { key: "payments", labelKey: "dashboard.tabs.payments",        icon: <PaymentIcon   sx={{ fontSize: 22 }} /> },
+    { key: "favorites",labelKey: "dashboard.tabs.favorites",       icon: <FavoriteIcon  sx={{ fontSize: 22 }} /> },
+    { key: "upcoming", labelKey: "dashboard.tabs.upcomingStays",   icon: <EventIcon     sx={{ fontSize: 22 }} /> },
 ];
 
 function SidebarItem({ item, isActive, onClick }: { item: NavItem; isActive: boolean; onClick: () => void }) {
@@ -122,15 +124,11 @@ export default function Dashboard() {
     const [myListings, setMyListings]       = useState<Apartment[]>([]);
     const [allApartments, setAllApartments] = useState<Apartment[]>([]);
     const [favoriteIds, setFavoriteIds]     = useState<number[]>([]);
-    const [usersMap, setUsersMap]           = useState<Record<number, string>>({});
 
     useEffect(() => {
         if (!currentUserId) return;
         apartmentService.getByOwner(currentUserId).then(setMyListings).catch(() => setMyListings([]));
         apartmentService.getAll().then(setAllApartments).catch(() => setAllApartments([]));
-        userService.getAll()
-            .then(list => setUsersMap(Object.fromEntries(list.map(u => [u.id, u.name]))))
-            .catch(() => {});
         favoriteService.getByUser(currentUserId)
             .then(favs => setFavoriteIds(favs.map(f => f.apartmentId)))
             .catch(() => setFavoriteIds([]));
@@ -152,8 +150,6 @@ export default function Dashboard() {
             setFavoriteIds(prev => isFav ? [...prev, id] : prev.filter(x => x !== id));
         }
     };
-
-    const getUserName = useCallback((id: number) => usersMap[id] ?? `User #${id}`, [usersMap]);
 
     const go = (key: NavKey) => {
         setActive(key);
@@ -205,20 +201,10 @@ export default function Dashboard() {
                     >
                         {!currentUser?.avatarUrl && initials}
                     </Avatar>
-                    <Typography sx={{
-                        fontSize: 12, fontWeight: 700,
-                        color: "text.primary",
-                        textAlign: "center",
-                        px: 1, lineHeight: 1.3, mb: 0.2,
-                    }}>
+                    <Typography sx={{ fontSize: 12, fontWeight: 700, color: "text.primary", textAlign: "center", px: 1, lineHeight: 1.3, mb: 0.2 }}>
                         {currentUser?.name}
                     </Typography>
-                    <Typography sx={{
-                        fontSize: 12, fontWeight: 700,
-                        color: "text.primary",
-                        textAlign: "center",
-                        px: 1, lineHeight: 1.3, mb: 3,
-                    }}>
+                    <Typography sx={{ fontSize: 12, fontWeight: 700, color: "text.primary", textAlign: "center", px: 1, lineHeight: 1.3, mb: 3 }}>
                         {currentUser?.surname}
                     </Typography>
 
@@ -244,7 +230,6 @@ export default function Dashboard() {
             {/* Content */}
             <Box sx={{ flex: 1, p: { xs: 2, md: 4 }, minWidth: 0 }}>
 
-                {/* Pe mobile afiseaza cardul cu user info sus (compenseaza lipsa sidebar-ului) */}
                 {isMobile && (
                     <Box sx={{
                         display: "flex", alignItems: "center", gap: 1.5,
@@ -255,11 +240,7 @@ export default function Dashboard() {
                     }}>
                         <Avatar
                             src={resolveMediaUrl(currentUser?.avatarUrl)}
-                            sx={{
-                                width: 42, height: 42,
-                                background: gradients.primary,
-                                fontSize: 14, fontWeight: 700,
-                            }}
+                            sx={{ width: 42, height: 42, background: gradients.primary, fontSize: 14, fontWeight: 700 }}
                         >
                             {!currentUser?.avatarUrl && initials}
                         </Avatar>
@@ -276,14 +257,8 @@ export default function Dashboard() {
 
                 {active === "profile" && (
                     <>
-                        <PageHeading
-                            title={t("dashboard.tabs.profile")}
-                            subtitle={t("dashboard.subtitle")}
-                        />
-                        <ProfileTab
-                            currentUser={currentUser}
-                            onEditProfile={() => navigate(paths.settings)}
-                        />
+                        <PageHeading title={t("dashboard.tabs.profile")} subtitle={t("dashboard.subtitle")} />
+                        <ProfileTab currentUser={currentUser} onEditProfile={() => navigate(paths.settings)} />
                     </>
                 )}
 
@@ -294,7 +269,7 @@ export default function Dashboard() {
                             myListings={myListings}
                             favoriteIds={favoriteIds}
                             onToggleFavorite={toggleFavorite}
-                            getUserName={getUserName}
+                            getUserName={(id) => `User #${id}`}
                         />
                     </>
                 )}
@@ -313,32 +288,26 @@ export default function Dashboard() {
                             favoriteApartments={favoriteApartments}
                             favoriteIds={favoriteIds}
                             onToggleFavorite={toggleFavorite}
-                            getUserName={getUserName}
+                            getUserName={(id) => `User #${id}`}
                         />
+                    </>
+                )}
+
+                {active === "upcoming" && (
+                    <>
+                        <PageHeading title={t("dashboard.tabs.upcomingStays")} />
+                        <UpcomingStaysTab />
                     </>
                 )}
             </Box>
 
             {/* Bottom Navigation — doar mobile */}
             {isMobile && (
-                <Paper
-                    elevation={8}
-                    sx={{
-                        position: "fixed",
-                        bottom: 0, left: 0, right: 0,
-                        zIndex: 900,
-                        borderTop: `1px solid ${colors.border}`,
-                        borderRadius: 0,
-                    }}
-                >
+                <Paper elevation={8} sx={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 900, borderTop: `1px solid ${colors.border}`, borderRadius: 0 }}>
                     <BottomNavigation
                         value={active}
                         onChange={(_, v) => go(v as NavKey)}
-                        sx={{
-                            height: BOTTOM_NAV_H,
-                            bgcolor: "background.paper",
-                            "& .Mui-selected": { color: "primary.main !important" },
-                        }}
+                        sx={{ height: BOTTOM_NAV_H, bgcolor: "background.paper", "& .Mui-selected": { color: "primary.main !important" } }}
                     >
                         {NAV.map(item => (
                             <BottomNavigationAction
@@ -349,15 +318,8 @@ export default function Dashboard() {
                                 sx={{
                                     minWidth: 0,
                                     color: "text.disabled",
-                                    "& .MuiBottomNavigationAction-label": {
-                                        fontSize: 10,
-                                        fontWeight: 600,
-                                        mt: 0.3,
-                                    },
-                                    "&.Mui-selected .MuiBottomNavigationAction-label": {
-                                        fontSize: 10,
-                                        fontWeight: 800,
-                                    },
+                                    "& .MuiBottomNavigationAction-label": { fontSize: 10, fontWeight: 600, mt: 0.3 },
+                                    "&.Mui-selected .MuiBottomNavigationAction-label": { fontSize: 10, fontWeight: 800 },
                                 }}
                             />
                         ))}

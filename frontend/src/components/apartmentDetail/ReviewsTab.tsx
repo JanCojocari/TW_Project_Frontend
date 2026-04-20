@@ -5,6 +5,7 @@ import {
     TextField, Button, Alert, Collapse, IconButton
 } from "@mui/material";
 import { Star as StarIcon, EmojiEmotions as EmojiIcon } from "@mui/icons-material";
+import { formatDate, formatDateShort, formatDateLong } from '../../utils/formatDate';
 import { useTranslation }    from "react-i18next";
 import { gradients, colors } from "../../theme/gradients.ts";
 import { resolveMediaUrl }   from "../../utils/mediaUrl.ts";
@@ -36,8 +37,8 @@ const ReviewCard = ({ review, isOwner, onResponseSubmitted }: {
             const start = new Date(review.stayStartDate);
             const end   = new Date(review.stayEndDate);
             const days  = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-            const startStr = start.toLocaleDateString(i18n.language === "en" ? "en-GB" : "ro-RO", { day: "numeric", month: "short" });
-            const endStr   = end.toLocaleDateString(i18n.language === "en" ? "en-GB" : "ro-RO", { day: "numeric", month: "short", year: "numeric" });
+            const startStr = formatDateShort(start);
+            const endStr   = formatDateLong(end);
             return `${startStr} - ${endStr} (${days} ${days === 1 ? "zi" : "zile"})`;
         })()
         : null;
@@ -45,10 +46,7 @@ const ReviewCard = ({ review, isOwner, onResponseSubmitted }: {
     const initials = review.userName
         ? `${review.userName[0]}${review.userSurname?.[0] ?? ""}`
         : `U${review.userId}`;
-    const date = new Date(review.createdAt).toLocaleDateString(
-        i18n.language === "en" ? "en-GB" : "ro-RO",
-        { year: "numeric", month: "long" }
-    );
+    const date = formatDate(review.createdAt);
 
     const handleSubmitResponse = async () => {
         if (!response.trim()) return;

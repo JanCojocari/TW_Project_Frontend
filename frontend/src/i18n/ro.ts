@@ -174,6 +174,7 @@ export default {
             apartments: "Proprietățile Mele",
             payments:   "Istoric Financiar",
             favorites:  "Favorite",
+            upcomingStays: "Sejururi viitoare",
         },
         profile: {
             edit:           "Editează Profil",
@@ -204,6 +205,11 @@ export default {
                 approved: "Aprobat",
                 declined: "Respins",
             },
+        },
+        upcomingStays: {
+            empty:   "Nu ai niciun sejur viitor programat.", 
+            badge:   "Viitor",
+            errorLoad: "Eroare la incarcarea sejururilor viitoare.",
         },
     },
 

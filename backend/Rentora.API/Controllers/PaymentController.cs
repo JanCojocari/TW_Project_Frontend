@@ -1,3 +1,4 @@
+// Rentora.API/Controllers/PaymentController.cs
 namespace Rentora.API.Controllers;
 
 using Microsoft.Extensions.Configuration;
@@ -19,7 +20,7 @@ public class PaymentController : ControllerBase
         var bl = new BusinessLogic(config);
         _paymentAction = bl.PaymentAction();
     }
-    
+
     [Authorize]
     [HttpGet("user/{userId}")]
     public IActionResult GetByUser(int userId)
@@ -27,7 +28,15 @@ public class PaymentController : ControllerBase
         var payments = _paymentAction.GetByUser(userId);
         return Ok(payments);
     }
-    
+
+    [Authorize]
+    [HttpGet("renter/{renterId}")]
+    public IActionResult GetByRenter(int renterId)
+    {
+        var payments = _paymentAction.GetByRenter(renterId);
+        return Ok(payments);
+    }
+
     [Authorize]
     [HttpGet("apartment/{apartmentId}")]
     public IActionResult GetByApartment(int apartmentId)
@@ -35,7 +44,7 @@ public class PaymentController : ControllerBase
         var payments = _paymentAction.GetByApartment(apartmentId);
         return Ok(payments);
     }
-    
+
     [Authorize]
     [HttpGet("{id}")]
     public IActionResult GetById(int id)
@@ -55,7 +64,7 @@ public class PaymentController : ControllerBase
             return BadRequest(result.Message);
         return Ok(result.Message);
     }
-    
+
     [Authorize]
     [HttpGet("has-paid/{apartmentId}")]
     public IActionResult HasPaid(int apartmentId)

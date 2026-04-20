@@ -10,6 +10,8 @@ import DeleteIcon         from "@mui/icons-material/Delete";
 import SearchIcon         from "@mui/icons-material/Search";
 import { useTranslation } from "react-i18next";
 import { adminService, type AdminReview } from "../../services/adminService";
+import { formatDate } from "../../utils/formatDate.ts"
+
 
 export default function ReviewsTab() {
     const { t }                   = useTranslation();
@@ -104,7 +106,7 @@ export default function ReviewsTab() {
                                 <TableCell sx={{ maxWidth: 250, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                     {review.comment ?? <em style={{ opacity: 0.5 }}>{t("admin.reviews.noComment")}</em>}
                                 </TableCell>
-                                <TableCell>{new Date(review.createdAt).toLocaleDateString()}</TableCell>
+                                <TableCell>{formatDate(review.createdAt)}</TableCell>
                                 <TableCell align="right">
                                     <Tooltip title={t("admin.common.delete")}>
                                         <IconButton size="small" color="error" onClick={() => setConfirmDelete(review)}>

@@ -16,11 +16,12 @@ interface Options {
     onError?:    (err: string) => void;
     onBack?:     () => void;
     defaultMethod: PaymentMethodId;
-    startDate: Date | null;
-    endDate:   Date | null;
+    startDate:  Date | null;
+    endDate:    Date | null;
+    renterId:   number;
 }
 
-export const usePaymentForm = ({ summary, apartmentId, onPay, onSuccess, onError, onBack, defaultMethod, startDate, endDate }: Options) => {
+export const usePaymentForm = ({ summary, apartmentId, onPay, onSuccess, onError, onBack, defaultMethod, startDate, endDate, renterId }: Options) => {
     const navigate = useNavigate();
 
     const [method, setMethod]           = useState<PaymentMethodId>(defaultMethod);
@@ -87,15 +88,15 @@ export const usePaymentForm = ({ summary, apartmentId, onPay, onSuccess, onError
         setSubmitError("");
         if (!validate()) return;
         setSubmitting(true);
-        const payload: PaymentPayload = { 
-            method, formValues: { ...formState, sameAddress }, 
-            summary, promoCode: appliedPromo || undefined, 
+        const payload: PaymentPayload = {
+            method, formValues: { ...formState, sameAddress },
+            summary, promoCode: appliedPromo || undefined,
             apartmentId: apartmentId ? Number(apartmentId) : undefined,
             startDate: startDate ?? undefined,
             endDate:   endDate   ?? undefined,
         };
         try {
-            const result = onPay ? await onPay(payload) : await paymentService.createPayment(payload);
+            const result = onPay ? await onPay(payload) : await paymentService.createPayment(payload, renterId);
             if (result.success) { setSubmitted(true); setSnackOpen(true); onSuccess?.(result); setTimeout(() => navigate("/dashboard"), 2500); }
             else { const msg = result.error ?? "Plata a eșuat. Încearcă din nou."; setSubmitError(msg); onError?.(msg); }
         } catch { const msg = "A apărut o eroare neașteptată. Încearcă din nou."; setSubmitError(msg); onError?.(msg); }
