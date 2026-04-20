@@ -11,6 +11,8 @@ import ApartmentIcon from "@mui/icons-material/Apartment";
 import PaymentIcon   from "@mui/icons-material/Payment";
 import FavoriteIcon  from "@mui/icons-material/Favorite";
 import EventIcon     from "@mui/icons-material/Event";
+import HistoryIcon   from "@mui/icons-material/History";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import type { Apartment }    from "../types/apartment.types";
 import { useAuth }           from "../auth/AuthContext";
 import { apartmentService }  from "../services/apartmentService";
@@ -22,22 +24,25 @@ import ProfileTab       from "../components/dashboard/ProfileTab";
 import MyListingsTab    from "../components/dashboard/MyListingsTab";
 import PaymentsTab      from "../components/dashboard/paymentTab/PaymentsTab";
 import FavoritesTab     from "../components/dashboard/FavoritesTab";
-import UpcomingStaysTab from "../components/dashboard/UpcomingStaysTab";
+import UpcomingStaysTab  from "../components/dashboard/UpcomingStaysTab";
+import PreviousStaysTab  from "../components/dashboard/PreviousStaysTab";
 
 const SIDEBAR_W    = 130;
 const NAVBAR_H     = 64;
 const BOTTOM_NAV_H = 64;
 
-type NavKey = "profile" | "listings" | "payments" | "favorites" | "upcoming";
+type NavKey = "profile" | "listings" | "recent" | "favorites" | "upcoming" | "previous" | "payments";
 
 interface NavItem { key: NavKey; labelKey: string; icon: React.ReactNode }
 
 const NAV: NavItem[] = [
-    { key: "profile",  labelKey: "dashboard.tabs.profile",        icon: <PersonIcon    sx={{ fontSize: 22 }} /> },
-    { key: "listings", labelKey: "dashboard.tabs.apartments",      icon: <ApartmentIcon sx={{ fontSize: 22 }} /> },
-    { key: "payments", labelKey: "dashboard.tabs.payments",        icon: <PaymentIcon   sx={{ fontSize: 22 }} /> },
-    { key: "favorites",labelKey: "dashboard.tabs.favorites",       icon: <FavoriteIcon  sx={{ fontSize: 22 }} /> },
-    { key: "upcoming", labelKey: "dashboard.tabs.upcomingStays",   icon: <EventIcon     sx={{ fontSize: 22 }} /> },
+    { key: "profile",   labelKey: "dashboard.tabs.profile",       icon: <PersonIcon     sx={{ fontSize: 22 }} /> },
+    { key: "listings",  labelKey: "dashboard.tabs.apartments",     icon: <ApartmentIcon  sx={{ fontSize: 22 }} /> },
+    { key: "recent",    labelKey: "dashboard.tabs.recentViewed",   icon: <VisibilityIcon sx={{ fontSize: 22 }} /> },
+    { key: "favorites", labelKey: "dashboard.tabs.favorites",      icon: <FavoriteIcon   sx={{ fontSize: 22 }} /> },
+    { key: "upcoming",  labelKey: "dashboard.tabs.upcomingStays",  icon: <EventIcon      sx={{ fontSize: 22 }} /> },
+    { key: "previous",  labelKey: "dashboard.tabs.previousStays",  icon: <HistoryIcon    sx={{ fontSize: 22 }} /> },
+    { key: "payments",  labelKey: "dashboard.tabs.payments",       icon: <PaymentIcon    sx={{ fontSize: 22 }} /> },
 ];
 
 function SidebarItem({ item, isActive, onClick }: { item: NavItem; isActive: boolean; onClick: () => void }) {
@@ -274,6 +279,13 @@ export default function Dashboard() {
                     </>
                 )}
 
+                {active === "recent" && (
+                    <>
+                        <PageHeading title={t("dashboard.tabs.recentViewed")} />
+                        {/* TODO: RecentViewTab — feature #3 */}
+                    </>
+                )}
+
                 {active === "payments" && (
                     <>
                         <PageHeading title={t("dashboard.tabs.payments")} />
@@ -297,6 +309,13 @@ export default function Dashboard() {
                     <>
                         <PageHeading title={t("dashboard.tabs.upcomingStays")} />
                         <UpcomingStaysTab />
+                    </>
+                )}
+
+                {active === "previous" && (
+                    <>
+                        <PageHeading title={t("dashboard.tabs.previousStays")} />
+                        <PreviousStaysTab />
                     </>
                 )}
             </Box>

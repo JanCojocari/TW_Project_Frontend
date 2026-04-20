@@ -1,4 +1,4 @@
-﻿// components/dashboard/UpcomingStaysTab.tsx
+﻿// components/dashboard/PreviousStaysTab.tsx
 import { useEffect, useState } from "react";
 import { Box, Typography, Chip, CircularProgress, Alert } from "@mui/material";
 import CalendarTodayIcon    from "@mui/icons-material/CalendarToday";
@@ -7,11 +7,10 @@ import { useAuth }          from "../../auth/AuthContext";
 import { apartmentService } from "../../services/apartmentService";
 import ApartmentCard        from "../listing/ApartmentCard";
 import type { Apartment }   from "../../types/apartment.types";
-import { formatDate } from '../../utils/formatDate';
 import { colors }           from "../../theme/gradients";
+import { formatDate }       from "../../utils/formatDate";
 import axiosInstance        from "../../api/axiosInstance";
 
-// Tip local — nu depinde de paymentHistoryService
 interface RenterPayment {
     id:          number;
     apartmentId: number;
@@ -36,7 +35,8 @@ async function fetchRenterPayments(renterId: number): Promise<RenterPayment[]> {
     return res.data;
 }
 
-export default function UpcomingStaysTab() {
+
+export default function PreviousStaysTab() {
     const { t }           = useTranslation();
     const { currentUser } = useAuth();
 
@@ -57,9 +57,12 @@ export default function UpcomingStaysTab() {
                     apartments.map(a => [a.Id_Apartment, a])
                 );
 
-                const upcoming = payments
-                    .filter(p => p.startDate != null && p.endDate != null && new Date(p.endDate) >= now)
-                    .sort((a, b) => new Date(a.startDate!).getTime() - new Date(b.startDate!).getTime())
+                // previous = sejururi complet terminate (endDate < now)
+                const previous = payments
+                    .filter(p => p.endDate != null && new Date(p.endDate) < now)
+                    .sort((a, b) =>
+                        new Date(b.startDate!).getTime() - new Date(a.startDate!).getTime()
+                    )
                     .reduce<StayEntry[]>((acc, p) => {
                         const apt = aptMap.get(p.apartmentId);
                         if (apt) acc.push({
@@ -70,7 +73,7 @@ export default function UpcomingStaysTab() {
                         return acc;
                     }, []);
 
-                setStays(upcoming);
+                setStays(previous);
             })
             .catch(() => setError(true))
             .finally(() => setLoading(false));
@@ -84,14 +87,14 @@ export default function UpcomingStaysTab() {
 
     if (error) return (
         <Alert severity="error" sx={{ mt: 2 }}>
-            {t("dashboard.upcomingStays.errorLoad")}
+            {t("dashboard.previousStays.errorLoad")}
         </Alert>
     );
 
     if (stays.length === 0) return (
         <Box sx={{ textAlign: "center", py: 10 }}>
             <Typography color="text.disabled" sx={{ fontSize: 18, fontStyle: "italic" }}>
-                {t("dashboard.upcomingStays.empty")}
+                {t("dashboard.previousStays.empty")}
             </Typography>
         </Box>
     );
@@ -118,10 +121,12 @@ export default function UpcomingStaysTab() {
                                 {formatDate(startDate)} — {formatDate(endDate)}
                             </Typography>
                         </Box>
-                        {startDate > new Date()
-                            ? <Chip label={t("dashboard.upcomingStays.badgeUpcoming")} size="small" color="primary" sx={{ fontWeight: 700, fontSize: 11 }} />
-                            : <Chip label={t("dashboard.upcomingStays.badgeNow")}      size="small" color="success" sx={{ fontWeight: 700, fontSize: 11 }} />
-                        }
+                        <Chip
+                            label={t("dashboard.previousStays.badgeDone")}
+                            size="small"
+                            color="default"
+                            sx={{ fontWeight: 700, fontSize: 11 }}
+                        />
                     </Box>
 
                     <ApartmentCard

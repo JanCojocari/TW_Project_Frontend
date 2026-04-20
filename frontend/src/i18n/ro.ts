@@ -175,6 +175,8 @@ export default {
             payments:   "Istoric Financiar",
             favorites:  "Favorite",
             upcomingStays: "Sejururi viitoare",
+            previousStays: "Sejururi anterioare",
+            recentViewed: "Vizualizate recent",
         },
         profile: {
             edit:           "Editează Profil",
@@ -207,9 +209,15 @@ export default {
             },
         },
         upcomingStays: {
-            empty:   "Nu ai niciun sejur viitor programat.", 
-            badge:   "Viitor",
+            empty:   "Nu ai niciun sejur viitor programat.",
+            badgeUpcoming: "Urmeaza",
+            badgeNow:      "Acum",
             errorLoad: "Eroare la incarcarea sejururilor viitoare.",
+        },
+        previousStays: {
+            empty:     "Nu ai niciun sejur anterior.",
+            badgeDone: "Finalizat",
+            errorLoad: "Eroare la incarcarea sejururilor anterioare.",
         },
     },
 
