@@ -122,16 +122,6 @@ const Listings = () => {
     const handleReset  = () => { setPendingFilters(defaultFilters); setAppliedFilters(defaultFilters); resetToFirstPage(); };
     const handleResetAll = () => { setSearchQuery(""); setAppliedFilters(defaultFilters); setPendingFilters(defaultFilters); resetToFirstPage(); };
 
-    useEffect(() => {
-        apartmentService.getAll()
-            .then(data => {
-                console.log("apartments loaded:", data.length, data);
-                setApartments(data);
-            })
-            .catch(() => setApartments([]));
-    }, []);
-    console.log("filteredApartments:", filteredApartments.length);
-    console.log("visibleApartments:", visibleApartments.length);
     return (
         <Box sx={{ minHeight: "100vh", bgcolor: "background.default", py: { xs: 4, md: 8 }, pt: 10 }}>
             <FilterDrawer

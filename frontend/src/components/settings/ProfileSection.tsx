@@ -43,7 +43,6 @@ export default function ProfileSection({ profile, saving, onUpdate, onSave }: Pr
                 description={t("settings.profile.description")}
             >
                 <Grid container spacing={2.5}>
-                    {/* Avatar centrat pe toata latimea */}
                     <Grid size={12} sx={{ display: "flex", justifyContent: "center" }}>
                         <AvatarUpload userId={profile.id} avatarUrl={profile.avatarUrl} />
                     </Grid>
@@ -58,12 +57,6 @@ export default function ProfileSection({ profile, saving, onUpdate, onSave }: Pr
                         <DebouncedTextField fullWidth label={t("settings.profile.surname")} size="small"
                                             value={profile.surname}
                                             onChange={(v) => onUpdate("surname", v)}
-                        />
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                        <DebouncedTextField fullWidth label={t("settings.profile.phone")} size="small"
-                                            value={profile.phone}
-                                            onChange={(v) => onUpdate("phone", v)}
                         />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6 }}>
@@ -87,7 +80,6 @@ export default function ProfileSection({ profile, saving, onUpdate, onSave }: Pr
                             ))}
                         </TextField>
                     </Grid>
-                    <Grid size={{ xs: 12, sm: 6 }} />
                     <Grid size={12}>
                         <Button variant="contained" disabled={saving} onClick={onSave}
                                 sx={{ borderRadius: 2, px: 4 }}

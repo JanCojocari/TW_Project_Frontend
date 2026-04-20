@@ -1,3 +1,4 @@
+// Rentora.BusinessLayer/Interfaces/IUserAction.cs
 using Rentora.Domain.Models.Responses;
 using Rentora.Domain.Models.User;
 
@@ -11,6 +12,7 @@ namespace Rentora.BusinessLayer.Interfaces
         List<UserDto> GetAll();
 
         ActionResponse Update(int id, UserUpdateDto data);
+        ActionResponse ChangePassword(int id, UserChangePasswordDto data);
         ActionResponse UpdateAvatar(int id, string avatarUrl);
         ActionResponse Delete(int id);
         ActionResponse UpdateRole(int id, int role);
