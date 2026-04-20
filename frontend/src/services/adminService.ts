@@ -14,6 +14,7 @@ export interface AdminUser {
     gender: string | null;
     accountBalance: number;
     role: number; // 0=Admin, 1=Owner, 2=Renter
+    avatarUrl?: string | null;
 }
 
 export interface AdminApartment {
@@ -24,7 +25,6 @@ export interface AdminApartment {
     imageUrl: string | null;
     interval: number;
     costPerInterval: number;
-    currency: number; // 0=USD, 1=EUR, 2=MDL
     rentMode: number;
     status: number; // 0=Pending, 1=Approved, 2=Declined
     location: object;

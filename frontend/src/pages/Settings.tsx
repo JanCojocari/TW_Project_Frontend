@@ -1,4 +1,4 @@
-// pages/settings/SettingsPage.tsx
+// pages/Settings.tsx
 import { Alert, Snackbar, Stack, Typography } from "@mui/material";
 import { useTranslation }      from "react-i18next";
 import { useAuth }             from "../auth/AuthContext";
@@ -24,9 +24,10 @@ export default function SettingsPage() {
         accountBalance: Number(currentUser.accountBalance),
         currency:       "EUR",
         role:           String(currentUser.role),
+        avatarUrl:      currentUser.avatarUrl,
     } : {
         id: 0, name: "", surname: "", email: "", phone: "",
-        birthday: "", gender: "", accountBalance: 0, currency: "EUR", role: "",
+        birthday: "", gender: "", accountBalance: 0, currency: "EUR", role: "", avatarUrl: null,
     };
 
     const {

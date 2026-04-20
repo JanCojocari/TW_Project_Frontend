@@ -3,7 +3,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Rentora.BusinessLayer;
 using Rentora.BusinessLayer.Structure;
 using Rentora.Domain.Models.User;
 
@@ -26,7 +25,7 @@ public class UserController : ControllerBase
             return Unauthorized(resp.Message);
         return Ok(result);
     }
-    
+
     [Authorize]
     [HttpGet]
     public IActionResult GetAll()
@@ -34,7 +33,7 @@ public class UserController : ControllerBase
         var users = _userAction.GetAll();
         return Ok(users);
     }
-    
+
     [Authorize]
     [HttpGet("{id}")]
     public IActionResult GetById(int id)
@@ -50,6 +49,17 @@ public class UserController : ControllerBase
     public IActionResult Update(int id, [FromBody] UserUpdateDto data)
     {
         var result = _userAction.Update(id, data);
+        if (!result.IsSuccess)
+            return BadRequest(result.Message);
+        return Ok(result.Message);
+    }
+
+    // Upload avatar: trimite imaginea si salveaza URL-ul pe user
+    [Authorize]
+    [HttpPut("{id}/avatar")]
+    public IActionResult UpdateAvatar(int id, [FromBody] UserUpdateAvatarDto data)
+    {
+        var result = _userAction.UpdateAvatar(id, data.AvatarUrl);
         if (!result.IsSuccess)
             return BadRequest(result.Message);
         return Ok(result.Message);

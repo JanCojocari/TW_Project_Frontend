@@ -1,4 +1,4 @@
-// src/components/settings/ProfileSection.tsx
+// components/settings/ProfileSection.tsx
 import { Button, Grid, MenuItem, TextField } from "@mui/material";
 import { DatePicker }           from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs }         from "@mui/x-date-pickers/AdapterDayjs";
@@ -7,6 +7,7 @@ import dayjs                    from "dayjs";
 import { useTranslation }       from "react-i18next";
 import SettingsSectionWrapper   from "./SettingsSectionWraper.tsx";
 import DebouncedTextField       from "../common/DebouncedTextField.tsx";
+import AvatarUpload             from "./AvatarUpload.tsx";
 import type { UserSettingsDto } from "../../hooks/useSettingsForm";
 
 interface Props {
@@ -26,7 +27,7 @@ export default function ProfileSection({ profile, saving, onUpdate, onSave }: Pr
         "Prefer să nu spun": "prefer_not_say",
     };
 
-    const genderOptions: { value: string; label: string }[] = [
+    const genderOptions = [
         { value: "male",           label: t("settings.profile.genderOptions.0") },
         { value: "female",         label: t("settings.profile.genderOptions.1") },
         { value: "other",          label: t("settings.profile.genderOptions.2") },
@@ -42,6 +43,11 @@ export default function ProfileSection({ profile, saving, onUpdate, onSave }: Pr
                 description={t("settings.profile.description")}
             >
                 <Grid container spacing={2.5}>
+                    {/* Avatar centrat pe toata latimea */}
+                    <Grid size={12} sx={{ display: "flex", justifyContent: "center" }}>
+                        <AvatarUpload userId={profile.id} avatarUrl={profile.avatarUrl} />
+                    </Grid>
+
                     <Grid size={{ xs: 12, sm: 6 }}>
                         <DebouncedTextField fullWidth label={t("settings.profile.name")} size="small"
                                             value={profile.name}

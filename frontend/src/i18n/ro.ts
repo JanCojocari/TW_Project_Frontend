@@ -210,6 +210,10 @@ export default {
     // ── Settings ──────────────────────────────────────────────────────────────
     settings: {
         title: "Setări cont",
+        avatar: {
+            change: "Schimbă fotografia de profil",
+            error:  "Upload eșuat. Încearcă din nou.",
+        },
         profile: {
             title:       "Profil personal",
             description: "Informațiile tale vizibile pe platformă.",

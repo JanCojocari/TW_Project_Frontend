@@ -29,16 +29,17 @@ public class ReviewActions
             .OrderByDescending(r => r.CreatedAt)
             .Select(r => new ReviewDto
             {
-                Id            = r.Id,
-                ApartmentId   = r.ApartmentId,
-                UserId        = r.UserId ?? 0,
-                UserName      = r.User != null ? r.User.Name : null,
-                UserSurname   = r.User != null ? r.User.Surname : null,
-                Rating        = r.Rating,
-                Comment       = r.Comment,
-                OwnerResponse = r.OwnerResponse,
-                CreatedAt     = r.CreatedAt,
-                StayStartDate = db.Payments
+                Id             = r.Id,
+                ApartmentId    = r.ApartmentId,
+                UserId         = r.UserId ?? 0,
+                UserName       = r.User != null ? r.User.Name : null,
+                UserSurname    = r.User != null ? r.User.Surname : null,
+                UserAvatarUrl  = r.User != null ? r.User.AvatarUrl : null,
+                Rating         = r.Rating,
+                Comment        = r.Comment,
+                OwnerResponse  = r.OwnerResponse,
+                CreatedAt      = r.CreatedAt,
+                StayStartDate  = db.Payments
                     .Where(p => p.ApartmentId == apartmentId && p.RenterId == r.UserId)
                     .OrderByDescending(p => p.CreatedAt)
                     .Select(p => p.StartDate)
@@ -55,10 +56,8 @@ public class ReviewActions
     protected ReviewDto? GetByIdExecution(int id)
     {
         using var db = new AppDbContext();
-
         var review = db.Reviews.FirstOrDefault(r => r.Id == id);
         if (review == null) return null;
-
         return MapToDto(review);
     }
 
@@ -74,7 +73,6 @@ public class ReviewActions
         if (!userExists)
             return new ActionResponse { IsSuccess = false, Message = "User not found." };
 
-        // validare ca userul a avut un stay platit
         var hasPayment = db.Payments.Any(p => p.ApartmentId == data.ApartmentId && p.RenterId == userId);
         if (!hasPayment)
             return new ActionResponse { IsSuccess = false, Message = "You must have completed a stay to leave a review." };
@@ -83,7 +81,6 @@ public class ReviewActions
         if (alreadyReviewed)
             return new ActionResponse { IsSuccess = false, Message = "You have already reviewed this apartment." };
 
-        // validare rating
         if (data.Rating < 1 || data.Rating > 5)
             return new ActionResponse { IsSuccess = false, Message = "Rating must be between 1 and 5." };
 
@@ -144,6 +141,7 @@ public class ReviewActions
         UserId        = r.UserId ?? 0,
         UserName      = r.User?.Name,
         UserSurname   = r.User?.Surname,
+        UserAvatarUrl = r.User?.AvatarUrl,
         Rating        = r.Rating,
         Comment       = r.Comment,
         OwnerResponse = r.OwnerResponse,

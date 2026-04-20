@@ -1,15 +1,16 @@
 // components/admin/UsersTab.tsx
 import { useEffect, useState } from "react";
 import {
-    Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+    Avatar, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     Paper, IconButton, Chip, Tooltip, Dialog, DialogTitle, DialogContent,
     DialogActions, Button, Typography, CircularProgress, Alert,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
-import PersonIcon from "@mui/icons-material/Person";
+import DeleteIcon              from "@mui/icons-material/Delete";
+import AdminPanelSettingsIcon  from "@mui/icons-material/AdminPanelSettings";
+import PersonIcon              from "@mui/icons-material/Person";
 import { adminService, type AdminUser } from "../../services/adminService";
 import { useAuth } from "../../auth/AuthContext";
+import { resolveMediaUrl } from "../../utils/mediaUrl";
 
 const roleLabel = (role: number) => {
     if (role === 0) return { label: "Admin",  color: "warning" as const };
@@ -19,12 +20,12 @@ const roleLabel = (role: number) => {
 
 export default function UsersTab() {
     const { currentUser } = useAuth();
-    const [users, setUsers]         = useState<AdminUser[]>([]);
-    const [loading, setLoading]     = useState(true);
-    const [error, setError]         = useState<string | null>(null);
+    const [users, setUsers]                 = useState<AdminUser[]>([]);
+    const [loading, setLoading]             = useState(true);
+    const [error, setError]                 = useState<string | null>(null);
     const [confirmDelete, setConfirmDelete] = useState<AdminUser | null>(null);
     const [confirmRole, setConfirmRole]     = useState<{ user: AdminUser; newRole: number } | null>(null);
-    const [busy, setBusy]           = useState(false);
+    const [busy, setBusy]                   = useState(false);
 
     const load = async () => {
         setLoading(true);
@@ -90,12 +91,24 @@ export default function UsersTab() {
                     </TableHead>
                     <TableBody>
                         {users.map(user => {
-                            const rl = roleLabel(user.role);
+                            const rl     = roleLabel(user.role);
                             const isSelf = user.id === currentUser?.id;
+                            const initials = `${user.name?.[0] ?? ""}${user.surname?.[0] ?? ""}`.toUpperCase();
+
                             return (
                                 <TableRow key={user.id} hover>
                                     <TableCell>{user.id}</TableCell>
-                                    <TableCell>{user.name} {user.surname}</TableCell>
+                                    <TableCell>
+                                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                            <Avatar
+                                                src={resolveMediaUrl(user.avatarUrl)}
+                                                sx={{ width: 28, height: 28, fontSize: 12 }}
+                                            >
+                                                {!user.avatarUrl && initials}
+                                            </Avatar>
+                                            {user.name} {user.surname}
+                                        </Box>
+                                    </TableCell>
                                     <TableCell>{user.email}</TableCell>
                                     <TableCell>{user.phone}</TableCell>
                                     <TableCell>
@@ -106,21 +119,16 @@ export default function UsersTab() {
                                         <Box sx={{ display: "flex", gap: 0.5, justifyContent: "flex-end" }}>
                                             {user.role !== 0 ? (
                                                 <Tooltip title="Make Admin">
-                                                    <IconButton
-                                                        size="small"
-                                                        color="warning"
-                                                        onClick={() => setConfirmRole({ user, newRole: 0 })}
+                                                    <IconButton size="small" color="warning"
+                                                                onClick={() => setConfirmRole({ user, newRole: 0 })}
                                                     >
                                                         <AdminPanelSettingsIcon fontSize="small" />
                                                     </IconButton>
                                                 </Tooltip>
                                             ) : (
                                                 <Tooltip title="Make Renter">
-                                                    <IconButton
-                                                        size="small"
-                                                        color="default"
-                                                        disabled={isSelf}
-                                                        onClick={() => setConfirmRole({ user, newRole: 2 })}
+                                                    <IconButton size="small" color="default" disabled={isSelf}
+                                                                onClick={() => setConfirmRole({ user, newRole: 2 })}
                                                     >
                                                         <PersonIcon fontSize="small" />
                                                     </IconButton>
@@ -128,11 +136,8 @@ export default function UsersTab() {
                                             )}
                                             <Tooltip title={isSelf ? "Cannot delete yourself" : "Delete user"}>
                                                 <span>
-                                                    <IconButton
-                                                        size="small"
-                                                        color="error"
-                                                        disabled={isSelf}
-                                                        onClick={() => setConfirmDelete(user)}
+                                                    <IconButton size="small" color="error" disabled={isSelf}
+                                                                onClick={() => setConfirmDelete(user)}
                                                     >
                                                         <DeleteIcon fontSize="small" />
                                                     </IconButton>

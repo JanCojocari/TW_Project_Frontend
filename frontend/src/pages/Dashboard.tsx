@@ -17,6 +17,7 @@ import { apartmentService }  from "../services/apartmentService";
 import { favoriteService }   from "../services/favoriteService";
 import { paths }             from "../app/paths";
 import { gradients, colors } from "../theme/gradients";
+import { resolveMediaUrl }   from "../utils/mediaUrl";
 import ProfileTab    from "../components/dashboard/ProfileTab";
 import MyListingsTab from "../components/dashboard/MyListingsTab";
 import PaymentsTab   from "../components/dashboard/paymentTab/PaymentsTab";
@@ -191,15 +192,18 @@ export default function Dashboard() {
                     pt: 3,
                     pb: 2,
                 }}>
-                    <Avatar sx={{
-                        width: 50, height: 50,
-                        background: gradients.primary,
-                        fontSize: 17, fontWeight: 700,
-                        mb: 0.8,
-                        border: `2px solid ${colors.primaryAlpha25}`,
-                        boxShadow: `0 4px 14px ${colors.primaryAlpha25}`,
-                    }}>
-                        {initials}
+                    <Avatar
+                        src={resolveMediaUrl(currentUser?.avatarUrl)}
+                        sx={{
+                            width: 50, height: 50,
+                            background: gradients.primary,
+                            fontSize: 17, fontWeight: 700,
+                            mb: 0.8,
+                            border: `2px solid ${colors.primaryAlpha25}`,
+                            boxShadow: `0 4px 14px ${colors.primaryAlpha25}`,
+                        }}
+                    >
+                        {!currentUser?.avatarUrl && initials}
                     </Avatar>
                     <Typography sx={{
                         fontSize: 12, fontWeight: 700,
@@ -249,12 +253,15 @@ export default function Dashboard() {
                         borderRadius: 2,
                         border: `1px solid ${colors.border}`,
                     }}>
-                        <Avatar sx={{
-                            width: 42, height: 42,
-                            background: gradients.primary,
-                            fontSize: 14, fontWeight: 700,
-                        }}>
-                            {initials}
+                        <Avatar
+                            src={resolveMediaUrl(currentUser?.avatarUrl)}
+                            sx={{
+                                width: 42, height: 42,
+                                background: gradients.primary,
+                                fontSize: 14, fontWeight: 700,
+                            }}
+                        >
+                            {!currentUser?.avatarUrl && initials}
                         </Avatar>
                         <Box sx={{ minWidth: 0, flex: 1 }}>
                             <Typography fontSize={14} fontWeight={700} color="text.primary" lineHeight={1.2} noWrap>

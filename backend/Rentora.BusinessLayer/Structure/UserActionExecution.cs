@@ -9,6 +9,7 @@ using Rentora.Domain.Models.Responses;
 public class UserActionExecution : UserActions, IUserAction
 {
     public UserActionExecution(IConfiguration config) : base(config) { }
+
     public ActionResponse Register(UserRegisterDto data)
         => RegisterExecution(data);
 
@@ -24,9 +25,12 @@ public class UserActionExecution : UserActions, IUserAction
     public ActionResponse Update(int id, UserUpdateDto data)
         => UpdateExecution(id, data);
 
+    public ActionResponse UpdateAvatar(int id, string avatarUrl)
+        => UpdateAvatarExecution(id, avatarUrl);
+
     public ActionResponse Delete(int id)
         => DeleteExecution(id);
-    
+
     public ActionResponse UpdateRole(int id, int role)
         => UpdateRoleExecution(id, role);
 }

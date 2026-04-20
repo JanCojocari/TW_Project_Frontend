@@ -13,6 +13,7 @@ import PaymentIcon   from "@mui/icons-material/Payment";
 import StarIcon      from "@mui/icons-material/Star";
 import SupportIcon   from "@mui/icons-material/Support";
 import { gradients, colors } from "../theme/gradients";
+import { resolveMediaUrl }   from "../utils/mediaUrl";
 import UsersTab    from "../components/admin/UsersTab";
 import ListingsTab from "../components/admin/ListingsTab";
 import SupportTab  from "../components/admin/SupportTab";
@@ -75,12 +76,15 @@ export default function AdminDashboard() {
                         alignItems: "center",
                         gap: 1.5,
                     }}>
-                        <Avatar sx={{
-                            width: 34, height: 34,
-                            background: gradients.primary,
-                            fontSize: 13, fontWeight: 700,
-                        }}>
-                            {currentUser?.name?.[0]?.toUpperCase() ?? "A"}
+                        <Avatar
+                            src={resolveMediaUrl(currentUser?.avatarUrl)}
+                            sx={{
+                                width: 34, height: 34,
+                                background: gradients.primary,
+                                fontSize: 13, fontWeight: 700,
+                            }}
+                        >
+                            {!currentUser?.avatarUrl && (currentUser?.name?.[0]?.toUpperCase() ?? "A")}
                         </Avatar>
                         <Box>
                             <Typography fontSize={13} fontWeight={700} color="text.primary" lineHeight={1.2}>
@@ -186,13 +190,16 @@ export default function AdminDashboard() {
                 }}>
                     {/* Avatar compact pe mobile */}
                     {isMobile && (
-                        <Avatar sx={{
-                            width: 36, height: 36,
-                            background: gradients.primary,
-                            fontSize: 13, fontWeight: 700,
-                            flexShrink: 0,
-                        }}>
-                            {currentUser?.name?.[0]?.toUpperCase() ?? "A"}
+                        <Avatar
+                            src={resolveMediaUrl(currentUser?.avatarUrl)}
+                            sx={{
+                                width: 36, height: 36,
+                                background: gradients.primary,
+                                fontSize: 13, fontWeight: 700,
+                                flexShrink: 0,
+                            }}
+                        >
+                            {!currentUser?.avatarUrl && (currentUser?.name?.[0]?.toUpperCase() ?? "A")}
                         </Avatar>
                     )}
                     <Box sx={{ minWidth: 0, flex: 1 }}>

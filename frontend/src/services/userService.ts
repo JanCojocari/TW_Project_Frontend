@@ -13,6 +13,7 @@ export interface UserApiDto {
     gender?: string | null;
     accountBalance: number;
     role: number;
+    avatarUrl?: string | null;
 }
 
 export interface UserLoginResponseDto {
@@ -29,7 +30,7 @@ export interface UserUpdateDto {
     gender?: string;
 }
 
-/** Maps API DTO → frontend User type (for backwards-compatible components) */
+/** Maps API DTO → frontend User type (pentru componente legacy) */
 export function mapUserApiToUser(dto: UserApiDto): User {
     return {
         Id_User:      dto.id,
@@ -56,6 +57,9 @@ export const userService = {
 
     update: (id: number, data: UserUpdateDto): Promise<string> =>
         axiosInstance.put<string>(`${BASE}/${id}`, data).then(r => r.data),
+
+    updateAvatar: (id: number, avatarUrl: string): Promise<string> =>
+        axiosInstance.put<string>(`${BASE}/${id}/avatar`, { avatarUrl }).then(r => r.data),
 
     delete: (id: number): Promise<string> =>
         axiosInstance.delete<string>(`${BASE}/${id}`).then(r => r.data),
