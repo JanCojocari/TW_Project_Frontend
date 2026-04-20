@@ -1,3 +1,4 @@
+// services/userService.ts
 import axiosInstance from "../api/axiosInstance";
 import type { User } from "../types/user.types";
 
@@ -22,15 +23,19 @@ export interface UserLoginResponseDto {
 }
 
 export interface UserUpdateDto {
-    name?: string;
-    surname?: string;
-    email?: string;
-    phone?: string;
+    name?:     string;
+    surname?:  string;
+    email?:    string;
+    phone?:    string;
     birthday?: string;
-    gender?: string;
+    gender?:   string;
 }
 
-/** Maps API DTO → frontend User type (pentru componente legacy) */
+export interface UserChangePasswordDto {
+    oldPassword: string;
+    newPassword: string;
+}
+
 export function mapUserApiToUser(dto: UserApiDto): User {
     return {
         Id_User:      dto.id,
@@ -57,6 +62,9 @@ export const userService = {
 
     update: (id: number, data: UserUpdateDto): Promise<string> =>
         axiosInstance.put<string>(`${BASE}/${id}`, data).then(r => r.data),
+
+    changePassword: (id: number, data: UserChangePasswordDto): Promise<string> =>
+        axiosInstance.put<string>(`${BASE}/${id}/password`, data).then(r => r.data),
 
     updateAvatar: (id: number, avatarUrl: string): Promise<string> =>
         axiosInstance.put<string>(`${BASE}/${id}/avatar`, { avatarUrl }).then(r => r.data),

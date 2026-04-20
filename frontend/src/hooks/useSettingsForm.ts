@@ -44,15 +44,16 @@ export function useSettingsForm(initial: UserSettingsDto) {
         setPassword((prev) => ({ ...prev, [field]: value }));
     }
 
-    // salveaza doar campurile de profil (fara phone/email)
+    // Trimite DOAR name/surname/birthday/gender — phone si email nu sunt incluse,
+    // deci backend-ul (patch-style) nu le va atinge.
     async function saveProfile() {
         setSaving(true);
         try {
             await userService.update(profile.id, {
-                name:     profile.name,
-                surname:  profile.surname,
-                birthday: profile.birthday,
-                gender:   profile.gender,
+                name:     profile.name     || undefined,
+                surname:  profile.surname  || undefined,
+                birthday: profile.birthday || undefined,
+                gender:   profile.gender   || undefined,
             });
             setSuccess(t("settings.profile.successMsg"));
         } catch {
@@ -62,17 +63,22 @@ export function useSettingsForm(initial: UserSettingsDto) {
         }
     }
 
-    // salveaza phone si email din ContactSection
+    // Trimite DOAR phone si email — name/surname/birthday/gender nu sunt incluse.
     async function saveContact() {
         setSaving(true);
         try {
             await userService.update(profile.id, {
-                email: profile.email,
-                phone: profile.phone,
+                phone: profile.phone || undefined,
+                email: profile.email || undefined,
             });
             setSuccess(t("settings.contact.successMsg"));
-        } catch {
-            setError(t("settings.contact.errorMsg"));
+        } catch (err: any) {
+            const msg = err?.response?.data;
+            setError(
+                typeof msg === "string" && msg.includes("Email")
+                    ? t("settings.contact.emailTaken")
+                    : t("settings.contact.errorMsg")
+            );
         } finally {
             setSaving(false);
         }
@@ -89,15 +95,20 @@ export function useSettingsForm(initial: UserSettingsDto) {
         }
         setSaving(true);
         try {
-            await userService.update(profile.id, {
-                // backend-ul accepta oldPassword/newPassword in UserUpdateDto
-                // daca endpoint-ul dedicat nu e gata, trimitem prin update general
-            } as any);
+            await userService.changePassword(profile.id, {
+                oldPassword: password.oldPassword,
+                newPassword: password.newPassword,
+            });
             setPassword(PASSWORD_INITIAL);
             setSuccess(t("settings.security.successMsg"));
             return true;
-        } catch {
-            setError(t("settings.security.errorMsg"));
+        } catch (err: any) {
+            const msg = err?.response?.data;
+            setError(
+                typeof msg === "string" && msg.includes("incorrect")
+                    ? t("settings.security.wrongCurrent")
+                    : t("settings.security.errorMsg")
+            );
             return false;
         } finally {
             setSaving(false);

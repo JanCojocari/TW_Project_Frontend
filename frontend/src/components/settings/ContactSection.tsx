@@ -1,10 +1,20 @@
 ﻿// components/settings/ContactSection.tsx
-import { useState }            from "react";
-import { Button, Grid }        from "@mui/material";
+import { useState, useMemo }   from "react";
+import { Button, Grid, InputAdornment, Typography } from "@mui/material";
 import { useTranslation }      from "react-i18next";
 import SettingsSectionWrapper  from "./SettingsSectionWraper.tsx";
 import DebouncedTextField      from "../common/DebouncedTextField.tsx";
 import type { UserSettingsDto } from "../../hooks/useSettingsForm";
+
+const PREFIX      = "+373";
+const MAX_DIGITS  = 8; // cifre dupa prefix
+
+/** Extrage doar cifrele locale din numarul stocat in backend (ex: "+37369050220" -> "69050220") */
+function stripPrefix(phone: string): string {
+    if (phone.startsWith(PREFIX)) return phone.slice(PREFIX.length);
+    // daca nu are prefix, returnam ce avem (max MAX_DIGITS)
+    return phone.replace(/\D/g, "").slice(0, MAX_DIGITS);
+}
 
 interface Props {
     profile:  UserSettingsDto;
@@ -13,24 +23,25 @@ interface Props {
     onSave:   () => void;
 }
 
-// max 9 cifre, optional prefix + sau 00
-const PHONE_REGEX = /^\+?[0-9]{0,9}$/;
-
 export default function ContactSection({ profile, saving, onUpdate, onSave }: Props) {
     const { t } = useTranslation();
 
-    const [phoneError, setPhoneError] = useState("");
     const [emailError, setEmailError] = useState("");
+    const [phoneError, setPhoneError] = useState("");
 
-    const handlePhone = (v: string) => {
-        // permite doar cifre, optionala + la inceput
-        if (v !== "" && !/^\+?[0-9]*$/.test(v)) return;
-        if (v.replace(/^\+/, "").length > 9) {
+    // cifrele locale (fara prefix) derivate din profile.phone
+    const localDigits = useMemo(() => stripPrefix(profile.phone ?? ""), [profile.phone]);
+
+    const handlePhoneDigits = (v: string) => {
+        // permite doar cifre
+        const digits = v.replace(/\D/g, "");
+        if (digits.length > MAX_DIGITS) {
             setPhoneError(t("settings.contact.phoneMax"));
             return;
         }
         setPhoneError("");
-        onUpdate("phone", v);
+        // stocam in state numarul complet cu prefix
+        onUpdate("phone", PREFIX + digits);
     };
 
     const handleEmail = (v: string) => {
@@ -53,18 +64,30 @@ export default function ContactSection({ profile, saving, onUpdate, onSave }: Pr
             description={t("settings.contact.description")}
         >
             <Grid container spacing={2.5}>
+                {/* Telefon cu prefix fix */}
                 <Grid size={{ xs: 12, sm: 6 }}>
                     <DebouncedTextField
                         fullWidth
                         label={t("settings.contact.phone")}
                         size="small"
-                        value={profile.phone}
-                        onChange={handlePhone}
+                        value={localDigits}
+                        onChange={handlePhoneDigits}
                         error={!!phoneError}
-                        helperText={phoneError}
-                        inputProps={{ maxLength: 10 }}
+                        helperText={phoneError || t("settings.contact.phoneHint")}
+                        inputProps={{ maxLength: MAX_DIGITS, inputMode: "numeric" }}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <Typography variant="body2" sx={{ fontWeight: 600, color: "text.primary", userSelect: "none" }}>
+                                        {PREFIX}
+                                    </Typography>
+                                </InputAdornment>
+                            ),
+                        }}
                     />
                 </Grid>
+
+                {/* Email */}
                 <Grid size={{ xs: 12, sm: 6 }}>
                     <DebouncedTextField
                         fullWidth
@@ -77,6 +100,7 @@ export default function ContactSection({ profile, saving, onUpdate, onSave }: Pr
                         helperText={emailError}
                     />
                 </Grid>
+
                 <Grid size={12}>
                     <Button
                         variant="contained"

@@ -1,4 +1,5 @@
-﻿namespace Rentora.BusinessLayer.Structure;
+﻿// Rentora.BusinessLayer/Structure/UserActionExecution.cs
+namespace Rentora.BusinessLayer.Structure;
 
 using Microsoft.Extensions.Configuration;
 using Rentora.BusinessLayer.Core;
@@ -24,6 +25,9 @@ public class UserActionExecution : UserActions, IUserAction
 
     public ActionResponse Update(int id, UserUpdateDto data)
         => UpdateExecution(id, data);
+
+    public ActionResponse ChangePassword(int id, UserChangePasswordDto data)
+        => ChangePasswordExecution(id, data);
 
     public ActionResponse UpdateAvatar(int id, string avatarUrl)
         => UpdateAvatarExecution(id, avatarUrl);

@@ -1,4 +1,5 @@
-﻿using Rentora.BusinessLayer.Helpers;
+﻿// Rentora.BusinessLayer/Core/UserActions.cs
+using Rentora.BusinessLayer.Helpers;
 using Rentora.Domain.Models.LoginResponse;
 using Microsoft.Extensions.Configuration;
 
@@ -53,16 +54,12 @@ public class UserActions
             u.PasswordHash == HashPassword(data.Password));
 
         if (user == null)
-            return new ActionResponse
-            {
-                IsSuccess = false,
-                Message   = "Invalid email or password."
-            };
+            return new ActionResponse { IsSuccess = false, Message = "Invalid email or password." };
 
         var jwtHelper = new JwtHelper(_config);
         var token     = jwtHelper.GenerateToken(user);
 
-        return new AuthResponseDto()
+        return new AuthResponseDto
         {
             User        = MapToDto(user),
             AccessToken = token
@@ -73,8 +70,7 @@ public class UserActions
     {
         using var db = new AppDbContext();
         var user = db.Users.FirstOrDefault(u => u.Id == id);
-        if (user == null) return null;
-        return MapToDto(user);
+        return user == null ? null : MapToDto(user);
     }
 
     protected List<UserDto> GetAllExecution()
@@ -83,6 +79,9 @@ public class UserActions
         return db.Users.Select(u => MapToDto(u)).ToList();
     }
 
+    // Patch-style: actualizeaza DOAR campurile non-null din DTO.
+    // ProfileSection trimite { Name, Surname, Birthday, Gender }  → Phone/Email raman neschimbate.
+    // ContactSection trimite { Phone, Email }                     → Name/Surname/etc raman neschimbate.
     protected ActionResponse UpdateExecution(int id, UserUpdateDto data)
     {
         using var db = new AppDbContext();
@@ -91,16 +90,46 @@ public class UserActions
         if (user == null)
             return new ActionResponse { IsSuccess = false, Message = "User not found." };
 
-        user.Name     = data.Name;
-        user.Surname  = data.Surname;
-        user.Phone    = data.Phone;
-        user.Birthday = data.Birthday;
-        user.Gender   = data.Gender;
+        if (data.Name     != null) user.Name     = data.Name;
+        if (data.Surname  != null) user.Surname  = data.Surname;
+        if (data.Phone    != null) user.Phone    = data.Phone;
+        if (data.Birthday != null) user.Birthday = data.Birthday.Value;
+        if (data.Gender   != null) user.Gender   = data.Gender;
 
-        db.Users.Update(user);
+        if (data.Email != null)
+        {
+            if (!string.IsNullOrWhiteSpace(data.Email))
+            {
+                var emailTaken = db.Users.Any(u => u.Email == data.Email && u.Id != id);
+                if (emailTaken)
+                    return new ActionResponse { IsSuccess = false, Message = "Email already in use." };
+            }
+            user.Email = data.Email;
+        }
+
         db.SaveChanges();
 
         return new ActionResponse { IsSuccess = true, Message = "User updated successfully." };
+    }
+
+    protected ActionResponse ChangePasswordExecution(int id, UserChangePasswordDto data)
+    {
+        using var db = new AppDbContext();
+
+        var user = db.Users.FirstOrDefault(u => u.Id == id);
+        if (user == null)
+            return new ActionResponse { IsSuccess = false, Message = "User not found." };
+
+        if (user.PasswordHash != HashPassword(data.OldPassword))
+            return new ActionResponse { IsSuccess = false, Message = "Current password is incorrect." };
+
+        if (data.NewPassword.Length < 6)
+            return new ActionResponse { IsSuccess = false, Message = "New password must be at least 6 characters." };
+
+        user.PasswordHash = HashPassword(data.NewPassword);
+        db.SaveChanges();
+
+        return new ActionResponse { IsSuccess = true, Message = "Password changed successfully." };
     }
 
     protected ActionResponse UpdateAvatarExecution(int id, string avatarUrl)
@@ -126,15 +155,12 @@ public class UserActions
             return new ActionResponse { IsSuccess = false, Message = "User not found." };
 
         var paymentsAsOwner = db.Payments.Where(p => p.OwnerId == id).ToList();
-        foreach (var p in paymentsAsOwner)
-            p.OwnerId = null;
+        foreach (var p in paymentsAsOwner) p.OwnerId = null;
 
         var paymentsAsRenter = db.Payments.Where(p => p.RenterId == id).ToList();
-        foreach (var p in paymentsAsRenter)
-            p.RenterId = null;
+        foreach (var p in paymentsAsRenter) p.RenterId = null;
 
         db.SaveChanges();
-
         db.Users.Remove(user);
         db.SaveChanges();
 

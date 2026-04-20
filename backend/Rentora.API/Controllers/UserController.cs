@@ -1,4 +1,5 @@
-﻿namespace Rentora.API.Controllers;
+﻿// Rentora.API/Controllers/UserController.cs
+namespace Rentora.API.Controllers;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authorization;
@@ -54,7 +55,16 @@ public class UserController : ControllerBase
         return Ok(result.Message);
     }
 
-    // Upload avatar: trimite imaginea si salveaza URL-ul pe user
+    [Authorize]
+    [HttpPut("{id}/password")]
+    public IActionResult ChangePassword(int id, [FromBody] UserChangePasswordDto data)
+    {
+        var result = _userAction.ChangePassword(id, data);
+        if (!result.IsSuccess)
+            return BadRequest(result.Message);
+        return Ok(result.Message);
+    }
+
     [Authorize]
     [HttpPut("{id}/avatar")]
     public IActionResult UpdateAvatar(int id, [FromBody] UserUpdateAvatarDto data)
