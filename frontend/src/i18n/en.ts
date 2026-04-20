@@ -166,6 +166,8 @@ export default {
             payments:   "Financial History",
             favorites:  "Favorites",
             upcomingStays: "Upcoming Stays",
+            previousStays: "Previous Stays",
+            recentViewed: "Recently Viewed",
         },
         profile: {
             edit:           "Edit Profile",
@@ -198,11 +200,16 @@ export default {
             },
         },
         upcomingStays: {
-           empty:   "You have no upcoming stays.",
-          badge:   "Upcoming",
-          errorLoad: "Failed to load upcoming stays.",
+            empty:   "You have no upcoming stays.",
+            badgeUpcoming: "Upcoming",
+            badgeNow:      "Now",
+            errorLoad: "Failed to load upcoming stays.",
        },
-
+        previousStays: {
+            empty:     "You have no previous stays.",
+            badgeDone: "Completed",
+            errorLoad: "Failed to load previous stays.",
+            },
     },
 
     settings: {
