@@ -153,6 +153,8 @@ export default {
         perHour:     "hour",
         perDay:      "day",
         perMonth:    "month",
+        statusPending:  "Your listing is pending review. It will be visible to renters once an admin approves it.",
+        statusDeclined: "Your listing has been declined by the admin. Please contact support for more information.",
     },
 
     dashboard: {

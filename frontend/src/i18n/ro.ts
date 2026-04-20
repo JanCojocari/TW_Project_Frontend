@@ -161,6 +161,8 @@ export default {
         perHour:     "oră",
         perDay:      "zi",
         perMonth:    "lună",
+        statusPending:  "Anunțul tău este în așteptare. Va fi vizibil pentru chiriași după aprobare de către admin.",
+        statusDeclined: "Anunțul tău a fost refuzat de admin. Contactează suportul pentru mai multe informații.",
     },
 
     // ── Dashboard ─────────────────────────────────────────────────────────────
