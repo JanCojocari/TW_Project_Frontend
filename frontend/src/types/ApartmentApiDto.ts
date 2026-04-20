@@ -34,6 +34,23 @@ export interface AdditionalInfoApi {
     cancellationPolicy: CancellationPolicyApi;
 }
 
+export interface FacilitiesApiDto {
+    apartmentId:     number;
+    wifi:            boolean;
+    parking:         boolean;
+    airConditioning: boolean;
+    heating:         boolean;
+    washer:          boolean;
+    dryer:           boolean;
+    kitchen:         boolean;
+    tv:              boolean;
+    pool:            boolean;
+    gym:             boolean;
+    elevator:        boolean;
+    petsAllowed:     boolean;
+    balcony:         boolean;
+}
+
 export interface ApartmentApiDto {
     id:              number;
     ownedId:         number;
@@ -47,6 +64,9 @@ export interface ApartmentApiDto {
     status:          ApartmentStatusApi;
     location:        MapLocationApi;
     additionalInfo:  AdditionalInfoApi;
+    facilities:      FacilitiesApiDto | null;
+    avgRating:       number;
+    reviewCount:     number;
 }
 
 export interface ApartmentCreateApiDto {

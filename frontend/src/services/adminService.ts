@@ -25,11 +25,14 @@ export interface AdminApartment {
     imageUrl: string | null;
     interval: number;
     costPerInterval: number;
-    currency: number; 
+    currency: number;
     rentMode: number;
-    status: number;
+    status: number; // 0=Pending, 1=Approved, 2=Declined
     location: object;
     additionalInfo: object;
+    ownerName: string;
+    ownerSurname: string;
+    ownerEmail: string;
 }
 export interface AdminSupportRequest {
     id: number;

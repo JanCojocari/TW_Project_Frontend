@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation }         from "react-i18next";
 import { Box, Container, Typography, Button, Chip, Alert, Paper, Tabs, Tab } from "@mui/material";
-import { ArrowBack as ArrowBackIcon, LocationOn as LocationOnIcon, Wifi as WifiIcon, MeetingRoom as RoomsIcon, Star as StarIcon } from "@mui/icons-material";
+import { ArrowBack as ArrowBackIcon, LocationOn as LocationOnIcon, Wifi as WifiIcon, MeetingRoom as RoomsIcon, Star as StarIcon, HourglassEmpty as HourglassIcon, Block as BlockIcon } from "@mui/icons-material";
 import type { Apartment }    from "../types/apartment.types";
 import type { User }         from "../types/user.types";
 import { colors }            from "../theme/gradients.ts";
@@ -104,6 +104,18 @@ const ApartmentDetail = () => {
                 {showRentSuccess && (
                     <Alert severity="success" onClose={() => setShowRentSuccess(false)} sx={{ mb: 3 }}>
                         {t("apartment.rentSuccess")}
+                    </Alert>
+                )}
+
+                {/* Banner status — vizibil doar pentru owner-ul anunțului */}
+                {currentUser?.id === apartment.Id_Owner && apartment.status === "pending" && (
+                    <Alert severity="warning" icon={<HourglassIcon />} sx={{ mb: 3, fontWeight: 500 }}>
+                        {t("apartment.statusPending")}
+                    </Alert>
+                )}
+                {currentUser?.id === apartment.Id_Owner && apartment.status === "declined" && (
+                    <Alert severity="error" icon={<BlockIcon />} sx={{ mb: 3, fontWeight: 500 }}>
+                        {t("apartment.statusDeclined")}
                     </Alert>
                 )}
 

@@ -17,6 +17,8 @@ export type Apartment = {
     facilities:        Facilities;
     additionalInfo:    AdditionalInfo;
     reviews:           Review[];
+    avgRating:         number;
+    reviewCount:       number;
 };
 
 export type MapLocation = {

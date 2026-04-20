@@ -9,6 +9,7 @@ import {
     CancellationPolicyApi,
     ApartmentStatusApi,
     type ApartmentApiDto,
+    type FacilitiesApiDto,
     type ApartmentCreateApiDto,
     type ApartmentUpdateApiDto,
 } from "../types/ApartmentApiDto";
@@ -63,6 +64,38 @@ const STATUS_MAP: Record<ApartmentStatusApi, ApartmentStatus> = {
     [ApartmentStatusApi.Declined]: "declined",
 };
 
+// ── Mapper facilități API → tip frontend ─────────────────────────────────────
+
+function mapFacilities(f: FacilitiesApiDto | null) {
+    if (!f) return { ...defaultFacilities };
+    return {
+        wifi:           f.wifi,
+        parking:        f.parking,
+        parkingFree:    false,
+        ac:             f.airConditioning,
+        heating:        f.heating,
+        washer:         f.washer,
+        dryer:          f.dryer,
+        dishwasher:     false,
+        refrigerator:   false,
+        microwave:      false,
+        oven:           false,
+        stove:          false,
+        tv:             f.tv,
+        balcony:        f.balcony,
+        terrace:        false,
+        garden:         false,
+        pool:           f.pool,
+        gym:            f.gym,
+        elevator:       f.elevator,
+        petFriendly:    f.petsAllowed,
+        smokingAllowed: false,
+        securityCamera: false,
+        keypadEntry:    false,
+        safe:           false,
+    };
+}
+
 // ── Mapper API DTO → tip frontend ────────────────────────────────────────────
 
 export function mapToApartment(dto: ApartmentApiDto): Apartment {
@@ -83,7 +116,7 @@ export function mapToApartment(dto: ApartmentApiDto): Apartment {
             city:      dto.location.city,
             country:   dto.location.country,
         },
-        facilities: { ...defaultFacilities },
+        facilities: mapFacilities(dto.facilities),
         additionalInfo: {
             rooms:              dto.additionalInfo.rooms,
             bedrooms:           0,
@@ -101,7 +134,9 @@ export function mapToApartment(dto: ApartmentApiDto): Apartment {
             description:        dto.additionalInfo.description,
             cancellationPolicy: CANCELLATION_MAP[dto.additionalInfo.cancellationPolicy] ?? "flexible",
         },
-        reviews: [],
+        reviews:     [],
+        avgRating:   dto.avgRating   ?? 0,
+        reviewCount: dto.reviewCount ?? 0,
     };
 }
 
