@@ -1,31 +1,40 @@
 // components/admin/ListingsTab.tsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
     Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     Paper, IconButton, Chip, Tooltip, Dialog, DialogTitle, DialogContent,
     DialogActions, Button, Typography, CircularProgress, Alert,
+    TextField, InputAdornment,
 } from "@mui/material";
 import DeleteIcon      from "@mui/icons-material/Delete";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon      from "@mui/icons-material/Cancel";
+import SearchIcon      from "@mui/icons-material/Search";
+import { useTranslation } from "react-i18next";
 import { adminService, type AdminApartment } from "../../services/adminService";
 
-const statusConfig = (status: number) => {
-    if (status === 0) return { label: "Pending",  color: "default"  as const };
-    if (status === 1) return { label: "Approved", color: "success"  as const };
-    return             { label: "Declined", color: "error"    as const };
+const statusConfig = (status: number, t: (k: string) => string) => {
+    if (status === 0) return { label: t("admin.listings.statusPending"),  color: "default" as const };
+    if (status === 1) return { label: t("admin.listings.statusApproved"), color: "success" as const };
+    return             { label: t("admin.listings.statusDeclined"), color: "error"   as const };
 };
 
-const intervalLabel = (v: number) => ["Hour", "Day", "Month"][v] ?? v;
-const rentModeLabel = (v: number) => ["Short-term", "Long-term"][v] ?? v;
-const currencyLabel = (v: number) => ["USD", "EUR", "MDL"][v] ?? "?";
+const currencyLabel = (v: number | undefined) =>
+    v != null ? (["USD", "EUR", "MDL"][v] ?? "?") : "";
 
 export default function ListingsTab() {
+    const { t }                   = useTranslation();
     const [apartments, setApartments] = useState<AdminApartment[]>([]);
     const [loading, setLoading]       = useState(true);
     const [error, setError]           = useState<string | null>(null);
     const [confirmDelete, setConfirmDelete] = useState<AdminApartment | null>(null);
     const [busy, setBusy]             = useState(false);
+    const [query, setQuery]           = useState("");
+
+    const intervalLabel = (v: number) =>
+        [t("admin.listings.intervalHour"), t("admin.listings.intervalDay"), t("admin.listings.intervalMonth")][v] ?? v;
+    const rentModeLabel = (v: number) =>
+        [t("admin.listings.modeShort"), t("admin.listings.modeLong")][v] ?? v;
 
     const load = async () => {
         setLoading(true);
@@ -33,7 +42,7 @@ export default function ListingsTab() {
             setApartments(await adminService.getApartments());
             setError(null);
         } catch {
-            setError("Failed to load apartments.");
+            setError(t("admin.listings.errorLoad"));
         } finally {
             setLoading(false);
         }
@@ -41,12 +50,22 @@ export default function ListingsTab() {
 
     useEffect(() => { load(); }, []);
 
+    const filtered = useMemo(() => {
+        const q = query.trim().toLowerCase();
+        if (!q) return apartments;
+        return apartments.filter(a =>
+            String(a.id).includes(q) ||
+            a.address?.toLowerCase().includes(q) ||
+            String(a.ownedId).includes(q)
+        );
+    }, [apartments, query]);
+
     const handleApprove = async (id: number) => {
         try {
             await adminService.approveApartment(id);
             setApartments(prev => prev.map(a => a.id === id ? { ...a, status: 1 } : a));
         } catch {
-            setError("Failed to approve apartment.");
+            setError(t("admin.listings.errorApprove"));
         }
     };
 
@@ -55,7 +74,7 @@ export default function ListingsTab() {
             await adminService.declineApartment(id);
             setApartments(prev => prev.map(a => a.id === id ? { ...a, status: 2 } : a));
         } catch {
-            setError("Failed to decline apartment.");
+            setError(t("admin.listings.errorDecline"));
         }
     };
 
@@ -66,7 +85,7 @@ export default function ListingsTab() {
             await adminService.deleteApartment(confirmDelete.id);
             setApartments(prev => prev.filter(a => a.id !== confirmDelete.id));
         } catch {
-            setError("Failed to delete apartment.");
+            setError(t("admin.listings.errorDelete"));
         } finally {
             setBusy(false);
             setConfirmDelete(null);
@@ -78,22 +97,37 @@ export default function ListingsTab() {
 
     return (
         <>
+            <TextField
+                fullWidth size="small"
+                placeholder={t("admin.listings.searchPlaceholder")}
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                sx={{ mb: 2 }}
+                InputProps={{
+                    startAdornment: (
+                        <InputAdornment position="start">
+                            <SearchIcon fontSize="small" sx={{ color: "text.disabled" }} />
+                        </InputAdornment>
+                    ),
+                }}
+            />
+
             <TableContainer component={Paper} elevation={0} sx={{ border: "1px solid", borderColor: "divider", borderRadius: 2 }}>
                 <Table size="small">
                     <TableHead>
                         <TableRow sx={{ "& th": { fontWeight: 700, bgcolor: "background.default" } }}>
-                            <TableCell>ID</TableCell>
-                            <TableCell>Address</TableCell>
-                            <TableCell>Owner ID</TableCell>
-                            <TableCell>Cost / Interval</TableCell>
-                            <TableCell>Mode</TableCell>
-                            <TableCell>Status</TableCell>
-                            <TableCell align="right">Actions</TableCell>
+                            <TableCell>{t("admin.listings.colId")}</TableCell>
+                            <TableCell>{t("admin.listings.colAddress")}</TableCell>
+                            <TableCell>{t("admin.listings.colOwnerId")}</TableCell>
+                            <TableCell>{t("admin.listings.colCost")}</TableCell>
+                            <TableCell>{t("admin.listings.colMode")}</TableCell>
+                            <TableCell>{t("admin.listings.colStatus")}</TableCell>
+                            <TableCell align="right">{t("admin.listings.colActions")}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {apartments.map(apt => {
-                            const sc = statusConfig(apt.status);
+                        {filtered.map(apt => {
+                            const sc = statusConfig(apt.status, t);
                             return (
                                 <TableRow key={apt.id} hover>
                                     <TableCell>{apt.id}</TableCell>
@@ -101,7 +135,9 @@ export default function ListingsTab() {
                                         {apt.address}
                                     </TableCell>
                                     <TableCell>{apt.ownedId}</TableCell>
-                                    <TableCell>{apt.costPerInterval} {currencyLabel(apt.currency)} / {intervalLabel(apt.interval)}</TableCell>
+                                    <TableCell>
+                                        {apt.costPerInterval} {currencyLabel((apt as any).currency)} / {intervalLabel(apt.interval)}
+                                    </TableCell>
                                     <TableCell>{rentModeLabel(apt.rentMode)}</TableCell>
                                     <TableCell>
                                         <Chip label={sc.label} color={sc.color} size="small" sx={{ fontWeight: 700 }} />
@@ -109,20 +145,20 @@ export default function ListingsTab() {
                                     <TableCell align="right">
                                         <Box sx={{ display: "flex", gap: 0.5, justifyContent: "flex-end" }}>
                                             {apt.status !== 1 && (
-                                                <Tooltip title="Approve">
+                                                <Tooltip title={t("admin.listings.approve")}>
                                                     <IconButton size="small" color="success" onClick={() => handleApprove(apt.id)}>
                                                         <CheckCircleIcon fontSize="small" />
                                                     </IconButton>
                                                 </Tooltip>
                                             )}
                                             {apt.status !== 2 && (
-                                                <Tooltip title="Decline">
+                                                <Tooltip title={t("admin.listings.decline")}>
                                                     <IconButton size="small" color="warning" onClick={() => handleDecline(apt.id)}>
                                                         <CancelIcon fontSize="small" />
                                                     </IconButton>
                                                 </Tooltip>
                                             )}
-                                            <Tooltip title="Delete">
+                                            <Tooltip title={t("admin.listings.delete")}>
                                                 <IconButton size="small" color="error" onClick={() => setConfirmDelete(apt)}>
                                                     <DeleteIcon fontSize="small" />
                                                 </IconButton>
@@ -132,22 +168,28 @@ export default function ListingsTab() {
                                 </TableRow>
                             );
                         })}
+                        {filtered.length === 0 && (
+                            <TableRow>
+                                <TableCell colSpan={7} align="center" sx={{ py: 4, color: "text.disabled" }}>
+                                    {t("admin.listings.noResults")}
+                                </TableCell>
+                            </TableRow>
+                        )}
                     </TableBody>
                 </Table>
             </TableContainer>
 
             <Dialog open={!!confirmDelete} onClose={() => setConfirmDelete(null)}>
-                <DialogTitle fontWeight={700}>Delete Listing</DialogTitle>
+                <DialogTitle fontWeight={700}>{t("admin.listings.deleteTitle")}</DialogTitle>
                 <DialogContent>
                     <Typography>
-                        Delete apartment <strong>#{confirmDelete?.id}</strong> at{" "}
-                        <strong>{confirmDelete?.address}</strong>? This cannot be undone.
+                        {t("admin.listings.deleteDesc", { id: confirmDelete?.id, address: confirmDelete?.address })}
                     </Typography>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setConfirmDelete(null)} disabled={busy}>Cancel</Button>
+                    <Button onClick={() => setConfirmDelete(null)} disabled={busy}>{t("admin.common.cancel")}</Button>
                     <Button onClick={handleDelete} color="error" variant="contained" disabled={busy}>
-                        {busy ? <CircularProgress size={16} /> : "Delete"}
+                        {busy ? <CircularProgress size={16} /> : t("admin.common.delete")}
                     </Button>
                 </DialogActions>
             </Dialog>
