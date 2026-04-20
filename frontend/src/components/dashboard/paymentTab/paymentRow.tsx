@@ -1,6 +1,7 @@
 ﻿// components/dashboard/payments/paymentRow.tsx
 import { Box, Chip, Paper, Tooltip, Typography } from "@mui/material";
 import CheckCircleIcon   from "@mui/icons-material/CheckCircle";
+import { formatDateMonth } from '../../../utils/formatDate';
 import { useTranslation } from "react-i18next";
 import { colors }         from "../../../theme/gradients";
 import DownloadButton     from "./downloadButton";
@@ -13,13 +14,10 @@ interface Props {
 }
 
 export default function PaymentRow({ payment, isLoading, onDownload }: Props) {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const hasServerUrl = !!payment.invoiceUrl;
 
-    const dateLabel = new Date(payment.createdAt).toLocaleDateString(
-        i18n.language === "en" ? "en-GB" : "ro-RO",
-        { month: "long", year: "numeric" }
-    );
+    const dateLabel = formatDateMonth(payment.createdAt);
 
     return (
         <Paper elevation={0} sx={{ p: 3, borderRadius: 3, bgcolor: "background.default", border: `1px solid ${colors.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", transition: "all 0.3s ease", "&:hover": { borderColor: "primary.main", boxShadow: `0 4px 16px ${colors.primaryAlpha10}` } }}>

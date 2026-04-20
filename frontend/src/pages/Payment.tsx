@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import StayPeriodSelector from "../components/payment/StayPeriodSelector";
 import type { Dayjs } from "dayjs";
+import { useAuth } from "../auth/AuthContext";
 
 interface Props {
     summary?:              OrderSummary;
@@ -38,9 +39,11 @@ const PaymentPage = ({ summary: summaryProp, defaultPaymentMethod = "card", onPa
     const [monthsInput, setMonthsInput] = useState<string>("1");
     const [hoursInput, setHoursInput] = useState<string>("1");
     const navigate = useNavigate();
+    const { currentUser } = useAuth();
+    const renterId = currentUser?.id ?? 0;
     const apartmentId     = searchParams.get("apartmentId");
     const summary         = useOrderSummary(
-        summaryProp, 
+        summaryProp,
         apartmentId,
         interval === "hour" ? null : startDate?.toDate() ?? null,
         interval === "hour" ? null : endDate?.toDate()   ?? null,
@@ -60,15 +63,19 @@ const PaymentPage = ({ summary: summaryProp, defaultPaymentMethod = "card", onPa
         setDateError(null);
         return true;
     };
-    
+
     const {
         method, formState, errors, sameAddress, setSameAddress,
         promoInput, setPromoInput, appliedPromo, promoDiscount, promoMessage, promoLoading,
         submitting, submitted, setSubmitted, submitError, setSubmitError, snackOpen, setSnackOpen, summaryOpen, setSummaryOpen,
         formRef, handleFieldChange, handleMethodChange, handlePromoApply, handlePromoRemove, handleSubmit, handleBack,
-    } = usePaymentForm({ 
-        summary, apartmentId, onPay, onBack, onSuccess, onError, 
-        startDate: startDate?.toDate() ?? null,    endDate:   endDate?.toDate() ?? null, defaultMethod: defaultPaymentMethod,});
+    } = usePaymentForm({
+        summary, apartmentId, onPay, onBack, onSuccess, onError,
+        startDate: startDate?.toDate() ?? null, endDate: endDate?.toDate() ?? null,
+        defaultMethod: defaultPaymentMethod, renterId,
+    });
+
+    const wrappedSubmit = (e: React.FormEvent) => { if (!validateDates()) { e.preventDefault(); return; } handleSubmit(e); };
 
     const currentFields  = FIELDS_BY_METHOD[method];
     const sym            = CURRENCY_SYMBOLS[summary.currency] ?? summary.currency;
@@ -112,13 +119,13 @@ const PaymentPage = ({ summary: summaryProp, defaultPaymentMethod = "card", onPa
                     onHoursBlur={() => { if (!hoursInput || parseInt(hoursInput) < 1) { setHoursInput("1"); setHours(1); } }}
                     onMonthsBlur={() => { if (!monthsInput || parseInt(monthsInput) < 1) { setMonthsInput("1"); setMonths(1); if (startDate) setEndDate(startDate.add(1, "month")); } }}
                 />
-                
+
                 <MobileSummaryAccordion open={summaryOpen} onToggle={() => setSummaryOpen((v) => !v)} effectiveTotal={effectiveTotal} currency={summary.currency} summaryCardProps={summaryCardProps} />
 
                 <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 380px" }, gap: 4, alignItems: "start" }}>
 
                     {/* LEFT: Form */}
-                    <Box component="form" onSubmit={handleSubmit} noValidate aria-label="Formular de plată" ref={formRef}>
+                    <Box component="form" onSubmit={wrappedSubmit} noValidate aria-label="Formular de plată" ref={formRef}>
                         <Paper elevation={1} sx={{ p: 3, borderRadius: 3, border: `1px solid ${colors.border}`, mb: 3 }}>
                             <Typography variant="subtitle1" fontWeight={700} mb={2}>{LABELS.paymentMethod}</Typography>
 

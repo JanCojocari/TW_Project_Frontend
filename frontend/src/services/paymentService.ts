@@ -1,21 +1,32 @@
-﻿import { VALID_PROMO_CODES } from "../types/paymentPageConfig";
+﻿// services/paymentService.ts
+import axiosInstance from "../api/axiosInstance";
+import { VALID_PROMO_CODES } from "../types/paymentPageConfig";
 import type { PaymentPayload, PaymentResult, PromoResult } from "../types/paymentPageConfig";
 
-const delay = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+const CURRENCY_TO_NUM: Record<string, number> = {
+    USD: 0,
+    EUR: 1,
+    MDL: 2,
+};
 
 export const paymentService = {
-    async createPayment(payload: PaymentPayload): Promise<PaymentResult> {
-        console.info("[paymentService] createPayment", payload);
-        await delay(1500);
-        return {
-            success: true,
-            transactionId: `TXN-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+    async createPayment(payload: PaymentPayload, renterId: number): Promise<PaymentResult> {
+        const body = {
+            apartmentId: payload.apartmentId,
+            currency:    CURRENCY_TO_NUM[payload.summary.currency] ?? 1,
+            startDate:   payload.startDate?.toISOString() ?? null,
+            endDate:     payload.endDate?.toISOString()   ?? null,
         };
+
+        const res = await axiosInstance.post(`/payments/${renterId}`, body);
+
+        if (res.status === 200 || res.status === 201) {
+            return { success: true, transactionId: String(res.data ?? "") };
+        }
+        return { success: false, error: "Payment failed." };
     },
 
     async validatePromo(code: string, subtotal: number): Promise<PromoResult> {
-        console.info("[paymentService] validatePromo", code);
-        await delay(600);
         const rate = VALID_PROMO_CODES[code.toUpperCase().trim()];
         if (rate === undefined) {
             return { valid: false, discount: 0, message: "Cod invalid sau expirat." };
@@ -24,7 +35,7 @@ export const paymentService = {
         return {
             valid: true,
             discount,
-            message: `Cod aplicat – ${(rate * 100).toFixed(0)}% reducere`,
+            message: `Cod aplicat - ${(rate * 100).toFixed(0)}% reducere`,
         };
     },
 };

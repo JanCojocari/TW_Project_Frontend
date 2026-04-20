@@ -1,43 +1,33 @@
-// components/admin/SupportTab.tsx
+// components/admin/ReviewsTab.tsx
 import { useEffect, useState, useMemo } from "react";
 import {
     Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-    Paper, IconButton, Chip, Select, MenuItem, Tooltip, Dialog, DialogTitle,
-    DialogContent, DialogActions, Button, Typography, CircularProgress, Alert,
+    Paper, IconButton, Tooltip, Dialog, DialogTitle, DialogContent,
+    DialogActions, Button, Typography, CircularProgress, Alert, Rating,
     TextField, InputAdornment,
 } from "@mui/material";
 import DeleteIcon         from "@mui/icons-material/Delete";
 import SearchIcon         from "@mui/icons-material/Search";
 import { useTranslation } from "react-i18next";
-import { adminService, type AdminSupportRequest } from "../../services/adminService";
+import { adminService, type AdminReview } from "../../services/adminService";
+import { formatDate } from "../../utils/formatDate.ts"
 
-export default function SupportTab() {
+export default function ReviewsTab() {
     const { t }                   = useTranslation();
-    const [requests, setRequests] = useState<AdminSupportRequest[]>([]);
+    const [reviews, setReviews]   = useState<AdminReview[]>([]);
     const [loading, setLoading]   = useState(true);
     const [error, setError]       = useState<string | null>(null);
-    const [confirmDelete, setConfirmDelete] = useState<AdminSupportRequest | null>(null);
+    const [confirmDelete, setConfirmDelete] = useState<AdminReview | null>(null);
     const [busy, setBusy]         = useState(false);
     const [query, setQuery]       = useState("");
-
-    // definite in render ca depind de t()
-    const STATUS_OPTIONS = [
-        { value: "Open",       label: t("admin.support.statusOpen"),       color: "default" as const },
-        { value: "InProgress", label: t("admin.support.statusInProgress"), color: "info"    as const },
-        { value: "Resolved",   label: t("admin.support.statusResolved"),   color: "success" as const },
-        { value: "Closed",     label: t("admin.support.statusClosed"),     color: "warning" as const },
-    ];
-
-    const statusFromNum = (n: number) => STATUS_OPTIONS[n]?.value ?? "Open";
-    const statusChip    = (n: number) => STATUS_OPTIONS[n] ?? STATUS_OPTIONS[0];
 
     const load = async () => {
         setLoading(true);
         try {
-            setRequests(await adminService.getSupportRequests());
+            setReviews(await adminService.getReviews());
             setError(null);
         } catch {
-            setError(t("admin.support.errorLoad"));
+            setError(t("admin.reviews.errorLoad"));
         } finally {
             setLoading(false);
         }
@@ -45,34 +35,25 @@ export default function SupportTab() {
 
     useEffect(() => { load(); }, []);
 
+    // filtrare client-side: id, userId (renterId), apartmentId
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
-        if (!q) return requests;
-        return requests.filter(r =>
+        if (!q) return reviews;
+        return reviews.filter(r =>
             String(r.id).includes(q) ||
-            String(r.userId ?? "").includes(q) ||
-            r.email?.toLowerCase().includes(q)
+            String(r.userId).includes(q) ||
+            String(r.apartmentId).includes(q)
         );
-    }, [requests, query]);
-
-    const handleStatusChange = async (id: number, statusStr: string) => {
-        try {
-            await adminService.updateSupportStatus(id, statusStr);
-            const newNum = STATUS_OPTIONS.findIndex(s => s.value === statusStr);
-            setRequests(prev => prev.map(r => r.id === id ? { ...r, status: newNum } : r));
-        } catch {
-            setError(t("admin.support.errorStatus"));
-        }
-    };
+    }, [reviews, query]);
 
     const handleDelete = async () => {
         if (!confirmDelete) return;
         setBusy(true);
         try {
-            await adminService.deleteSupport(confirmDelete.id);
-            setRequests(prev => prev.filter(r => r.id !== confirmDelete.id));
+            await adminService.deleteReview(confirmDelete.id);
+            setReviews(prev => prev.filter(r => r.id !== confirmDelete.id));
         } catch {
-            setError(t("admin.support.errorDelete"));
+            setError(t("admin.reviews.errorDelete"));
         } finally {
             setBusy(false);
             setConfirmDelete(null);
@@ -86,7 +67,7 @@ export default function SupportTab() {
         <>
             <TextField
                 fullWidth size="small"
-                placeholder={t("admin.support.searchPlaceholder")}
+                placeholder={t("admin.reviews.searchPlaceholder")}
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 sx={{ mb: 2 }}
@@ -103,60 +84,41 @@ export default function SupportTab() {
                 <Table size="small">
                     <TableHead>
                         <TableRow sx={{ "& th": { fontWeight: 700, bgcolor: "background.default" } }}>
-                            <TableCell>{t("admin.support.colId")}</TableCell>
-                            <TableCell>{t("admin.support.colUser")}</TableCell>
-                            <TableCell>{t("admin.support.colSubject")}</TableCell>
-                            <TableCell>{t("admin.support.colMessage")}</TableCell>
-                            <TableCell>{t("admin.support.colCreated")}</TableCell>
-                            <TableCell>{t("admin.support.colStatus")}</TableCell>
-                            <TableCell align="right">{t("admin.support.colActions")}</TableCell>
+                            <TableCell>{t("admin.reviews.colId")}</TableCell>
+                            <TableCell>{t("admin.reviews.colApartment")}</TableCell>
+                            <TableCell>{t("admin.reviews.colUserId")}</TableCell>
+                            <TableCell>{t("admin.reviews.colRating")}</TableCell>
+                            <TableCell>{t("admin.reviews.colComment")}</TableCell>
+                            <TableCell>{t("admin.reviews.colCreated")}</TableCell>
+                            <TableCell align="right">{t("admin.reviews.colActions")}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filtered.map(req => {
-                            const chip = statusChip(req.status);
-                            return (
-                                <TableRow key={req.id} hover>
-                                    <TableCell>{req.id}</TableCell>
-                                    <TableCell>{req.userId ?? req.email}</TableCell>
-                                    <TableCell sx={{ maxWidth: 150, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                        {req.subject}
-                                    </TableCell>
-                                    <TableCell sx={{ maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                        {req.message}
-                                    </TableCell>
-                                    <TableCell>{new Date(req.createdAt).toLocaleDateString()}</TableCell>
-                                    <TableCell>
-                                        <Select
-                                            size="small"
-                                            value={statusFromNum(req.status)}
-                                            onChange={e => handleStatusChange(req.id, e.target.value)}
-                                            sx={{ fontSize: 13, minWidth: 120 }}
-                                            renderValue={() => (
-                                                <Chip label={chip.label} color={chip.color} size="small" sx={{ fontWeight: 700, cursor: "pointer" }} />
-                                            )}
-                                        >
-                                            {STATUS_OPTIONS.map(opt => (
-                                                <MenuItem key={opt.value} value={opt.value}>
-                                                    <Chip label={opt.label} color={opt.color} size="small" sx={{ fontWeight: 700 }} />
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        <Tooltip title={t("admin.support.colActions")}>
-                                            <IconButton size="small" color="error" onClick={() => setConfirmDelete(req)}>
-                                                <DeleteIcon fontSize="small" />
-                                            </IconButton>
-                                        </Tooltip>
-                                    </TableCell>
-                                </TableRow>
-                            );
-                        })}
+                        {filtered.map(review => (
+                            <TableRow key={review.id} hover>
+                                <TableCell>{review.id}</TableCell>
+                                <TableCell>#{review.apartmentId}</TableCell>
+                                <TableCell>{review.userId}</TableCell>
+                                <TableCell>
+                                    <Rating value={review.rating} readOnly size="small" />
+                                </TableCell>
+                                <TableCell sx={{ maxWidth: 250, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                    {review.comment ?? <em style={{ opacity: 0.5 }}>{t("admin.reviews.noComment")}</em>}
+                                </TableCell>
+                                <TableCell>{formatDate(review.createdAt)}</TableCell>
+                                <TableCell align="right">
+                                    <Tooltip title={t("admin.common.delete")}>
+                                        <IconButton size="small" color="error" onClick={() => setConfirmDelete(review)}>
+                                            <DeleteIcon fontSize="small" />
+                                        </IconButton>
+                                    </Tooltip>
+                                </TableCell>
+                            </TableRow>
+                        ))}
                         {filtered.length === 0 && (
                             <TableRow>
                                 <TableCell colSpan={7} align="center" sx={{ py: 4, color: "text.disabled" }}>
-                                    {t("admin.support.noResults")}
+                                    {t("admin.reviews.noResults")}
                                 </TableCell>
                             </TableRow>
                         )}
@@ -165,10 +127,10 @@ export default function SupportTab() {
             </TableContainer>
 
             <Dialog open={!!confirmDelete} onClose={() => setConfirmDelete(null)}>
-                <DialogTitle fontWeight={700}>{t("admin.support.deleteTitle")}</DialogTitle>
+                <DialogTitle fontWeight={700}>{t("admin.reviews.deleteTitle")}</DialogTitle>
                 <DialogContent>
                     <Typography>
-                        {t("admin.support.deleteDesc", { id: confirmDelete?.id, subject: confirmDelete?.subject })}
+                        {t("admin.reviews.deleteDesc", { id: confirmDelete?.id, userId: confirmDelete?.userId })}
                     </Typography>
                 </DialogContent>
                 <DialogActions>

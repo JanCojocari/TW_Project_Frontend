@@ -165,6 +165,7 @@ export default {
             apartments: "My Properties",
             payments:   "Financial History",
             favorites:  "Favorites",
+            upcomingStays: "Upcoming Stays",
         },
         profile: {
             edit:           "Edit Profile",
@@ -196,6 +197,12 @@ export default {
                 declined: "Declined",
             },
         },
+        upcomingStays: {
+           empty:   "You have no upcoming stays.",
+          badge:   "Upcoming",
+          errorLoad: "Failed to load upcoming stays.",
+       },
+
     },
 
     settings: {
