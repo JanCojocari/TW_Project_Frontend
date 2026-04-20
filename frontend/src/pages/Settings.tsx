@@ -5,6 +5,7 @@ import { useAuth }             from "../auth/AuthContext";
 import { useSettingsForm }     from "../hooks/useSettingsForm";
 import type { UserSettingsDto } from "../hooks/useSettingsForm";
 import ProfileSection          from "../components/settings/ProfileSection";
+import ContactSection          from "../components/settings/ContactSection";
 import SecuritySection         from "../components/settings/SecuritySection";
 import BalanceSection          from "../components/settings/BalanceSection";
 import DangerZoneSection       from "../components/settings/DangerZoneSection";
@@ -33,7 +34,7 @@ export default function SettingsPage() {
     const {
         profile, updateProfile, password, updatePassword,
         saving, success, error, clearSuccess, clearError,
-        saveProfile, savePassword, deleteAccount,
+        saveProfile, saveContact, savePassword, deleteAccount,
     } = useSettingsForm(initialProfile);
 
     return (
@@ -41,6 +42,7 @@ export default function SettingsPage() {
             <Typography variant="h5" fontWeight={900}>{t("settings.title")}</Typography>
 
             <ProfileSection  profile={profile}  saving={saving} onUpdate={updateProfile} onSave={saveProfile} />
+            <ContactSection  profile={profile}  saving={saving} onUpdate={updateProfile} onSave={saveContact} />
             <SecuritySection password={password} saving={saving} onUpdate={updatePassword} onSave={savePassword} />
             <BalanceSection  balance={profile.accountBalance} currency={profile.currency} />
             <DangerZoneSection email={profile.email} saving={saving} onDelete={deleteAccount} />

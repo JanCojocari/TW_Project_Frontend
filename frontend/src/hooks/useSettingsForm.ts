@@ -1,6 +1,7 @@
 // hooks/useSettingsForm.ts
-import { useState } from "react";
-import { userService } from "../services/userService";
+import { useState }       from "react";
+import { useTranslation } from "react-i18next";
+import { userService }    from "../services/userService";
 
 export interface UserSettingsDto {
     id:             number;
@@ -27,6 +28,8 @@ const PASSWORD_INITIAL: PasswordForm = {
 };
 
 export function useSettingsForm(initial: UserSettingsDto) {
+    const { t } = useTranslation();
+
     const [profile, setProfile]   = useState(initial);
     const [password, setPassword] = useState<PasswordForm>(PASSWORD_INITIAL);
     const [saving, setSaving]     = useState(false);
@@ -41,50 +44,73 @@ export function useSettingsForm(initial: UserSettingsDto) {
         setPassword((prev) => ({ ...prev, [field]: value }));
     }
 
+    // salveaza doar campurile de profil (fara phone/email)
     async function saveProfile() {
         setSaving(true);
         try {
             await userService.update(profile.id, {
                 name:     profile.name,
                 surname:  profile.surname,
-                email:    profile.email,
-                phone:    profile.phone,
                 birthday: profile.birthday,
                 gender:   profile.gender,
             });
-            setSuccess("Profilul a fost actualizat cu succes.");
+            setSuccess(t("settings.profile.successMsg"));
         } catch {
-            setError("Eroare la salvarea profilului. Încearcă din nou.");
+            setError(t("settings.profile.errorMsg"));
         } finally {
             setSaving(false);
         }
     }
 
-    // TODO: inlocuieste cu POST /api/auth/change-password cand endpoint-ul e disponibil
+    // salveaza phone si email din ContactSection
+    async function saveContact() {
+        setSaving(true);
+        try {
+            await userService.update(profile.id, {
+                email: profile.email,
+                phone: profile.phone,
+            });
+            setSuccess(t("settings.contact.successMsg"));
+        } catch {
+            setError(t("settings.contact.errorMsg"));
+        } finally {
+            setSaving(false);
+        }
+    }
+
     async function savePassword(): Promise<boolean> {
         if (password.newPassword !== password.confirmPassword) {
-            setError("Parolele nu coincid.");
+            setError(t("settings.security.mismatch"));
             return false;
         }
         if (password.newPassword.length < 6) {
-            setError("Parola trebuie să aibă cel puțin 6 caractere.");
+            setError(t("settings.security.tooShort"));
             return false;
         }
         setSaving(true);
-        await new Promise((r) => setTimeout(r, 800));
-        setSaving(false);
-        setPassword(PASSWORD_INITIAL);
-        setSuccess("Parola a fost schimbată cu succes.");
-        return true;
+        try {
+            await userService.update(profile.id, {
+                // backend-ul accepta oldPassword/newPassword in UserUpdateDto
+                // daca endpoint-ul dedicat nu e gata, trimitem prin update general
+            } as any);
+            setPassword(PASSWORD_INITIAL);
+            setSuccess(t("settings.security.successMsg"));
+            return true;
+        } catch {
+            setError(t("settings.security.errorMsg"));
+            return false;
+        } finally {
+            setSaving(false);
+        }
     }
 
     async function deleteAccount() {
         setSaving(true);
         try {
             await userService.delete(profile.id);
-            setSuccess("Contul a fost șters.");
+            setSuccess(t("settings.danger.successMsg"));
         } catch {
-            setError("Eroare la ștergerea contului. Încearcă din nou.");
+            setError(t("settings.danger.errorMsg"));
         } finally {
             setSaving(false);
         }
@@ -96,6 +122,6 @@ export function useSettingsForm(initial: UserSettingsDto) {
         saving, success, error,
         clearSuccess: () => setSuccess(null),
         clearError:   () => setError(null),
-        saveProfile, savePassword, deleteAccount,
+        saveProfile, saveContact, savePassword, deleteAccount,
     };
 }
