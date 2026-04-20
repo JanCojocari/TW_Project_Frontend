@@ -10,7 +10,7 @@ public class FacilitiesDto
     public bool Washer { get; set; }
     public bool Dryer { get; set; }
     public bool Kitchen { get; set; }
-    public bool TV { get; set; }
+    public bool Tv { get; set; }
     public bool Pool { get; set; }
     public bool Gym { get; set; }
     public bool Elevator { get; set; }

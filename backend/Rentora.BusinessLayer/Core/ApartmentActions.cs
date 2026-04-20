@@ -1,8 +1,10 @@
 namespace Rentora.BusinessLayer.Core;
 
+using Microsoft.EntityFrameworkCore;
 using Rentora.DataAccess;
 using Rentora.Domain.Entities;
 using Rentora.Domain.Models.Apartment;
+using Rentora.Domain.Models.Facilities;
 using Rentora.Domain.Models.Responses;
 using Rentora.Domain.OwnedTypes;
 using Rentora.Domain.Enums;
@@ -15,11 +17,28 @@ public class ApartmentActions
     {
         using var db = new AppDbContext();
 
-        return db.Apartments
-            .Where(a => a.Status == ApartmentStatus.Approved)
-            .Where(a => a.RenterId == null)
-            .Select(a => MapToDto(a))
+        var apartments = db.Apartments
+            .Include(a => a.Facilities)
+            .Where(a => a.Status == ApartmentStatus.Approved && a.RenterId == null)
             .ToList();
+
+        if (!apartments.Any()) return new List<ApartmentDto>();
+
+        var ids = apartments.Select(a => a.Id).ToList();
+        var reviewStats = db.Reviews
+            .Where(r => ids.Contains(r.ApartmentId))
+            .GroupBy(r => r.ApartmentId)
+            .Select(g => new { ApartmentId = g.Key, Count = g.Count(), Avg = g.Average(r => (double)r.Rating) })
+            .ToDictionary(x => x.ApartmentId);
+
+        return apartments.Select(a => {
+            var dto = MapToDto(a);
+            if (reviewStats.TryGetValue(a.Id, out var stats)) {
+                dto.ReviewCount = stats.Count;
+                dto.AvgRating   = Math.Round(stats.Avg, 1);
+            }
+            return dto;
+        }).ToList();
     }
     
     protected List<ApartmentDto> GetAllForAdminExecution()
@@ -34,10 +53,21 @@ public class ApartmentActions
     {
         using var db = new AppDbContext();
 
-        var apartment = db.Apartments.FirstOrDefault(a => a.Id == id);
+        var apartment = db.Apartments
+            .Include(a => a.Facilities)
+            .FirstOrDefault(a => a.Id == id);
         if (apartment == null) return null;
 
-        return MapToDto(apartment);
+        var dto = MapToDto(apartment);
+
+        var ratings = db.Reviews
+            .Where(r => r.ApartmentId == id)
+            .Select(r => r.Rating)
+            .ToList();
+        dto.ReviewCount = ratings.Count;
+        dto.AvgRating   = ratings.Any() ? Math.Round(ratings.Average(), 1) : 0;
+
+        return dto;
     }
 
     protected List<ApartmentDto> GetByOwnerExecution(int ownerId)
@@ -193,17 +223,34 @@ public class ApartmentActions
 
     private static ApartmentDto MapToDto(Apartment a) => new ApartmentDto
     {
-        Id = a.Id,
-        OwnedId = a.OwnedId,
-        RenterId = a.RenterId,
-        Address = a.Address,
-        ImageUrl = a.ImageUrl,
-        Interval = a.Interval,
+        Id              = a.Id,
+        OwnedId         = a.OwnedId,
+        RenterId        = a.RenterId,
+        Address         = a.Address,
+        ImageUrl        = a.ImageUrl,
+        Interval        = a.Interval,
         CostPerInterval = a.CostPerInterval,
-        Currency = a.Currency,
-        RentMode = a.RentMode,
-        Status = a.Status,
-        Location = a.Location,
-        AdditionalInfo = a.AdditionlaInfo
+        Currency        = a.Currency,
+        RentMode        = a.RentMode,
+        Status          = a.Status,
+        Location        = a.Location,
+        AdditionalInfo  = a.AdditionlaInfo,
+        Facilities      = a.Facilities != null ? new FacilitiesDto
+        {
+            ApartmentId     = a.Facilities.ApartmentId,
+            Wifi            = a.Facilities.Wifi,
+            Parking         = a.Facilities.Parking,
+            AirConditioning = a.Facilities.AirConditioning,
+            Heating         = a.Facilities.Heating,
+            Washer          = a.Facilities.Washer,
+            Dryer           = a.Facilities.Dryer,
+            Kitchen         = a.Facilities.Kitchen,
+            Tv              = a.Facilities.TV,
+            Pool            = a.Facilities.Pool,
+            Gym             = a.Facilities.Gym,
+            Elevator        = a.Facilities.Elevator,
+            PetsAllowed     = a.Facilities.PetsAllowed,
+            Balcony         = a.Facilities.Balcony,
+        } : null,
     };
 }

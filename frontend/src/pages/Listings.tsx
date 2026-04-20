@@ -28,6 +28,9 @@ const Listings = () => {
 
     useEffect(() => {
         apartmentService.getAll().then(setApartments).catch(() => setApartments([]));
+    }, []);
+
+    useEffect(() => {
         if (currentUser?.id) {
             favoriteService.getByUser(currentUser.id)
                 .then(favs => setFavorites(favs.map(f => f.apartmentId)))
@@ -95,14 +98,10 @@ const Listings = () => {
             if (activeFacilities.length > 0) {
                 if (!activeFacilities.every(([key]) => apt.facilities[key as keyof typeof apt.facilities])) return false;
             }
-            if (filters.minRating !== null || filters.minReviews !== null) {
-                const reviews = apt.reviews ?? [];
-                if (filters.minReviews !== null && reviews.length < filters.minReviews) return false;
-                if (filters.minRating !== null) {
-                    if (!reviews.length) return false;
-                    const avgRating = reviews.reduce((sum, review) => sum + review.ratings.overall, 0) / reviews.length;
-                    if (avgRating < filters.minRating) return false;
-                }
+            if (filters.minReviews !== null && apt.reviewCount < filters.minReviews) return false;
+            if (filters.minRating  !== null) {
+                if (apt.reviewCount === 0)         return false;
+                if (apt.avgRating < filters.minRating) return false;
             }
             return true;
         });
@@ -136,13 +135,6 @@ const Listings = () => {
     const handleReset  = () => { setPendingFilters(defaultFilters); setAppliedFilters(defaultFilters); resetToFirstPage(); };
     const handleResetAll = () => { setSearchQuery(""); setAppliedFilters(defaultFilters); setPendingFilters(defaultFilters); resetToFirstPage(); };
 
-    useEffect(() => {
-        apartmentService.getAll()
-            .then(data => {
-                setApartments(data);
-            })
-            .catch(() => setApartments([]));
-    }, []);
     return (
         <Box sx={{ minHeight: "100vh", bgcolor: "background.default", py: { xs: 4, md: 8 }, pt: 10 }}>
             <FilterDrawer
