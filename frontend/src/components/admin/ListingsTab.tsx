@@ -6,12 +6,15 @@ import {
     DialogActions, Button, Typography, CircularProgress, Alert,
     TextField, InputAdornment,
 } from "@mui/material";
-import DeleteIcon      from "@mui/icons-material/Delete";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon      from "@mui/icons-material/Cancel";
-import SearchIcon      from "@mui/icons-material/Search";
-import { useTranslation } from "react-i18next";
+import DeleteIcon        from "@mui/icons-material/Delete";
+import CheckCircleIcon   from "@mui/icons-material/CheckCircle";
+import CancelIcon        from "@mui/icons-material/Cancel";
+import SearchIcon        from "@mui/icons-material/Search";
+import OpenInNewIcon     from "@mui/icons-material/OpenInNew";
+import { useTranslation }  from "react-i18next";
+import { useNavigate }     from "react-router-dom";
 import { adminService, type AdminApartment } from "../../services/adminService";
+import { paths } from "../../app/paths";
 
 const statusConfig = (status: number, t: (k: string) => string) => {
     if (status === 0) return { label: t("admin.listings.statusPending"),  color: "default" as const };
@@ -19,22 +22,16 @@ const statusConfig = (status: number, t: (k: string) => string) => {
     return             { label: t("admin.listings.statusDeclined"), color: "error"   as const };
 };
 
-const currencyLabel = (v: number | undefined) =>
-    v != null ? (["USD", "EUR", "MDL"][v] ?? "?") : "";
-
 export default function ListingsTab() {
-    const { t }                   = useTranslation();
-    const [apartments, setApartments] = useState<AdminApartment[]>([]);
-    const [loading, setLoading]       = useState(true);
-    const [error, setError]           = useState<string | null>(null);
-    const [confirmDelete, setConfirmDelete] = useState<AdminApartment | null>(null);
-    const [busy, setBusy]             = useState(false);
-    const [query, setQuery]           = useState("");
+    const { t }    = useTranslation();
+    const navigate = useNavigate();
 
-    const intervalLabel = (v: number) =>
-        [t("admin.listings.intervalHour"), t("admin.listings.intervalDay"), t("admin.listings.intervalMonth")][v] ?? v;
-    const rentModeLabel = (v: number) =>
-        [t("admin.listings.modeShort"), t("admin.listings.modeLong")][v] ?? v;
+    const [apartments, setApartments]       = useState<AdminApartment[]>([]);
+    const [loading, setLoading]             = useState(true);
+    const [error, setError]                 = useState<string | null>(null);
+    const [confirmDelete, setConfirmDelete] = useState<AdminApartment | null>(null);
+    const [busy, setBusy]                   = useState(false);
+    const [query, setQuery]                 = useState("");
 
     const load = async () => {
         setLoading(true);
@@ -56,7 +53,9 @@ export default function ListingsTab() {
         return apartments.filter(a =>
             String(a.id).includes(q) ||
             a.address?.toLowerCase().includes(q) ||
-            String(a.ownedId).includes(q)
+            a.ownerName?.toLowerCase().includes(q) ||
+            a.ownerSurname?.toLowerCase().includes(q) ||
+            a.ownerEmail?.toLowerCase().includes(q)
         );
     }, [apartments, query]);
 
@@ -118,10 +117,10 @@ export default function ListingsTab() {
                         <TableRow sx={{ "& th": { fontWeight: 700, bgcolor: "background.default" } }}>
                             <TableCell>{t("admin.listings.colId")}</TableCell>
                             <TableCell>{t("admin.listings.colAddress")}</TableCell>
-                            <TableCell>{t("admin.listings.colOwnerId")}</TableCell>
-                            <TableCell>{t("admin.listings.colCost")}</TableCell>
-                            <TableCell>{t("admin.listings.colMode")}</TableCell>
+                            <TableCell>{t("admin.listings.colOwner")}</TableCell>
+                            <TableCell>{t("admin.listings.colOwnerEmail")}</TableCell>
                             <TableCell>{t("admin.listings.colStatus")}</TableCell>
+                            <TableCell>{t("admin.listings.colView")}</TableCell>
                             <TableCell align="right">{t("admin.listings.colActions")}</TableCell>
                         </TableRow>
                     </TableHead>
@@ -131,16 +130,28 @@ export default function ListingsTab() {
                             return (
                                 <TableRow key={apt.id} hover>
                                     <TableCell>{apt.id}</TableCell>
-                                    <TableCell sx={{ maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                    <TableCell sx={{ maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                         {apt.address}
                                     </TableCell>
-                                    <TableCell>{apt.ownedId}</TableCell>
-                                    <TableCell>
-                                        {apt.costPerInterval} {currencyLabel((apt as any).currency)} / {intervalLabel(apt.interval)}
+                                    <TableCell sx={{ whiteSpace: "nowrap" }}>
+                                        {apt.ownerName} {apt.ownerSurname}
                                     </TableCell>
-                                    <TableCell>{rentModeLabel(apt.rentMode)}</TableCell>
+                                    <TableCell sx={{ maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                        {apt.ownerEmail}
+                                    </TableCell>
                                     <TableCell>
                                         <Chip label={sc.label} color={sc.color} size="small" sx={{ fontWeight: 700 }} />
+                                    </TableCell>
+                                    <TableCell>
+                                        <Tooltip title={t("admin.listings.viewDetail")}>
+                                            <IconButton
+                                                size="small"
+                                                color="primary"
+                                                onClick={() => navigate(paths.apartmentDetail(apt.id))}
+                                            >
+                                                <OpenInNewIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
                                     </TableCell>
                                     <TableCell align="right">
                                         <Box sx={{ display: "flex", gap: 0.5, justifyContent: "flex-end" }}>

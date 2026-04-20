@@ -3,6 +3,7 @@ namespace Rentora.API.Controllers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Rentora.BusinessLayer;
 using Rentora.DataAccess;
 using Rentora.Domain.Enums;
@@ -86,7 +87,19 @@ public class AdminController : ControllerBase
     [HttpGet("apartments")]
     public IActionResult GetAllApartments()
     {
-        var apartments = _bl.ApartmentAction().GetAllForAdmin();
+        using var db = new AppDbContext();
+        var apartments = db.Apartments
+            .Include(a => a.Owner)
+            .OrderByDescending(a => a.Id)
+            .Select(a => new {
+                a.Id, a.OwnedId, a.RenterId, a.Address, a.ImageUrl,
+                a.Interval, a.CostPerInterval, a.Currency, a.RentMode, a.Status,
+                a.Location, a.AdditionlaInfo,
+                OwnerName    = a.Owner != null ? a.Owner.Name    : string.Empty,
+                OwnerSurname = a.Owner != null ? a.Owner.Surname : string.Empty,
+                OwnerEmail   = a.Owner != null ? a.Owner.Email   : string.Empty,
+            })
+            .ToList();
         return Ok(apartments);
     }
 
