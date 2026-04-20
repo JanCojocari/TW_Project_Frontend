@@ -1,7 +1,7 @@
 ﻿// src/components/createListing/StepLocation.tsx
 import React, { memo }       from "react";
-import { Box, Typography, Button, Chip } from "@mui/material";
-import { LocationOn as LocationOnIcon, Add as AddIcon } from "@mui/icons-material";
+import { Box, Typography, IconButton, Chip } from "@mui/material";
+import { LocationOn as LocationOnIcon, Add as AddIcon, MyLocation as PinIcon } from "@mui/icons-material";
 import { useTranslation }    from "react-i18next";
 import Section               from "./Section.tsx";
 import DebouncedTextField    from "../common/DebouncedTextField.tsx";
@@ -25,55 +25,151 @@ interface Props {
 
 const icon = <LocationOnIcon sx={{ fontSize: 24 }} />;
 
-const StepLocation = memo(({ city, region, postalCode, latitude, longitude, landmarks, landmarkInput, errors, set, clearError, onAddLandmark, onRemoveLandmark }: Props) => {
+const StepLocation = memo(({
+                               city, region, postalCode, latitude, longitude,
+                               landmarks, landmarkInput, errors,
+                               set, clearError, onAddLandmark, onRemoveLandmark,
+                           }: Props) => {
     const { t } = useTranslation();
+
     return (
-        <Section icon={icon}
-                 title={t("createListing.steps.location.title")}
-                 subtitle={t("createListing.steps.location.subtitle")}
-                 step={3}>
+        <Section
+            icon={icon}
+            title={t("createListing.steps.location.title")}
+            subtitle={t("createListing.steps.location.subtitle")}
+            step={3}
+        >
             <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr 1fr" }, gap: 2 }}>
-                    <DebouncedTextField label={t("components.steps.location.city")} value={city}
-                                        onChange={(v) => { set("city", v as any); clearError("city"); }}
-                                        error={!!errors.city} helperText={errors.city} />
-                    <DebouncedTextField label={t("components.steps.location.region")} value={region}
-                                        onChange={(v) => set("region", v as any)}
-                                        placeholder={t("components.steps.location.regionPlaceholder")} />
-                    <DebouncedTextField label={t("components.steps.location.postal")} value={postalCode}
-                                        onChange={(v) => set("postalCode", v as any)}
-                                        placeholder={t("components.steps.location.postalPlaceholder")} />
-                </Box>
-                <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
-                    <DebouncedTextField label={t("components.steps.location.lat")} value={latitude} type="number"
-                                        onChange={(v) => set("latitude", v as any)}
-                                        placeholder={t("components.steps.location.latPlaceholder")}
-                                        inputProps={{ onWheel: (e: any) => e.currentTarget.blur() }} />
-                    <DebouncedTextField label={t("components.steps.location.lng")} value={longitude} type="number"
-                                        onChange={(v) => set("longitude", v as any)}
-                                        placeholder={t("components.steps.location.lngPlaceholder")}
-                                        inputProps={{ onWheel: (e: any) => e.currentTarget.blur() }} />
-                </Box>
+
+                {/* City — prominent at top */}
                 <Box>
-                    <Typography variant="body2" fontWeight={700} color="text.secondary" sx={{ mb: 1 }}>
+                    <Typography variant="caption" fontWeight={700} color="text.secondary"
+                                sx={{ textTransform: "uppercase", letterSpacing: 1, display: "block", mb: 1 }}>
+                        {t("components.steps.location.city")}
+                    </Typography>
+                    <DebouncedTextField
+                        placeholder={t("components.steps.location.city")}
+                        value={city}
+                        onChange={(v) => { set("city", v as FormState["city"]); clearError("city"); }}
+                        error={!!errors.city}
+                        helperText={errors.city}
+                        fullWidth
+                        sx={{
+                            "& .MuiOutlinedInput-root": {
+                                fontSize: 16,
+                                fontWeight: 600,
+                                borderRadius: 2.5,
+                            },
+                        }}
+                    />
+                </Box>
+
+                {/* Region + Postal */}
+                <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+                    <DebouncedTextField
+                        label={t("components.steps.location.region")}
+                        value={region}
+                        onChange={(v) => set("region", v as FormState["region"])}
+                        placeholder={t("components.steps.location.regionPlaceholder")}
+                    />
+                    <DebouncedTextField
+                        label={t("components.steps.location.postal")}
+                        value={postalCode}
+                        onChange={(v) => set("postalCode", v as FormState["postalCode"])}
+                        placeholder={t("components.steps.location.postalPlaceholder")}
+                    />
+                </Box>
+
+                {/* Lat / Lng — compact with pin icon */}
+                <Box sx={{
+                    p: 2.5, borderRadius: 3,
+                    bgcolor: colors.primaryAlpha06,
+                    border: `1px solid ${colors.primaryAlpha25}`,
+                }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+                        <PinIcon sx={{ fontSize: 16, color: colors.primaryDark }} />
+                        <Typography variant="caption" fontWeight={700} color="text.secondary"
+                                    sx={{ textTransform: "uppercase", letterSpacing: 1 }}>
+                            {t("components.steps.location.lat")} / {t("components.steps.location.lng")}
+                        </Typography>
+                    </Box>
+                    <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+                        <DebouncedTextField
+                            label={t("components.steps.location.lat")}
+                            value={latitude}
+                            type="number"
+                            size="small"
+                            onChange={(v) => set("latitude", v as FormState["latitude"])}
+                            placeholder={t("components.steps.location.latPlaceholder")}
+                            inputProps={{ onWheel: (e: React.WheelEvent<HTMLInputElement>) => e.currentTarget.blur() }}
+                        />
+                        <DebouncedTextField
+                            label={t("components.steps.location.lng")}
+                            value={longitude}
+                            type="number"
+                            size="small"
+                            onChange={(v) => set("longitude", v as FormState["longitude"])}
+                            placeholder={t("components.steps.location.lngPlaceholder")}
+                            inputProps={{ onWheel: (e: React.WheelEvent<HTMLInputElement>) => e.currentTarget.blur() }}
+                        />
+                    </Box>
+                </Box>
+
+                {/* Landmarks as pill tags */}
+                <Box>
+                    <Typography variant="caption" fontWeight={700} color="text.secondary"
+                                sx={{ textTransform: "uppercase", letterSpacing: 1, display: "block", mb: 1.5 }}>
                         {t("components.steps.location.landmarks")}
                     </Typography>
+
+                    {/* Input + add */}
                     <Box sx={{ display: "flex", gap: 1, mb: 1.5 }}>
-                        <DebouncedTextField size="small" fullWidth
-                                            placeholder={t("components.steps.location.landmarkPlaceholder")}
-                                            value={landmarkInput}
-                                            onChange={(v) => set("landmarkInput", v as any)}
-                                            onKeyDown={(e: React.KeyboardEvent) => { if (e.key === "Enter") { e.preventDefault(); onAddLandmark(); } }} />
-                        <Button variant="outlined" onClick={onAddLandmark} sx={{ minWidth: 48, px: 2 }}>
+                        <DebouncedTextField
+                            size="small"
+                            fullWidth
+                            placeholder={t("components.steps.location.landmarkPlaceholder")}
+                            value={landmarkInput}
+                            onChange={(v) => set("landmarkInput", v as FormState["landmarkInput"])}
+                            onKeyDown={(e: React.KeyboardEvent) => {
+                                if (e.key === "Enter") { e.preventDefault(); onAddLandmark(); }
+                            }}
+                            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
+                        />
+                        <IconButton
+                            onClick={onAddLandmark}
+                            sx={{
+                                bgcolor: colors.primaryAlpha10,
+                                color: colors.primaryDark,
+                                borderRadius: 2,
+                                px: 2,
+                                border: `1px solid ${colors.primaryAlpha25}`,
+                                "&:hover": { bgcolor: colors.primaryAlpha25 },
+                            }}
+                        >
                             <AddIcon />
-                        </Button>
+                        </IconButton>
                     </Box>
-                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                        {landmarks.map((lm, i) => (
-                            <Chip key={i} label={lm} size="small" onDelete={() => onRemoveLandmark(i)}
-                                  sx={{ bgcolor: colors.primaryAlpha10, color: colors.primaryDark, fontWeight: 600 }} />
-                        ))}
-                    </Box>
+
+                    {/* Pills */}
+                    {landmarks.length > 0 && (
+                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                            {landmarks.map((lm, i) => (
+                                <Chip
+                                    key={i}
+                                    label={lm}
+                                    size="small"
+                                    onDelete={() => onRemoveLandmark(i)}
+                                    sx={{
+                                        bgcolor: colors.primaryAlpha10,
+                                        color: colors.primaryDark,
+                                        fontWeight: 600,
+                                        border: `1px solid ${colors.primaryAlpha25}`,
+                                        "& .MuiChip-deleteIcon": { color: colors.primaryDark, opacity: 0.6, "&:hover": { opacity: 1 } },
+                                    }}
+                                />
+                            ))}
+                        </Box>
+                    )}
                 </Box>
             </Box>
         </Section>

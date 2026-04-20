@@ -1,6 +1,6 @@
 ﻿// pages/ApartmentDetail.tsx
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation }         from "react-i18next";
 import { Box, Container, Typography, Button, Chip, Alert, Paper, Tabs, Tab } from "@mui/material";
 import { ArrowBack as ArrowBackIcon, LocationOn as LocationOnIcon, Wifi as WifiIcon, MeetingRoom as RoomsIcon, Star as StarIcon } from "@mui/icons-material";
@@ -34,7 +34,10 @@ const ApartmentDetail = () => {
     const [loading, setLoading]                 = useState(true);
     const { currentUser }                       = useAuth();
 
+    const recentViewAdded = useRef(false);
+
     useEffect(() => {
+        recentViewAdded.current = false;
         const apartmentId = Number(id);
         setLoading(true);
         setOwner(null);
@@ -42,7 +45,8 @@ const ApartmentDetail = () => {
         apartmentService.getById(apartmentId)
             .then(apt => {
                 setApartment(apt);
-                if (apt && currentUser) {
+                if (apt && currentUser && !recentViewAdded.current) {
+                    recentViewAdded.current = true;
                     recentViewService.add(currentUser.id, apartmentId).catch(() => {});
                     userService.getById(apt.Id_Owner).then(u => setOwner(mapUserApiToUser(u))).catch(() => {});
                     if (apt.Id_Renter) userService.getById(apt.Id_Renter).then(u => setRenter(mapUserApiToUser(u))).catch(() => {});

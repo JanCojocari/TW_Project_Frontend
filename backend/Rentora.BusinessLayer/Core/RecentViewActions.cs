@@ -16,6 +16,7 @@ public class RecentViewActions
         return db.RecentViews
             .Where(r => r.UserId == userId)
             .OrderByDescending(r => r.ViewedAt)
+            .Take(20)
             .Select(r => MapToDto(r))
             .ToList();
     }

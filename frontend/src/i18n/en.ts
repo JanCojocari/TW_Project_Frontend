@@ -203,13 +203,36 @@ export default {
             empty:   "You have no upcoming stays.",
             badgeUpcoming: "Upcoming",
             badgeNow:      "Now",
+            noResults: "No apartments viewed in this period.",
             errorLoad: "Failed to load upcoming stays.",
+            sectionLabel: "Your upcoming stays",
+            night:        "night",
+            nights:       "nights",
+            elapsed:      "elapsed",
+            badgePast:    "Past",
        },
         previousStays: {
             empty:     "You have no previous stays.",
             badgeDone: "Completed",
             errorLoad: "Failed to load previous stays.",
-            },
+            sectionLabel: "Your previous stays",
+            night:        "night",
+            nights:       "nights",
+        },
+        recentViewed: {
+            empty:     "You haven't viewed any apartments yet.", 
+            clearAll:  "Clear history", 
+            clearing:  "Clearing...", 
+            viewedOn:  "Viewed on", 
+            errorLoad: "Failed to load recently viewed apartments.",
+            groups: {
+                all: "All",
+                today: "Today",
+                yesterday: "Yesterday",
+                thisWeek: "This week",
+                older: "Older",
+            }
+        },
     },
 
     settings: {
@@ -291,6 +314,8 @@ export default {
         errorsAlert: "Please fill in the required fields marked below.",
         cancel:      "Cancel",
         publish:     "Publish listing",
+        next:        "Next",
+        publishing:  "Publishing...",
         steps: {
             basic:       { title: "Basic information",   subtitle: "Address, price and rental interval" },
             photos:      { title: "Photos",              subtitle: "Add representative images" },

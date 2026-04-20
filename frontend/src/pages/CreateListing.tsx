@@ -1,35 +1,70 @@
 ﻿// src/pages/CreateListing.tsx
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useNavigate }    from "react-router-dom";
 import { useAuth }        from "../auth/AuthContext.tsx";
 import { useTranslation } from "react-i18next";
-import { Box, Container, Typography, Button, Alert } from "@mui/material";
+import {
+    Box, Button, Alert, Typography, LinearProgress, Tooltip,
+} from "@mui/material";
+import {
+    Home as HomeIcon,
+    PhotoCamera as CameraIcon,
+    LocationOn as LocationIcon,
+    Star as FacilitiesIcon,
+    MeetingRoom as SpaceIcon,
+    Description as DescIcon,
+    CheckCircle as CheckIcon,
+    ArrowBack as ArrowBackIcon,
+    ArrowForward as ArrowForwardIcon,
+} from "@mui/icons-material";
 import { apartmentService, buildCreatePayload } from "../services/apartmentService.ts";
-import { uploadService }  from "../services/uploadService.ts";
-import { ArrowBack as ArrowBackIcon, Home as HomeIcon } from "@mui/icons-material";
-import { gradients } from "../theme/gradients.ts";
-import { paths }     from "../app/paths.ts";
-import { useListingForm } from "../types/UseListingForm.ts";
-import SuccessScreen      from "../components/createListing/SuccessScreen.tsx";
-import StepBasicInfo      from "../components/createListing/StepBasicInfo.tsx";
-import StepPhotos         from "../components/createListing/StepPhotos.tsx";
-import StepLocation       from "../components/createListing/StepLocation.tsx";
-import StepFacilities     from "../components/createListing/StepFacilities.tsx";
-import StepSpaceInfo      from "../components/createListing/StepSpaceInfo.tsx";
-import StepDescription    from "../components/createListing/StepDescription.tsx";
+import { uploadService }   from "../services/uploadService.ts";
+import { gradients, colors } from "../theme/gradients.ts";
+import { paths }           from "../app/paths.ts";
+import { useListingForm }  from "../types/UseListingForm.ts";
+import SuccessScreen       from "../components/createListing/SuccessScreen.tsx";
+import StepBasicInfo       from "../components/createListing/StepBasicInfo.tsx";
+import StepPhotos          from "../components/createListing/StepPhotos.tsx";
+import StepLocation        from "../components/createListing/StepLocation.tsx";
+import StepFacilities      from "../components/createListing/StepFacilities.tsx";
+import StepSpaceInfo       from "../components/createListing/StepSpaceInfo.tsx";
+import StepDescription     from "../components/createListing/StepDescription.tsx";
 
-const headerIcon = <HomeIcon sx={{ fontSize: 28 }} />;
+/* ─── step config ─────────────────────────────────────────────────────── */
+const NAVBAR_H = 64;
+const SIDEBAR_W = 220;
+
+interface StepMeta {
+    key: string;
+    labelKey: string;
+    icon: React.ReactNode;
+    descKey: string;
+}
+
+const STEPS: StepMeta[] = [
+    { key: "basic",       labelKey: "createListing.steps.basic.title",       icon: <HomeIcon       sx={{ fontSize: 20 }} />, descKey: "createListing.steps.basic.subtitle"       },
+    { key: "photos",      labelKey: "createListing.steps.photos.title",      icon: <CameraIcon     sx={{ fontSize: 20 }} />, descKey: "createListing.steps.photos.subtitle"      },
+    { key: "location",    labelKey: "createListing.steps.location.title",    icon: <LocationIcon   sx={{ fontSize: 20 }} />, descKey: "createListing.steps.location.subtitle"    },
+    { key: "facilities",  labelKey: "createListing.steps.facilities.title",  icon: <FacilitiesIcon sx={{ fontSize: 20 }} />, descKey: "createListing.steps.facilities.subtitle"  },
+    { key: "space",       labelKey: "createListing.steps.space.title",       icon: <SpaceIcon      sx={{ fontSize: 20 }} />, descKey: "createListing.steps.space.subtitle"       },
+    { key: "description", labelKey: "createListing.steps.description.title", icon: <DescIcon       sx={{ fontSize: 20 }} />, descKey: "createListing.steps.description.subtitle" },
+];
 
 const CreateListing = () => {
     const navigate        = useNavigate();
     const { t }           = useTranslation();
     const { currentUser } = useAuth();
+
     const {
         form, errors, submitted,
         set, clearError, setFacility,
         handleImages, removeImage, addLandmark, removeLandmark,
         submit,
     } = useListingForm();
+
+    const [activeStep, setActiveStep] = useState(0);
+    const [visitedSteps, setVisitedSteps] = useState<Set<number>>(new Set([0]));
+    const contentRef = useRef<HTMLDivElement>(null);
 
     const handleAddImages   = useCallback(
         (files: FileList | null) => handleImages(files, form.images.length),
@@ -44,146 +79,385 @@ const CreateListing = () => {
         [addLandmark, form.landmarkInput],
     );
 
-    const [apiError, setApiError]     = useState<string | null>(null);
+    const [apiError, setApiError]         = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const goToStep = (idx: number) => {
+        setActiveStep(idx);
+        setVisitedSteps(prev => new Set([...prev, idx]));
+        // scroll content to top
+        if (contentRef.current) contentRef.current.scrollTop = 0;
+    };
 
     const handleSubmit = useCallback(
         () => submit(async (markDone) => {
             if (isSubmitting) return;
             setApiError(null);
+            setIsSubmitting(true);
             try {
-                // 1. Upload imagini — daca userul a selectat fisiere
                 let imageUrls: string[] = [];
                 if (form.images.length > 0) {
                     imageUrls = await uploadService.images(form.images);
                 }
-
-                // 2. Creeaza apartamentul cu URL-urile rezultate
                 await apartmentService.create(
                     currentUser?.id ?? 0,
                     buildCreatePayload(form, imageUrls),
                 );
-
                 markDone();
-
-                // 3. Redirect la dashboard — anuntul e Pending, apare in "Proprietatile mele"
                 setTimeout(() => navigate(paths.dashboard), 1500);
             } catch {
                 setApiError("Eroare la salvarea anunțului. Verificați conexiunea și încercați din nou.");
                 setIsSubmitting(false);
             }
         }),
-        [submit, navigate, form, currentUser],
+        [submit, navigate, form, currentUser, isSubmitting],
     );
 
     if (submitted) return <SuccessScreen />;
 
+    /* progress = how far we've advanced / total steps */
+    const progress = Math.round(((activeStep) / (STEPS.length - 1)) * 100);
+
+    /* summary bar values */
+    const summaryAddress  = form.address  || "—";
+    const summaryPrice    = form.cost     ? `${form.cost} ${form.currency}` : "—";
+    const summaryInterval = form.interval ? `/${form.interval}` : "";
+
     return (
-        <Box sx={{ minHeight: "100vh", bgcolor: "background.default", py: { xs: 3, md: 5 }, mt: 10 }}>
-            <Container maxWidth="md">
+        <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "background.default", mt: `${NAVBAR_H}px` }}>
 
-                <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)} sx={{ mb: 3, fontWeight: 600 }}>
-                    {t("createListing.back")}
-                </Button>
+            {/* ── Sidebar ─────────────────────────────────────────────── */}
+            <Box sx={{
+                width: SIDEBAR_W,
+                bgcolor: "background.paper",
+                borderRight: `1px solid ${colors.border}`,
+                position: "sticky",
+                top: NAVBAR_H,
+                height: `calc(100vh - ${NAVBAR_H}px)`,
+                alignSelf: "flex-start",
+                flexShrink: 0,
+                display: "flex",
+                flexDirection: "column",
+                overflowY: "auto",
+                zIndex: 900,
+            }}>
+                {/* Sidebar header */}
+                <Box sx={{ px: 3, pt: 3, pb: 2, borderBottom: `1px solid ${colors.border}` }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 0.5 }}>
+                        <Box sx={{ background: gradients.primary, p: 1, borderRadius: 1.5, display: "flex", color: "white", flexShrink: 0 }}>
+                            <HomeIcon sx={{ fontSize: 18 }} />
+                        </Box>
+                        <Typography fontWeight={800} fontSize={15} sx={{ letterSpacing: "-0.3px" }}>
+                            {t("createListing.title")}
+                        </Typography>
+                    </Box>
+                    <Typography variant="caption" color="text.secondary">
+                        {t("createListing.subtitle")}
+                    </Typography>
 
-                <Box sx={{ mb: 4 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                        <Box sx={{ background: gradients.primary, p: 1.5, borderRadius: 2, display: "flex", color: "white" }}>
-                            {headerIcon}
+                    {/* Progress bar */}
+                    <Box sx={{ mt: 2 }}>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
+                            <Typography variant="caption" fontWeight={600} color="text.secondary">
+                                {t("components.section.step")} {activeStep + 1}/{STEPS.length}
+                            </Typography>
+                            <Typography variant="caption" fontWeight={700} sx={{ color: colors.primaryDark }}>
+                                {progress}%
+                            </Typography>
                         </Box>
-                        <Box>
-                            <Typography variant="h4" fontWeight={900}>{t("createListing.title")}</Typography>
-                            <Typography variant="body2" color="text.secondary">{t("createListing.subtitle")}</Typography>
-                        </Box>
+                        <LinearProgress
+                            variant="determinate"
+                            value={progress}
+                            sx={{
+                                height: 5,
+                                borderRadius: 99,
+                                bgcolor: colors.primaryAlpha10,
+                                "& .MuiLinearProgress-bar": {
+                                    background: gradients.primary,
+                                    borderRadius: 99,
+                                },
+                            }}
+                        />
                     </Box>
                 </Box>
 
-                {Object.values(errors).some(Boolean) && (
-                    <Alert severity="error" sx={{ mb: 3, borderRadius: 3 }}>
-                        {t("createListing.errorsAlert")}
-                    </Alert>
-                )}
-                {apiError && (
-                    <Alert severity="error" sx={{ mb: 3, borderRadius: 3 }}>
-                        {apiError}
-                    </Alert>
-                )}
+                {/* Step nav */}
+                <Box sx={{ flex: 1, py: 1.5 }}>
+                    {STEPS.map((step, idx) => {
+                        const isActive    = idx === activeStep;
+                        const isVisited   = visitedSteps.has(idx);
+                        const isCompleted = isVisited && idx < activeStep;
 
-                <StepBasicInfo
-                    address={form.address}
-                    cost={form.cost}
-                    currency={form.currency}
-                    interval={form.interval}
-                    errors={errors}
-                    set={set}
-                    clearError={clearError}
-                />
-                <StepPhotos
-                    images={form.images}
-                    imagePreviewUrls={form.imagePreviewUrls}
-                    errors={errors}
-                    onAddImages={handleAddImages}
-                    onRemoveImage={handleRemoveImage}
-                />
-                <StepLocation
-                    city={form.city}
-                    region={form.region}
-                    postalCode={form.postalCode}
-                    latitude={form.latitude}
-                    longitude={form.longitude}
-                    landmarks={form.landmarks}
-                    landmarkInput={form.landmarkInput}
-                    errors={errors}
-                    set={set}
-                    clearError={clearError}
-                    onAddLandmark={handleAddLandmark}
-                    onRemoveLandmark={removeLandmark}
-                />
-                <StepFacilities
-                    facilities={form.facilities}
-                    onToggle={setFacility}
-                />
-                <StepSpaceInfo
-                    rooms={form.rooms}
-                    bedrooms={form.bedrooms}
-                    bathrooms={form.bathrooms}
-                    beds={form.beds}
-                    surfaceArea={form.surfaceArea}
-                    maxGuests={form.maxGuests}
-                    floor={form.floor}
-                    totalFloors={form.totalFloors}
-                    checkInFrom={form.checkInFrom}
-                    checkInUntil={form.checkInUntil}
-                    checkOutFrom={form.checkOutFrom}
-                    checkOutUntil={form.checkOutUntil}
-                    selfCheckIn={form.selfCheckIn}
-                    set={set}
-                />
-                <StepDescription
-                    description={form.description}
-                    houseRules={form.houseRules}
-                    cancellationPolicy={form.cancellationPolicy}
-                    errors={errors}
-                    set={set}
-                    clearError={clearError}
-                />
+                        return (
+                            <Tooltip key={step.key} title={t(step.descKey)} placement="right" arrow>
+                                <Box
+                                    onClick={() => goToStep(idx)}
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 1.5,
+                                        px: 2,
+                                        py: 1.3,
+                                        cursor: "pointer",
+                                        position: "relative",
+                                        transition: "all 0.15s",
+                                        bgcolor: isActive ? colors.primaryAlpha10 : "transparent",
+                                        "&:hover": { bgcolor: isActive ? colors.primaryAlpha10 : colors.primaryAlpha06 },
+                                        // left accent bar for active
+                                        "&::before": isActive ? {
+                                            content: '""',
+                                            position: "absolute",
+                                            left: 0, top: "15%", bottom: "15%",
+                                            width: 3,
+                                            borderRadius: "0 4px 4px 0",
+                                            background: gradients.primary,
+                                        } : {},
+                                    }}
+                                >
+                                    {/* Step number / check icon */}
+                                    <Box sx={{
+                                        width: 28, height: 28, borderRadius: "50%",
+                                        display: "flex", alignItems: "center", justifyContent: "center",
+                                        flexShrink: 0,
+                                        bgcolor: isCompleted
+                                            ? colors.success
+                                            : isActive
+                                                ? colors.primaryDark
+                                                : colors.primaryAlpha10,
+                                        color: isCompleted || isActive ? "#fff" : colors.primaryDark,
+                                        transition: "all 0.2s",
+                                        fontSize: 12,
+                                        fontWeight: 800,
+                                    }}>
+                                        {isCompleted
+                                            ? <CheckIcon sx={{ fontSize: 15 }} />
+                                            : <Box component="span" sx={{ display: "flex", alignItems: "center", color: "inherit" }}>
+                                                {step.icon}
+                                            </Box>
+                                        }
+                                    </Box>
 
-                <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2, mb: 6 }}>
-                    <Button variant="outlined" size="large" fullWidth onClick={() => navigate(-1)}
-                            sx={{ py: 1.8, borderRadius: 2.5, fontWeight: 700 }}>
-                        {t("createListing.cancel")}
-                    </Button>
-                    <Button
-                        variant="contained" size="large" fullWidth
-                        onClick={handleSubmit}
-                        disabled={isSubmitting}
-                        sx={{ py: 1.8, borderRadius: 2.5, fontWeight: 800, fontSize: 16 }}
-                    >
-                        {isSubmitting ? "Se publică..." : t("createListing.publish")}
-                    </Button>
+                                    {/* Label */}
+                                    <Typography
+                                        variant="body2"
+                                        fontWeight={isActive ? 700 : 400}
+                                        sx={{ color: isActive ? colors.primaryDark : isCompleted ? "text.primary" : "text.secondary" }}
+                                    >
+                                        {t(step.labelKey)}
+                                    </Typography>
+
+                                    {isCompleted && (
+                                        <CheckIcon sx={{ fontSize: 14, color: colors.success, ml: "auto" }} />
+                                    )}
+                                </Box>
+                            </Tooltip>
+                        );
+                    })}
                 </Box>
 
-            </Container>
+                {/* Back to listings button */}
+                <Box sx={{ p: 2, borderTop: `1px solid ${colors.border}` }}>
+                    <Button
+                        startIcon={<ArrowBackIcon />}
+                        onClick={() => navigate(-1)}
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        sx={{ borderRadius: 2, fontWeight: 600, borderColor: colors.border, color: "text.secondary" }}
+                    >
+                        {t("createListing.back")}
+                    </Button>
+                </Box>
+            </Box>
+
+            {/* ── Main content ─────────────────────────────────────────── */}
+            <Box
+                ref={contentRef}
+                sx={{
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    maxWidth: "100%",
+                    overflowY: "auto",
+                    height: `calc(100vh - ${NAVBAR_H}px)`,
+                }}
+            >
+                {/* Top progress bar (thin, full-width) */}
+                <LinearProgress
+                    variant="determinate"
+                    value={progress}
+                    sx={{
+                        height: 3,
+                        borderRadius: 0,
+                        bgcolor: "transparent",
+                        "& .MuiLinearProgress-bar": {
+                            background: gradients.primary,
+                        },
+                    }}
+                />
+
+                {/* Error alert */}
+                {(Object.values(errors).some(Boolean) || apiError) && (
+                    <Box sx={{ px: { xs: 3, md: 5 }, pt: 3 }}>
+                        <Alert severity="error" sx={{ borderRadius: 3 }}>
+                            {apiError ?? t("createListing.errorsAlert")}
+                        </Alert>
+                    </Box>
+                )}
+
+                {/* Step content */}
+                <Box
+                    sx={{
+                        flex: 1,
+                        px: { xs: 3, md: 5 },
+                        py: 4,
+                        pb: 12, // space for floating summary
+                    }}
+                >
+                    {/* Step heading */}
+                    <Box sx={{ mb: 3 }}>
+                        <Typography variant="h5" fontWeight={900} sx={{
+                            letterSpacing: "-0.5px",
+                            background: gradients.textPrimary,
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                        }}>
+                            {t(STEPS[activeStep].labelKey)}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.4 }}>
+                            {t(STEPS[activeStep].descKey)}
+                        </Typography>
+                    </Box>
+
+                    {/* Rendered step */}
+                    {activeStep === 0 && (
+                        <StepBasicInfo
+                            address={form.address} cost={form.cost}
+                            currency={form.currency} interval={form.interval}
+                            errors={errors} set={set} clearError={clearError}
+                        />
+                    )}
+                    {activeStep === 1 && (
+                        <StepPhotos
+                            images={form.images} imagePreviewUrls={form.imagePreviewUrls}
+                            errors={errors} onAddImages={handleAddImages} onRemoveImage={handleRemoveImage}
+                        />
+                    )}
+                    {activeStep === 2 && (
+                        <StepLocation
+                            city={form.city} region={form.region} postalCode={form.postalCode}
+                            latitude={form.latitude} longitude={form.longitude}
+                            landmarks={form.landmarks} landmarkInput={form.landmarkInput}
+                            errors={errors} set={set} clearError={clearError}
+                            onAddLandmark={handleAddLandmark} onRemoveLandmark={removeLandmark}
+                        />
+                    )}
+                    {activeStep === 3 && (
+                        <StepFacilities facilities={form.facilities} onToggle={setFacility} />
+                    )}
+                    {activeStep === 4 && (
+                        <StepSpaceInfo
+                            rooms={form.rooms} bedrooms={form.bedrooms} bathrooms={form.bathrooms}
+                            beds={form.beds} surfaceArea={form.surfaceArea} maxGuests={form.maxGuests}
+                            floor={form.floor} totalFloors={form.totalFloors}
+                            checkInFrom={form.checkInFrom} checkInUntil={form.checkInUntil}
+                            checkOutFrom={form.checkOutFrom} checkOutUntil={form.checkOutUntil}
+                            selfCheckIn={form.selfCheckIn} set={set}
+                        />
+                    )}
+                    {activeStep === 5 && (
+                        <StepDescription
+                            description={form.description} houseRules={form.houseRules}
+                            cancellationPolicy={form.cancellationPolicy}
+                            errors={errors} set={set} clearError={clearError}
+                        />
+                    )}
+                </Box>
+
+                {/* ── Floating summary + nav bar ───────────────────────── */}
+                <Box sx={{
+                    position: "sticky",
+                    bottom: 0,
+                    bgcolor: "background.paper",
+                    borderTop: `1px solid ${colors.border}`,
+                    px: { xs: 3, md: 5 },
+                    py: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 3,
+                    backdropFilter: "blur(8px)",
+                    zIndex: 10,
+                    boxShadow: "0 -4px 24px rgba(0,0,0,0.06)",
+                }}>
+                    {/* Live summary */}
+                    <Box sx={{ flex: 1, display: { xs: "none", sm: "flex" }, gap: 3 }}>
+                        {form.address && (
+                            <Box>
+                                <Typography variant="caption" color="text.disabled" sx={{ textTransform: "uppercase", letterSpacing: 0.8, fontWeight: 700 }}>
+                                    {t('components.infoPanel.address')}
+                                </Typography>
+                                <Typography variant="body2" fontWeight={600} sx={{ maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                    {summaryAddress}
+                                </Typography>
+                            </Box>
+                        )}
+                        {form.cost && (
+                            <Box>
+                                <Typography variant="caption" color="text.disabled" sx={{ textTransform: "uppercase", letterSpacing: 0.8, fontWeight: 700 }}>
+                                    {t('components.infoPanel.price')}
+                                </Typography>
+                                <Typography variant="body2" fontWeight={700} sx={{ color: colors.primaryDark }}>
+                                    {summaryPrice}{summaryInterval}
+                                </Typography>
+                            </Box>
+                        )}
+                    </Box>
+
+                    {/* Navigation buttons */}
+                    <Box sx={{ display: "flex", gap: 1.5, ml: "auto" }}>
+                        {activeStep > 0 && (
+                            <Button
+                                variant="outlined"
+                                startIcon={<ArrowBackIcon />}
+                                onClick={() => goToStep(activeStep - 1)}
+                                sx={{ fontWeight: 600, borderRadius: 2, borderColor: colors.border, color: "text.secondary" }}
+                            >
+                                {t("createListing.back")}
+                            </Button>
+                        )}
+                        {activeStep < STEPS.length - 1 ? (
+                            <Button
+                                variant="contained"
+                                endIcon={<ArrowForwardIcon />}
+                                onClick={() => goToStep(activeStep + 1)}
+                                sx={{
+                                    fontWeight: 700,
+                                    borderRadius: 2,
+                                    px: 3,
+                                    background: gradients.primary,
+                                    boxShadow: `0 4px 14px ${colors.primaryAlpha25}`,
+                                }}
+                            >{t('createListing.next') ?? 'Next'}</Button>
+                        ) : (
+                            <Button
+                                variant="contained"
+                                onClick={handleSubmit}
+                                disabled={isSubmitting}
+                                sx={{
+                                    fontWeight: 800,
+                                    fontSize: 15,
+                                    borderRadius: 2,
+                                    px: 4,
+                                    background: gradients.primary,
+                                    boxShadow: `0 4px 14px ${colors.primaryAlpha25}`,
+                                }}
+                            >
+                                {isSubmitting ? (t("createListing.publishing") ?? "Se publică...") : t("createListing.publish")}
+                            </Button>
+                        )}
+                    </Box>
+                </Box>
+            </Box>
         </Box>
     );
 };
