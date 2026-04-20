@@ -13,4 +13,5 @@ public class UserDto
     public string? Gender { get; set; }
     public decimal AccountBalance { get; set; }
     public Role Role { get; set; }
+    public string? AvatarUrl { get; set; }
 }

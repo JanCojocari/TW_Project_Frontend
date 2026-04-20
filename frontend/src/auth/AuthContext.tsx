@@ -8,11 +8,12 @@ const STORAGE_KEY = "rentora_user";
 const TOKEN_KEY   = "token";
 
 type AuthContextType = {
-    isAuthenticated: boolean;
-    isAdmin:         boolean;
-    currentUser:     UserApiDto | null;
-    login:           (email: string, password: string) => Promise<void>;
-    logout:          () => void;
+    isAuthenticated:   boolean;
+    isAdmin:           boolean;
+    currentUser:       UserApiDto | null;
+    login:             (email: string, password: string) => Promise<void>;
+    logout:            () => void;
+    updateCurrentUser: (patch: Partial<UserApiDto>) => void;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -58,14 +59,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setCurrentUser(null);
     };
 
+    // Actualizeaza partial userul curent (ex: dupa schimbarea avatarului)
+    const updateCurrentUser = (patch: Partial<UserApiDto>) => {
+        setCurrentUser(prev => prev ? { ...prev, ...patch } : prev);
+    };
+
     return (
         <AuthContext.Provider
             value={{
                 isAuthenticated: !!currentUser,
-                isAdmin:         currentUser?.role === 0, // 0 = Admin
+                isAdmin:         currentUser?.role === 0,
                 currentUser,
                 login,
                 logout,
+                updateCurrentUser,
             }}
         >
             {children}

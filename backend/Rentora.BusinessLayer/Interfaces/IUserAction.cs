@@ -11,8 +11,8 @@ namespace Rentora.BusinessLayer.Interfaces
         List<UserDto> GetAll();
 
         ActionResponse Update(int id, UserUpdateDto data);
+        ActionResponse UpdateAvatar(int id, string avatarUrl);
         ActionResponse Delete(int id);
         ActionResponse UpdateRole(int id, int role);
-
     }
 }

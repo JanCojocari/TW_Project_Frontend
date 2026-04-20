@@ -7,6 +7,7 @@ import {
 import { Star as StarIcon, EmojiEmotions as EmojiIcon } from "@mui/icons-material";
 import { useTranslation }    from "react-i18next";
 import { gradients, colors } from "../../theme/gradients.ts";
+import { resolveMediaUrl }   from "../../utils/mediaUrl.ts";
 import { reviewService }     from "../../services/reviewService.ts";
 import { paymentHistoryService } from "../../services/paymentHistoryService.ts";
 import { useAuth }           from "../../auth/AuthContext.tsx";
@@ -68,7 +69,12 @@ const ReviewCard = ({ review, isOwner, onResponseSubmitted }: {
         <Paper variant="outlined" sx={{ p: 3, borderRadius: 3, border: `1px solid ${colors.border}`, transition: "all 0.2s ease", "&:hover": { borderColor: colors.primary, boxShadow: `0 4px 16px ${colors.primaryAlpha10}` } }}>
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                    <Avatar sx={{ background: gradients.primary, fontWeight: 700, width: 42, height: 42 }}>{initials}</Avatar>
+                    <Avatar
+                        src={resolveMediaUrl(review.userAvatarUrl)}
+                        sx={{ background: gradients.primary, fontWeight: 700, width: 42, height: 42 }}
+                    >
+                        {!review.userAvatarUrl && initials}
+                    </Avatar>
                     <Box>
                         <Typography variant="subtitle2" fontWeight={700}>
                             {review.userName ? `${review.userName} ${review.userSurname ?? ""}` : `User #${review.userId}`}

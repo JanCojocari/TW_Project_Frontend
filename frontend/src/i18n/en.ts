@@ -200,6 +200,10 @@ export default {
 
     settings: {
         title: "Account Settings",
+        avatar: {
+            change: "Change profile photo",
+            error:  "Upload failed. Please try again.",
+        },
         profile: {
             title:       "Personal profile",
             description: "Your information visible on the platform.",

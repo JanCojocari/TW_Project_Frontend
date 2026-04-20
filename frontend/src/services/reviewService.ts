@@ -8,6 +8,7 @@ export interface ReviewApiDto {
     userId: number;
     userName?: string;
     userSurname?: string;
+    userAvatarUrl?: string | null;
     comment?: string;
     ownerResponse?: string;
     rating: number;

@@ -8,11 +8,12 @@ export interface UserSettingsDto {
     surname:        string;
     email:          string;
     phone:          string;
-    birthday:       string;   // ISO date string
+    birthday:       string;
     gender:         string;
     accountBalance: number;
     currency:       "EUR" | "USD" | "MDL";
     role:           string;
+    avatarUrl?:     string | null;
 }
 
 export interface PasswordForm {
@@ -59,7 +60,7 @@ export function useSettingsForm(initial: UserSettingsDto) {
         }
     }
 
-    // TODO: replace with POST /api/auth/change-password when endpoint is available
+    // TODO: inlocuieste cu POST /api/auth/change-password cand endpoint-ul e disponibil
     async function savePassword(): Promise<boolean> {
         if (password.newPassword !== password.confirmPassword) {
             setError("Parolele nu coincid.");
