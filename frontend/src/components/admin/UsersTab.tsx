@@ -1,24 +1,28 @@
 // components/admin/UsersTab.tsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
     Avatar, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     Paper, IconButton, Chip, Tooltip, Dialog, DialogTitle, DialogContent,
     DialogActions, Button, Typography, CircularProgress, Alert,
+    TextField, InputAdornment,
 } from "@mui/material";
 import DeleteIcon              from "@mui/icons-material/Delete";
 import AdminPanelSettingsIcon  from "@mui/icons-material/AdminPanelSettings";
 import PersonIcon              from "@mui/icons-material/Person";
+import SearchIcon              from "@mui/icons-material/Search";
+import { useTranslation }      from "react-i18next";
 import { adminService, type AdminUser } from "../../services/adminService";
-import { useAuth } from "../../auth/AuthContext";
-import { resolveMediaUrl } from "../../utils/mediaUrl";
+import { useAuth }             from "../../auth/AuthContext";
+import { resolveMediaUrl }     from "../../utils/mediaUrl";
 
-const roleLabel = (role: number) => {
-    if (role === 0) return { label: "Admin",  color: "warning" as const };
-    if (role === 1) return { label: "Owner",  color: "info"    as const };
-    return             { label: "Renter", color: "default" as const };
+const roleLabel = (role: number, t: (k: string) => string) => {
+    if (role === 0) return { label: t("admin.users.roleAdmin"),  color: "warning" as const };
+    if (role === 1) return { label: t("admin.users.roleOwner"),  color: "info"    as const };
+    return             { label: t("admin.users.roleRenter"), color: "default" as const };
 };
 
 export default function UsersTab() {
+    const { t }           = useTranslation();
     const { currentUser } = useAuth();
     const [users, setUsers]                 = useState<AdminUser[]>([]);
     const [loading, setLoading]             = useState(true);
@@ -26,6 +30,7 @@ export default function UsersTab() {
     const [confirmDelete, setConfirmDelete] = useState<AdminUser | null>(null);
     const [confirmRole, setConfirmRole]     = useState<{ user: AdminUser; newRole: number } | null>(null);
     const [busy, setBusy]                   = useState(false);
+    const [query, setQuery]                 = useState("");
 
     const load = async () => {
         setLoading(true);
@@ -33,13 +38,24 @@ export default function UsersTab() {
             setUsers(await adminService.getUsers());
             setError(null);
         } catch {
-            setError("Failed to load users.");
+            setError(t("admin.users.errorLoad"));
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => { load(); }, []);
+
+    const filtered = useMemo(() => {
+        const q = query.trim().toLowerCase();
+        if (!q) return users;
+        return users.filter(u =>
+            String(u.id).includes(q) ||
+            u.name?.toLowerCase().includes(q) ||
+            u.surname?.toLowerCase().includes(q) ||
+            u.email?.toLowerCase().includes(q)
+        );
+    }, [users, query]);
 
     const handleDelete = async () => {
         if (!confirmDelete) return;
@@ -48,7 +64,7 @@ export default function UsersTab() {
             await adminService.deleteUser(confirmDelete.id);
             setUsers(prev => prev.filter(u => u.id !== confirmDelete.id));
         } catch {
-            setError("Failed to delete user.");
+            setError(t("admin.users.errorDelete"));
         } finally {
             setBusy(false);
             setConfirmDelete(null);
@@ -64,7 +80,7 @@ export default function UsersTab() {
                 u.id === confirmRole.user.id ? { ...u, role: confirmRole.newRole } : u
             ));
         } catch {
-            setError("Failed to update role.");
+            setError(t("admin.users.errorRole"));
         } finally {
             setBusy(false);
             setConfirmRole(null);
@@ -76,22 +92,37 @@ export default function UsersTab() {
 
     return (
         <>
+            <TextField
+                fullWidth size="small"
+                placeholder={t("admin.users.searchPlaceholder")}
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                sx={{ mb: 2 }}
+                InputProps={{
+                    startAdornment: (
+                        <InputAdornment position="start">
+                            <SearchIcon fontSize="small" sx={{ color: "text.disabled" }} />
+                        </InputAdornment>
+                    ),
+                }}
+            />
+
             <TableContainer component={Paper} elevation={0} sx={{ border: "1px solid", borderColor: "divider", borderRadius: 2 }}>
                 <Table size="small">
                     <TableHead>
                         <TableRow sx={{ "& th": { fontWeight: 700, bgcolor: "background.default" } }}>
-                            <TableCell>ID</TableCell>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Email</TableCell>
-                            <TableCell>Phone</TableCell>
-                            <TableCell>Role</TableCell>
-                            <TableCell>Balance</TableCell>
-                            <TableCell align="right">Actions</TableCell>
+                            <TableCell>{t("admin.users.colId")}</TableCell>
+                            <TableCell>{t("admin.users.colName")}</TableCell>
+                            <TableCell>{t("admin.users.colEmail")}</TableCell>
+                            <TableCell>{t("admin.users.colPhone")}</TableCell>
+                            <TableCell>{t("admin.users.colRole")}</TableCell>
+                            <TableCell>{t("admin.users.colBalance")}</TableCell>
+                            <TableCell align="right">{t("admin.users.colActions")}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {users.map(user => {
-                            const rl     = roleLabel(user.role);
+                        {filtered.map(user => {
+                            const rl     = roleLabel(user.role, t);
                             const isSelf = user.id === currentUser?.id;
                             const initials = `${user.name?.[0] ?? ""}${user.surname?.[0] ?? ""}`.toUpperCase();
 
@@ -100,10 +131,7 @@ export default function UsersTab() {
                                     <TableCell>{user.id}</TableCell>
                                     <TableCell>
                                         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                            <Avatar
-                                                src={resolveMediaUrl(user.avatarUrl)}
-                                                sx={{ width: 28, height: 28, fontSize: 12 }}
-                                            >
+                                            <Avatar src={resolveMediaUrl(user.avatarUrl)} sx={{ width: 28, height: 28, fontSize: 12 }}>
                                                 {!user.avatarUrl && initials}
                                             </Avatar>
                                             {user.name} {user.surname}
@@ -118,27 +146,21 @@ export default function UsersTab() {
                                     <TableCell align="right">
                                         <Box sx={{ display: "flex", gap: 0.5, justifyContent: "flex-end" }}>
                                             {user.role !== 0 ? (
-                                                <Tooltip title="Make Admin">
-                                                    <IconButton size="small" color="warning"
-                                                                onClick={() => setConfirmRole({ user, newRole: 0 })}
-                                                    >
+                                                <Tooltip title={t("admin.users.makeAdmin")}>
+                                                    <IconButton size="small" color="warning" onClick={() => setConfirmRole({ user, newRole: 0 })}>
                                                         <AdminPanelSettingsIcon fontSize="small" />
                                                     </IconButton>
                                                 </Tooltip>
                                             ) : (
-                                                <Tooltip title="Make Renter">
-                                                    <IconButton size="small" color="default" disabled={isSelf}
-                                                                onClick={() => setConfirmRole({ user, newRole: 2 })}
-                                                    >
+                                                <Tooltip title={t("admin.users.makeRenter")}>
+                                                    <IconButton size="small" color="default" disabled={isSelf} onClick={() => setConfirmRole({ user, newRole: 2 })}>
                                                         <PersonIcon fontSize="small" />
                                                     </IconButton>
                                                 </Tooltip>
                                             )}
-                                            <Tooltip title={isSelf ? "Cannot delete yourself" : "Delete user"}>
+                                            <Tooltip title={isSelf ? t("admin.users.cannotDeleteSelf") : t("admin.users.deleteUser")}>
                                                 <span>
-                                                    <IconButton size="small" color="error" disabled={isSelf}
-                                                                onClick={() => setConfirmDelete(user)}
-                                                    >
+                                                    <IconButton size="small" color="error" disabled={isSelf} onClick={() => setConfirmDelete(user)}>
                                                         <DeleteIcon fontSize="small" />
                                                     </IconButton>
                                                 </span>
@@ -148,41 +170,46 @@ export default function UsersTab() {
                                 </TableRow>
                             );
                         })}
+                        {filtered.length === 0 && (
+                            <TableRow>
+                                <TableCell colSpan={7} align="center" sx={{ py: 4, color: "text.disabled" }}>
+                                    {t("admin.users.noResults")}
+                                </TableCell>
+                            </TableRow>
+                        )}
                     </TableBody>
                 </Table>
             </TableContainer>
 
-            {/* Delete Confirm Dialog */}
             <Dialog open={!!confirmDelete} onClose={() => setConfirmDelete(null)}>
-                <DialogTitle fontWeight={700}>Delete User</DialogTitle>
+                <DialogTitle fontWeight={700}>{t("admin.users.deleteTitle")}</DialogTitle>
                 <DialogContent>
                     <Typography>
-                        Are you sure you want to delete{" "}
-                        <strong>{confirmDelete?.name} {confirmDelete?.surname}</strong>?
-                        This action cannot be undone.
+                        {t("admin.users.deleteDesc", { name: `${confirmDelete?.name} ${confirmDelete?.surname}` })}
                     </Typography>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setConfirmDelete(null)} disabled={busy}>Cancel</Button>
+                    <Button onClick={() => setConfirmDelete(null)} disabled={busy}>{t("admin.common.cancel")}</Button>
                     <Button onClick={handleDelete} color="error" variant="contained" disabled={busy}>
-                        {busy ? <CircularProgress size={16} /> : "Delete"}
+                        {busy ? <CircularProgress size={16} /> : t("admin.common.delete")}
                     </Button>
                 </DialogActions>
             </Dialog>
 
-            {/* Role Change Confirm Dialog */}
             <Dialog open={!!confirmRole} onClose={() => setConfirmRole(null)}>
-                <DialogTitle fontWeight={700}>Change Role</DialogTitle>
+                <DialogTitle fontWeight={700}>{t("admin.users.roleTitle")}</DialogTitle>
                 <DialogContent>
                     <Typography>
-                        Set <strong>{confirmRole?.user.name} {confirmRole?.user.surname}</strong> as{" "}
-                        <strong>{confirmRole?.newRole === 0 ? "Admin" : "Renter"}</strong>?
+                        {t("admin.users.roleDesc", {
+                            name: `${confirmRole?.user.name} ${confirmRole?.user.surname}`,
+                            role: confirmRole?.newRole === 0 ? t("admin.users.roleAdmin") : t("admin.users.roleRenter"),
+                        })}
                     </Typography>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setConfirmRole(null)} disabled={busy}>Cancel</Button>
+                    <Button onClick={() => setConfirmRole(null)} disabled={busy}>{t("admin.common.cancel")}</Button>
                     <Button onClick={handleRoleChange} color="warning" variant="contained" disabled={busy}>
-                        {busy ? <CircularProgress size={16} /> : "Confirm"}
+                        {busy ? <CircularProgress size={16} /> : t("admin.common.confirm")}
                     </Button>
                 </DialogActions>
             </Dialog>
