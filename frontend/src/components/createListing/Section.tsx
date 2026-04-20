@@ -1,6 +1,6 @@
 ﻿// src/components/createListing/Section.tsx
 import React, { memo }       from "react";
-import { Box, Paper, Typography, Chip, Divider } from "@mui/material";
+import { Box, Typography, Chip } from "@mui/material";
 import { useTranslation }    from "react-i18next";
 import { gradients, colors } from "../../theme/gradients.ts";
 
@@ -12,31 +12,77 @@ interface Props {
     children:  React.ReactNode;
 }
 
-// ✅ FIX: memo previne re-randarea când title/subtitle/step nu s-au schimbat.
-// icon e ReactNode deci nu poate fi comparat stabil — dar title/subtitle sunt string-uri stabile.
 const Section = memo(({ icon, title, subtitle, step, children }: Props) => {
     const { t } = useTranslation();
     return (
-        <Paper elevation={1} sx={{ p: { xs: 3, sm: 4 }, borderRadius: 4, border: `1px solid ${colors.border}`, mb: 3 }}>
-            <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2, mb: 3 }}>
-                <Box sx={{ background: gradients.primary, p: 1.5, borderRadius: 2, display: "flex", color: "white", flexShrink: 0, boxShadow: `0 4px 12px ${colors.primaryAlpha25}` }}>
+        <Box sx={{
+            position: "relative",
+            bgcolor: "background.paper",
+            border: `1px solid ${colors.border}`,
+            borderRadius: 4,
+            overflow: "hidden",
+            mb: 3,
+            boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+            transition: "box-shadow 0.2s",
+            "&:hover": { boxShadow: "0 4px 24px rgba(0,0,0,0.07)" },
+        }}>
+            {/* Left accent bar */}
+            <Box sx={{
+                position: "absolute",
+                left: 0, top: 0, bottom: 0,
+                width: 4,
+                background: gradients.primary,
+                borderRadius: "4px 0 0 4px",
+            }} />
+
+            {/* Header */}
+            <Box sx={{
+                display: "flex", alignItems: "flex-start", gap: 2,
+                px: { xs: 3, sm: 4 }, pt: { xs: 3, sm: 4 }, pb: 2.5,
+                pl: { xs: 4, sm: 5 }, // extra left padding to clear accent bar
+                borderBottom: `1px solid ${colors.border}`,
+            }}>
+                <Box sx={{
+                    background: gradients.primary,
+                    p: 1.25, borderRadius: 2,
+                    display: "flex", color: "white",
+                    flexShrink: 0,
+                    boxShadow: `0 4px 12px ${colors.primaryAlpha25}`,
+                }}>
                     {icon}
                 </Box>
                 <Box sx={{ flex: 1 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                        <Typography variant="h6" fontWeight={800}>{title}</Typography>
-                        <Chip label={`${t("components.section.step")} ${step}`} size="small"
-                              sx={{ bgcolor: colors.primaryAlpha10, color: colors.primaryDark, fontWeight: 700, fontSize: 11 }} />
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
+                        <Typography variant="h6" fontWeight={800} sx={{ letterSpacing: "-0.3px" }}>
+                            {title}
+                        </Typography>
+                        <Chip
+                            label={`${t("components.section.step")} ${step}`}
+                            size="small"
+                            sx={{
+                                bgcolor: colors.primaryAlpha10,
+                                color: colors.primaryDark,
+                                fontWeight: 700,
+                                fontSize: 11,
+                                height: 22,
+                            }}
+                        />
                     </Box>
-                    {subtitle && <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>{subtitle}</Typography>}
+                    {subtitle && (
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.4 }}>
+                            {subtitle}
+                        </Typography>
+                    )}
                 </Box>
             </Box>
-            <Divider sx={{ mb: 3 }} />
-            {children}
-        </Paper>
+
+            {/* Body */}
+            <Box sx={{ px: { xs: 3, sm: 4 }, pl: { xs: 4, sm: 5 }, py: 3 }}>
+                {children}
+            </Box>
+        </Box>
     );
 });
 
 Section.displayName = "Section";
-
 export default Section;

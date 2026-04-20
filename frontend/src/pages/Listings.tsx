@@ -1,21 +1,23 @@
 ﻿// pages/Listings.tsx
 import { Box, Container, Typography, Button, Badge } from "@mui/material";
 import { Home as HomeIcon, TrendingUp as TrendingUpIcon, FilterList as FilterListIcon } from "@mui/icons-material";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation }    from "react-i18next";
 import type { Apartment }    from "../types/apartment.types.ts";
-import { userService }       from "../services/userService.ts";
 import ApartmentCard         from "../components/listing/ApartmentCard.tsx";
 import SearchBar             from "../components/listing/SearchBar.tsx";
 import FilterDrawer          from "../components/filter/FilterDrawer.tsx";
 import { defaultFilters, type FilterState } from "../types//filterTypes.ts";
 import { gradients, colors } from "../theme/gradients.ts";
 import { apartmentService }  from "../services/apartmentService.ts";
+import { favoriteService }    from "../services/favoriteService.ts";
+import { useAuth }            from "../auth/AuthContext";
 
 const LISTINGS_PER_PAGE = 24;
 
 const Listings = () => {
     const { t } = useTranslation();
+    const { currentUser } = useAuth();
     const [apartments, setApartments]         = useState<Apartment[]>([]);
     const [searchQuery, setSearchQuery]      = useState("");
     const [favorites, setFavorites]          = useState<number[]>([]);
@@ -23,20 +25,32 @@ const Listings = () => {
     const [pendingFilters, setPendingFilters] = useState<FilterState>(defaultFilters);
     const [appliedFilters, setAppliedFilters] = useState<FilterState>(defaultFilters);
     const [currentPage, setCurrentPage]      = useState(1);
-    const [usersMap, setUsersMap]            = useState<Record<number, string>>({});
 
     useEffect(() => {
         apartmentService.getAll().then(setApartments).catch(() => setApartments([]));
-        userService.getAll()
-            .then(list => setUsersMap(Object.fromEntries(list.map(u => [u.id, u.name]))))
-            .catch(() => {});
-    }, []);
+        if (currentUser?.id) {
+            favoriteService.getByUser(currentUser.id)
+                .then(favs => setFavorites(favs.map(f => f.apartmentId)))
+                .catch(() => {});
+        }
+    }, [currentUser?.id]);
 
-    const toggleFavorite = (id: number) =>
-        setFavorites((prev) => prev.includes(id) ? prev.filter((favId) => favId !== id) : [...prev, id]);
+    const toggleFavorite = async (id: number) => {
+        if (!currentUser?.id) return;
+        const isFav = favorites.includes(id);
+        // optimistic update
+        setFavorites(prev => isFav ? prev.filter(x => x !== id) : [...prev, id]);
+        try {
+            isFav
+                ? await favoriteService.remove(currentUser.id, id)
+                : await favoriteService.add(currentUser.id, id);
+        } catch {
+            // rollback on error
+            setFavorites(prev => isFav ? [...prev, id] : prev.filter(x => x !== id));
+        }
+    };
 
     const getStatus   = (apt: Apartment) => apt.Id_Renter !== null ? t("listings.occupied") : t("listings.available");
-    const getUserName = useCallback((userId: number) => usersMap[userId] ?? `User #${userId}`, [usersMap]);
 
     const activeFilterCount = useMemo(() => {
         const filters = appliedFilters;
@@ -54,7 +68,7 @@ const Listings = () => {
             USD: [0, 10000],
             EUR: [0, 10000],
             MDL: [0, 50000],
-        };        
+        };
         const [defaultMin, defaultMax] = defaultRangeByCurrency[filters.currency] ?? [0, 2000];
         if (filters.priceRange[0] !== defaultMin || filters.priceRange[1] !== defaultMax) count++;
         count += Object.values(filters.facilities).filter(Boolean).length;
@@ -122,6 +136,13 @@ const Listings = () => {
     const handleReset  = () => { setPendingFilters(defaultFilters); setAppliedFilters(defaultFilters); resetToFirstPage(); };
     const handleResetAll = () => { setSearchQuery(""); setAppliedFilters(defaultFilters); setPendingFilters(defaultFilters); resetToFirstPage(); };
 
+    useEffect(() => {
+        apartmentService.getAll()
+            .then(data => {
+                setApartments(data);
+            })
+            .catch(() => setApartments([]));
+    }, []);
     return (
         <Box sx={{ minHeight: "100vh", bgcolor: "background.default", py: { xs: 4, md: 8 }, pt: 10 }}>
             <FilterDrawer
@@ -132,7 +153,7 @@ const Listings = () => {
                 onApply={handleApply}
                 onReset={handleReset}
             />
-            
+
             <Container maxWidth={false} sx={{ width: "100%", px: { xs: 2, sm: 3, md: 6, lg: 10 }, display: "flex", alignItems: "center", flexDirection: "column", mt: 10 }}>
                 {/* Hero */}
                 <Box sx={{ mb: 4, textAlign: "center" }}>
@@ -193,7 +214,7 @@ const Listings = () => {
                     <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", lg: "1fr 1fr 1fr" }, gap: 5, width: "100%" }}>
                         {visibleApartments.map((apt, idx) => (
                             <Box key={apt.Id_Apartment} sx={{ animation: `fadeInUp 0.5s cubic-bezier(0.165,0.84,0.44,1) ${idx * 0.08}s both`, "@keyframes fadeInUp": { from: { opacity: 0, transform: "translateY(28px)" }, to: { opacity: 1, transform: "translateY(0)" } } }}>
-                                <ApartmentCard apartment={apt} toggleFavorite={toggleFavorite} favorites={favorites} getStatus={getStatus} getUserName={getUserName} />
+                                <ApartmentCard apartment={apt} toggleFavorite={toggleFavorite} favorites={favorites} getStatus={getStatus} getUserName={(id: number) => `User #${id}`} />
                             </Box>
                         ))}
                     </Box>

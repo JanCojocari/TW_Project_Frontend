@@ -1,41 +1,336 @@
 ﻿// components/dashboard/UpcomingStaysTab.tsx
-import { useEffect, useState } from "react";
-import { Box, Typography, Chip, CircularProgress, Alert } from "@mui/material";
-import CalendarTodayIcon    from "@mui/icons-material/CalendarToday";
-import { useTranslation }   from "react-i18next";
-import { useAuth }          from "../../auth/AuthContext";
-import { apartmentService } from "../../services/apartmentService";
-import ApartmentCard        from "../listing/ApartmentCard";
-import type { Apartment }   from "../../types/apartment.types";
-import { formatDate } from '../../utils/formatDate';
-import { colors }           from "../../theme/gradients";
-import axiosInstance        from "../../api/axiosInstance";
+import { useEffect, useState }  from "react";
+import { Box, Typography, Button, CircularProgress, Alert, Chip } from "@mui/material";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import LocationOnIcon    from "@mui/icons-material/LocationOn";
+import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
+import { useTranslation }    from "react-i18next";
+import { useNavigate }       from "react-router-dom";
+import { useAuth }           from "../../auth/AuthContext";
+import { apartmentService }  from "../../services/apartmentService";
+import type { Apartment }    from "../../types/apartment.types";
+import { formatDate }        from "../../utils/formatDate";
+import { colors, gradients } from "../../theme/gradients";
+import axiosInstance         from "../../api/axiosInstance";
+import { paths }             from "../../app/paths";
 
-// Tip local — nu depinde de paymentHistoryService
+/* ─── types ───────────────────────────────────────────────────────────── */
 interface RenterPayment {
-    id:          number;
-    apartmentId: number;
-    renterId:    number;
-    ownerId:     number;
-    totalCost:   number;
-    currency:    number;
-    createdAt:   string;
-    startDate:   string | null;
-    endDate:     string | null;
-    invoiceUrl:  string | null;
+    id: number; apartmentId: number; renterId: number; ownerId: number;
+    totalCost: number; currency: number; createdAt: string;
+    startDate: string | null; endDate: string | null; invoiceUrl: string | null;
 }
-
-interface StayEntry {
-    apartment: Apartment;
-    startDate: Date;
-    endDate:   Date;
-}
+interface StayEntry { apartment: Apartment; startDate: Date; endDate: Date }
 
 async function fetchRenterPayments(renterId: number): Promise<RenterPayment[]> {
-    const res = await axiosInstance.get<RenterPayment[]>(`/payments/renter/${renterId}`);
-    return res.data;
+    return axiosInstance.get<RenterPayment[]>(`/payments/renter/${renterId}`).then(r => r.data);
 }
 
+/* ─── helpers ─────────────────────────────────────────────────────────── */
+function stayProgress(start: Date, end: Date): number {
+    const now = Date.now();
+    if (now <= start.getTime()) return 0;
+    if (now >= end.getTime())   return 100;
+    return Math.round(((now - start.getTime()) / (end.getTime() - start.getTime())) * 100);
+}
+
+function nightsCount(start: Date, end: Date): number {
+    return Math.max(1, Math.round((end.getTime() - start.getTime()) / 86_400_000));
+}
+
+function isActive(start: Date, end: Date): boolean {
+    const now = Date.now();
+    return now >= start.getTime() && now <= end.getTime();
+}
+
+/* ─── StayProgressBar — overlay pe imaginea cardului ─────────────────── */
+function StayProgressBar({ startDate, endDate }: { startDate: Date; endDate: Date }) {
+    const { t }    = useTranslation();
+    const pct      = stayProgress(startDate, endDate);
+    const active   = isActive(startDate, endDate);
+    const upcoming = startDate > new Date();
+    const nights   = nightsCount(startDate, endDate);
+
+    // Rentora: verde = colors.success, albastru = colors.primary
+    const accentColor = active ? colors.success : colors.primary;
+    const accentAlpha = active ? colors.successAlpha15 : colors.primaryAlpha15;
+
+    return (
+        <Box sx={{
+            position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 3,
+            background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%)",
+            px: 2, pt: 3, pb: 1.5,
+        }}>
+            {/* Date pills + status chip */}
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                <Box sx={{
+                    display: "flex", alignItems: "center", gap: 0.6,
+                    bgcolor: "rgba(255,255,255,0.13)", backdropFilter: "blur(6px)",
+                    border: "1px solid rgba(255,255,255,0.18)",
+                    px: 1.2, py: 0.5, borderRadius: 99,
+                }}>
+                    <CalendarTodayIcon sx={{ fontSize: 11, color: "rgba(255,255,255,0.8)" }} />
+                    <Typography sx={{ fontSize: 11, fontWeight: 700, color: "#fff", lineHeight: 1 }}>
+                        {formatDate(startDate)}
+                    </Typography>
+                </Box>
+
+                {/* Status chip — culori Rentora */}
+                <Box sx={{
+                    px: 1.2, py: 0.5, borderRadius: 99,
+                    bgcolor: accentColor,
+                    boxShadow: `0 2px 10px ${accentAlpha}`,
+                }}>
+                    <Typography sx={{ fontSize: 10, fontWeight: 800, color: "#fff", lineHeight: 1, letterSpacing: 0.4 }}>
+                        {active
+                            ? t("dashboard.upcomingStays.badgeNow")
+                            : upcoming
+                                ? t("dashboard.upcomingStays.badgeUpcoming")
+                                : t("dashboard.upcomingStays.badgePast") ?? "Past"}
+                    </Typography>
+                </Box>
+
+                <Box sx={{
+                    display: "flex", alignItems: "center", gap: 0.6,
+                    bgcolor: "rgba(255,255,255,0.13)", backdropFilter: "blur(6px)",
+                    border: "1px solid rgba(255,255,255,0.18)",
+                    px: 1.2, py: 0.5, borderRadius: 99,
+                }}>
+                    <Typography sx={{ fontSize: 11, fontWeight: 700, color: "#fff", lineHeight: 1 }}>
+                        {formatDate(endDate)}
+                    </Typography>
+                    <CalendarTodayIcon sx={{ fontSize: 11, color: "rgba(255,255,255,0.8)" }} />
+                </Box>
+            </Box>
+
+            {/* Progress track */}
+            <Box sx={{ height: 3, bgcolor: "rgba(255,255,255,0.18)", borderRadius: 99, overflow: "hidden" }}>
+                <Box sx={{
+                    height: "100%", width: `${pct}%`,
+                    background: accentColor,
+                    borderRadius: 99,
+                    transition: "width 0.6s ease",
+                }} />
+            </Box>
+
+            <Typography sx={{ fontSize: 10, color: "rgba(255,255,255,0.45)", mt: 0.5, textAlign: "center" }}>
+                {nights} {nights === 1
+                ? (t("dashboard.upcomingStays.night") ?? "night")
+                : (t("dashboard.upcomingStays.nights") ?? "nights")}
+                {active && pct > 0 && ` · ${pct}% ${t("dashboard.upcomingStays.elapsed") ?? "elapsed"}`}
+            </Typography>
+        </Box>
+    );
+}
+
+/* ─── HeroStayCard — card mare vertical ──────────────────────────────── */
+function HeroStayCard({ stay }: { stay: StayEntry }) {
+    const { t }    = useTranslation();
+    const navigate = useNavigate();
+    const { apartment, startDate, endDate } = stay;
+    const cardImage = apartment.image_urls?.[0] ?? apartment.image_url;
+
+    return (
+        <Box sx={{
+            borderRadius: 4, overflow: "hidden",
+            border: `1px solid ${colors.border}`,
+            bgcolor: "background.paper",
+            display: "flex", flexDirection: "column",
+            height: "100%",
+            boxShadow: `0 4px 24px ${colors.primaryAlpha10}`,
+            transition: "box-shadow 0.25s, transform 0.25s",
+            "&:hover": {
+                boxShadow: `0 10px 40px ${colors.primaryAlpha25}`,
+                transform: "translateY(-3px)",
+            },
+        }}>
+            {/* Imagine */}
+            <Box sx={{ position: "relative", flex: "0 0 300px", overflow: "hidden", bgcolor: "background.default" }}>
+                {cardImage
+                    ? <img src={cardImage} alt={apartment.Address}
+                           style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    : <Box sx={{
+                        width: "100%", height: "100%",
+                        background: gradients.primary,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>
+                        <LocationOnIcon sx={{ fontSize: 48, color: "#fff", opacity: 0.4 }} />
+                    </Box>
+                }
+                <StayProgressBar startDate={startDate} endDate={endDate} />
+            </Box>
+
+            {/* Info */}
+            <Box sx={{ p: 3, flex: 1, display: "flex", flexDirection: "column", gap: 2.5 }}>
+                {/* Adresa */}
+                <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
+                    <Box sx={{
+                        background: colors.primaryAlpha10, p: 1, borderRadius: 1.5,
+                        border: `1px solid ${colors.primaryAlpha25}`, flexShrink: 0,
+                    }}>
+                        <LocationOnIcon sx={{ fontSize: 18, color: "primary.main", display: "block" }} />
+                    </Box>
+                    <Typography sx={{ fontWeight: 800, fontSize: 16, color: "text.primary", lineHeight: 1.35, letterSpacing: "-0.3px" }}>
+                        {apartment.Address}
+                    </Typography>
+                </Box>
+
+                {/* Proprietar + pret */}
+                <Box sx={{
+                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                    p: 2, borderRadius: 2,
+                    bgcolor: "background.default",
+                    border: `1px solid ${colors.border}`,
+                }}>
+                    <Box>
+                        <Typography sx={{ fontSize: 10, fontWeight: 700, color: "text.disabled", textTransform: "uppercase", letterSpacing: 1, mb: 0.3 }}>
+                            {t("apartment.owner")}
+                        </Typography>
+                        <Typography sx={{ fontWeight: 700, fontSize: 13, color: "text.primary" }}>
+                            {`User #${apartment.Id_Owner}`}
+                        </Typography>
+                    </Box>
+                    <Box sx={{ textAlign: "right" }}>
+                        <Typography sx={{ fontSize: 10, fontWeight: 700, color: "text.disabled", textTransform: "uppercase", letterSpacing: 1, mb: 0.3 }}>
+                            {t("apartment.price")}
+                        </Typography>
+                        <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.4, justifyContent: "flex-end" }}>
+                            <Typography sx={{ fontWeight: 900, fontSize: 20, color: "primary.main", lineHeight: 1 }}>
+                                {apartment.Cost_per_interval}
+                            </Typography>
+                            <Typography sx={{ fontWeight: 600, fontSize: 12, color: "text.secondary" }}>
+                                {apartment.Currency}
+                            </Typography>
+                        </Box>
+                    </Box>
+                </Box>
+
+                {/* CTA */}
+                <Button
+                    variant="contained"
+                    fullWidth
+                    endIcon={<ArrowRightAltIcon />}
+                    onClick={() => navigate(paths.apartmentDetail(apartment.Id_Apartment))}
+                    sx={{
+                        mt: "auto", fontWeight: 700, textTransform: "none",
+                        borderRadius: 2.5, py: 1.3,
+                        background: gradients.primary,
+                        boxShadow: `0 4px 14px ${colors.primaryAlpha25}`,
+                        "&:hover": {
+                            background: gradients.primaryHover,
+                            boxShadow: `0 6px 20px ${colors.primaryAlpha25}`,
+                            transform: "translateY(-1px)",
+                        },
+                    }}
+                >
+                    {t("listings.details")}
+                </Button>
+            </Box>
+        </Box>
+    );
+}
+
+/* ─── CompactStayCard — card orizontal mic ───────────────────────────── */
+function CompactStayCard({ stay }: { stay: StayEntry }) {
+    const { t }    = useTranslation();
+    const navigate = useNavigate();
+    const { apartment, startDate, endDate } = stay;
+    const cardImage = apartment.image_urls?.[0] ?? apartment.image_url;
+    const active    = isActive(startDate, endDate);
+    const pct       = stayProgress(startDate, endDate);
+
+    return (
+        <Box sx={{
+            borderRadius: 3, overflow: "hidden",
+            border: `1px solid ${colors.border}`,
+            bgcolor: "background.paper",
+            display: "flex",
+            boxShadow: `0 2px 12px ${colors.primaryAlpha10}`,
+            transition: "box-shadow 0.2s, transform 0.2s",
+            "&:hover": {
+                boxShadow: `0 6px 24px ${colors.primaryAlpha25}`,
+                transform: "translateY(-2px)",
+            },
+        }}>
+            {/* Thumbnail */}
+            <Box sx={{ position: "relative", width: 110, flexShrink: 0, overflow: "hidden", bgcolor: "background.default" }}>
+                {cardImage
+                    ? <img src={cardImage} alt={apartment.Address}
+                           style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    : <Box sx={{ width: "100%", height: "100%", background: gradients.primary }} />
+                }
+                {/* Dot verde daca e activ */}
+                {active && (
+                    <Box sx={{
+                        position: "absolute", top: 8, left: 8,
+                        bgcolor: colors.success, borderRadius: 99,
+                        width: 8, height: 8,
+                        boxShadow: `0 0 0 3px ${colors.successAlpha15}`,
+                    }} />
+                )}
+            </Box>
+
+            {/* Info */}
+            <Box sx={{ flex: 1, p: 1.75, display: "flex", flexDirection: "column", gap: 0.75, minWidth: 0 }}>
+                <Typography sx={{
+                    fontWeight: 700, fontSize: 13, color: "text.primary",
+                    lineHeight: 1.3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                }}>
+                    {apartment.Address}
+                </Typography>
+
+                {/* Date range */}
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    <CalendarTodayIcon sx={{ fontSize: 11, color: "text.disabled" }} />
+                    <Typography sx={{ fontSize: 11, color: "text.secondary", fontWeight: 500 }}>
+                        {formatDate(startDate)}
+                    </Typography>
+                    <ArrowRightAltIcon sx={{ fontSize: 13, color: "text.disabled" }} />
+                    <Typography sx={{ fontSize: 11, color: "text.secondary", fontWeight: 500 }}>
+                        {formatDate(endDate)}
+                    </Typography>
+                </Box>
+
+                {/* Mini progress bar */}
+                <Box sx={{ height: 3, bgcolor: colors.primaryAlpha10, borderRadius: 99, overflow: "hidden" }}>
+                    <Box sx={{
+                        height: "100%", width: `${pct}%`,
+                        background: active ? colors.success : gradients.primary,
+                        borderRadius: 99,
+                    }} />
+                </Box>
+
+                {/* Pret + buton */}
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: "auto" }}>
+                    <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.3 }}>
+                        <Typography sx={{ fontWeight: 900, fontSize: 15, color: "primary.main", lineHeight: 1 }}>
+                            {apartment.Cost_per_interval}
+                        </Typography>
+                        <Typography sx={{ fontWeight: 500, fontSize: 11, color: "text.secondary" }}>
+                            {apartment.Currency}
+                        </Typography>
+                    </Box>
+                    <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => navigate(paths.apartmentDetail(apartment.Id_Apartment))}
+                        sx={{
+                            fontSize: 11, fontWeight: 700, textTransform: "none",
+                            borderRadius: 99, px: 1.5, py: 0.3,
+                            borderColor: colors.primaryAlpha25,
+                            color: "primary.main",
+                            "&:hover": { borderColor: "primary.main", bgcolor: colors.primaryAlpha06 },
+                        }}
+                    >
+                        {t("listings.details")}
+                    </Button>
+                </Box>
+            </Box>
+        </Box>
+    );
+}
+
+/* ─── main component ──────────────────────────────────────────────────── */
 export default function UpcomingStaysTab() {
     const { t }           = useTranslation();
     const { currentUser } = useAuth();
@@ -53,23 +348,15 @@ export default function UpcomingStaysTab() {
             apartmentService.getAll(),
         ])
             .then(([payments, apartments]) => {
-                const aptMap = new Map<number, Apartment>(
-                    apartments.map(a => [a.Id_Apartment, a])
-                );
-
+                const aptMap = new Map<number, Apartment>(apartments.map(a => [a.Id_Apartment, a]));
                 const upcoming = payments
                     .filter(p => p.startDate != null && p.endDate != null && new Date(p.endDate) >= now)
                     .sort((a, b) => new Date(a.startDate!).getTime() - new Date(b.startDate!).getTime())
                     .reduce<StayEntry[]>((acc, p) => {
                         const apt = aptMap.get(p.apartmentId);
-                        if (apt) acc.push({
-                            apartment: apt,
-                            startDate: new Date(p.startDate!),
-                            endDate:   new Date(p.endDate!),
-                        });
+                        if (apt) acc.push({ apartment: apt, startDate: new Date(p.startDate!), endDate: new Date(p.endDate!) });
                         return acc;
                     }, []);
-
                 setStays(upcoming);
             })
             .catch(() => setError(true))
@@ -96,43 +383,49 @@ export default function UpcomingStaysTab() {
         </Box>
     );
 
-    return (
-        <Box sx={{ display: "grid", gap: 4, gridTemplateColumns: { xs: "1fr", sm: "repeat(2,1fr)", md: "repeat(3,1fr)" } }}>
-            {stays.map(({ apartment, startDate, endDate }) => (
-                <Box key={apartment.Id_Apartment}>
-                    <Box sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        gap: 0.75,
-                        mb: 1.5,
-                        px: 2,
-                        py: 1.5,
-                        backgroundColor: "background.paper",
-                        border: `1px solid ${colors.border}`,
-                        borderRadius: 2,
-                    }}>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                            <CalendarTodayIcon sx={{ fontSize: 18, color: "primary.main" }} />
-                            <Typography sx={{ fontSize: 16, fontWeight: 800, color: "text.primary", letterSpacing: "-0.3px" }}>
-                                {formatDate(startDate)} — {formatDate(endDate)}
-                            </Typography>
-                        </Box>
-                        {startDate > new Date()
-                            ? <Chip label={t("dashboard.upcomingStays.badgeUpcoming")} size="small" color="primary" sx={{ fontWeight: 700, fontSize: 11 }} />
-                            : <Chip label={t("dashboard.upcomingStays.badgeNow")}      size="small" color="success" sx={{ fontWeight: 700, fontSize: 11 }} />
-                        }
-                    </Box>
+    const [hero, ...rest] = stays;
 
-                    <ApartmentCard
-                        apartment={apartment}
-                        favorites={[]}
-                        toggleFavorite={() => {}}
-                        getUserName={(id: number) => `User #${id}`}
-                        getStatus={() => t("listings.occupied")}
-                    />
+    return (
+        <Box sx={{ pb: 6 }}>
+            {/* Section label */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>
+                <CalendarTodayIcon sx={{ fontSize: 18, color: "primary.main" }} />
+                <Typography sx={{
+                    fontSize: 13, fontWeight: 800, color: "text.disabled",
+                    textTransform: "uppercase", letterSpacing: "1px",
+                }}>
+                    {t("dashboard.upcomingStays.sectionLabel") ?? "Your upcoming stays"}
+                </Typography>
+                <Chip
+                    label={stays.length}
+                    size="small"
+                    sx={{
+                        height: 20, fontSize: 11, fontWeight: 800,
+                        bgcolor: colors.primaryAlpha10, color: "primary.main",
+                    }}
+                />
+            </Box>
+
+            {/* Layout editorial: hero stanga + compact stack dreapta */}
+            {stays.length === 1 ? (
+                <Box sx={{ maxWidth: 480 }}>
+                    <HeroStayCard stay={hero} />
                 </Box>
-            ))}
+            ) : (
+                <Box sx={{
+                    display: "grid",
+                    gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                    gap: 3,
+                    alignItems: "stretch",
+                }}>
+                    <HeroStayCard stay={hero} />
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                        {rest.map(stay => (
+                            <CompactStayCard key={stay.apartment.Id_Apartment} stay={stay} />
+                        ))}
+                    </Box>
+                </Box>
+            )}
         </Box>
     );
 }

@@ -26,6 +26,7 @@ import PaymentsTab      from "../components/dashboard/paymentTab/PaymentsTab";
 import FavoritesTab     from "../components/dashboard/FavoritesTab";
 import UpcomingStaysTab  from "../components/dashboard/UpcomingStaysTab";
 import PreviousStaysTab  from "../components/dashboard/PreviousStaysTab";
+import RecentViewTab     from "../components/dashboard/RecentViewTab";
 
 const SIDEBAR_W    = 130;
 const NAVBAR_H     = 64;
@@ -282,7 +283,7 @@ export default function Dashboard() {
                 {active === "recent" && (
                     <>
                         <PageHeading title={t("dashboard.tabs.recentViewed")} />
-                        {/* TODO: RecentViewTab — feature #3 */}
+                        <RecentViewTab />
                     </>
                 )}
 
