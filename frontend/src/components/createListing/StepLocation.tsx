@@ -69,14 +69,18 @@ const StepLocation = memo(({
                     <DebouncedTextField
                         label={t("components.steps.location.region")}
                         value={region}
-                        onChange={(v) => set("region", v as FormState["region"])}
+                        onChange={(v) => { set("region", v as FormState["region"]); clearError("region"); }}
                         placeholder={t("components.steps.location.regionPlaceholder")}
+                        error={!!errors.region}
+                        helperText={errors.region}
                     />
                     <DebouncedTextField
                         label={t("components.steps.location.postal")}
                         value={postalCode}
-                        onChange={(v) => set("postalCode", v as FormState["postalCode"])}
+                        onChange={(v) => { set("postalCode", v as FormState["postalCode"]); clearError("postalCode"); }}
                         placeholder={t("components.steps.location.postalPlaceholder")}
+                        error={!!errors.postalCode}
+                        helperText={errors.postalCode}
                     />
                 </Box>
 

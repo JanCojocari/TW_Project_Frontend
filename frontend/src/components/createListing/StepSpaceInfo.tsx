@@ -18,7 +18,7 @@ import dayjs                     from "dayjs";
 import { useTranslation }        from "react-i18next";
 import Section                   from "./Section.tsx";
 import DebouncedTextField        from "../common/DebouncedTextField.tsx";
-import type { FormState }        from "../../types/CreateListingTypes.ts";
+import type { FormState, Errors }        from "../../types/CreateListingTypes.ts";
 import { colors }                from "../../theme/gradients.ts";
 
 interface Props {
@@ -35,7 +35,9 @@ interface Props {
     checkOutFrom:  string;
     checkOutUntil: string;
     selfCheckIn:   boolean;
+    errors:        Errors;
     set:           <K extends keyof FormState>(key: K, value: FormState[K]) => void;
+    clearError:    (key: string) => void;
 }
 
 const toTime   = (s: string) => s ? dayjs(`2000-01-01T${s}`) : null;
@@ -47,12 +49,13 @@ const timePickerProps = (zIndex = 1400) => ({
 
 /* ── Stepper control ─────────────────────────────────────────────────── */
 function Stepper({
-                     label, value, onChange, min = 0,
+                     label, value, onChange, min = 0, error = false,
                  }: {
     label: string;
     value: string;
     onChange: (v: string) => void;
     min?: number;
+    error?: boolean;
 }) {
     const num = parseInt(value, 10) || 0;
     const dec = () => onChange(String(Math.max(min, num - 1)));
@@ -62,11 +65,11 @@ function Stepper({
         <Box sx={{
             display: "flex", flexDirection: "column", alignItems: "center",
             p: 2, borderRadius: 3,
-            border: `1px solid ${colors.border}`,
-            bgcolor: "background.paper",
+            border: `1px solid ${error ? "#d32f2f" : colors.border}`,
+            bgcolor: error ? "rgba(211,47,47,0.04)" : "background.paper",
             gap: 1,
             transition: "border-color 0.15s",
-            "&:hover": { borderColor: colors.primaryDark },
+            "&:hover": { borderColor: error ? "#d32f2f" : colors.primaryDark },
         }}>
             <Typography variant="caption" fontWeight={700} color="text.secondary"
                         sx={{ textTransform: "uppercase", letterSpacing: 0.8, textAlign: "center", lineHeight: 1.2 }}>
@@ -110,7 +113,7 @@ function Stepper({
 }
 
 /* ── MaxGuests — visual person indicator ─────────────────────────────── */
-function MaxGuestsControl({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function MaxGuestsControl({ value, onChange, error = false }: { value: string; onChange: (v: string) => void; error?: boolean }) {
     const { t } = useTranslation();
     const num = parseInt(value, 10) || 0;
     const MAX_ICONS = 10;
@@ -119,8 +122,8 @@ function MaxGuestsControl({ value, onChange }: { value: string; onChange: (v: st
     return (
         <Box sx={{
             p: 2.5, borderRadius: 3,
-            border: `1px solid ${colors.border}`,
-            bgcolor: "background.paper",
+            border: `1px solid ${error ? "#d32f2f" : colors.border}`,
+            bgcolor: error ? "rgba(211,47,47,0.04)" : "background.paper",
         }}>
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1.5 }}>
                 <Typography variant="caption" fontWeight={700} color="text.secondary"
@@ -168,7 +171,7 @@ const StepSpaceInfo = memo(({
                                 rooms, bedrooms, bathrooms, beds, surfaceArea,
                                 maxGuests, floor, totalFloors,
                                 checkInFrom, checkInUntil, checkOutFrom, checkOutUntil,
-                                selfCheckIn, set,
+                                selfCheckIn, errors, set, clearError,
                             }: Props) => {
     const { t } = useTranslation();
 
@@ -202,7 +205,8 @@ const StepSpaceInfo = memo(({
                                 key={f.key}
                                 label={f.label}
                                 value={values[f.key]}
-                                onChange={(v) => set(f.key, v as FormState[typeof f.key])}
+                                onChange={(v) => { set(f.key, v as FormState[typeof f.key]); clearError(f.key); }}
+                                error={!!errors[f.key]}
                             />
                         ))}
                     </Box>
@@ -212,8 +216,8 @@ const StepSpaceInfo = memo(({
                         {/* Surface */}
                         <Box sx={{
                             p: 2.5, borderRadius: 3,
-                            border: `1px solid ${colors.border}`,
-                            bgcolor: "background.paper",
+                            border: `1px solid ${errors.surfaceArea ? "#d32f2f" : colors.border}`,
+                            bgcolor: errors.surfaceArea ? "rgba(211,47,47,0.04)" : "background.paper",
                             display: "flex",
                             flexDirection: "column",
                             justifyContent: "space-between",
@@ -227,7 +231,7 @@ const StepSpaceInfo = memo(({
                             <DebouncedTextField
                                 type="number"
                                 value={surfaceArea}
-                                onChange={(v) => set("surfaceArea", v as FormState["surfaceArea"])}
+                                onChange={(v) => { set("surfaceArea", v as FormState["surfaceArea"]); clearError("surfaceArea"); }}
                                 inputProps={{ min: 0, onWheel: (e: React.WheelEvent<HTMLInputElement>) => e.currentTarget.blur() }}
                                 fullWidth
                                 variant="standard"
@@ -247,7 +251,8 @@ const StepSpaceInfo = memo(({
                         {/* Max guests */}
                         <MaxGuestsControl
                             value={maxGuests}
-                            onChange={(v) => set("maxGuests", v as FormState["maxGuests"])}
+                            onChange={(v) => { set("maxGuests", v as FormState["maxGuests"]); clearError("maxGuests"); }}
+                            error={!!errors.maxGuests}
                         />
                     </Box>
 
@@ -261,36 +266,36 @@ const StepSpaceInfo = memo(({
                             </Typography>
                         </Box>
                         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2 }}>
-                            <Box sx={{ p: 2, borderRadius: 2.5, bgcolor: colors.primaryAlpha06, border: `1px solid ${colors.primaryAlpha25}`, display: "flex", flexDirection: "column", gap: 1.5, overflow: "hidden" }}>
+                            <Box sx={{ p: 2, borderRadius: 2.5, bgcolor: colors.primaryAlpha06, border: `1px solid ${(errors.checkInFrom || errors.checkInUntil) ? "#d32f2f" : colors.primaryAlpha25}`, display: "flex", flexDirection: "column", gap: 1.5, overflow: "hidden" }}>
                                 <Typography variant="caption" fontWeight={700} color="primary.main">Check-in</Typography>
                                 <Box sx={{ display: "flex", gap: 1, minWidth: 0 }}>
                                     <TimePicker
                                         label={t("components.steps.space.from")}
                                         value={toTime(checkInFrom)}
-                                        onChange={(d) => set("checkInFrom", fromTime(d) as FormState["checkInFrom"])}
+                                        onChange={(d) => { set("checkInFrom", fromTime(d) as FormState["checkInFrom"]); clearError("checkInFrom"); }}
                                         slotProps={timePickerProps()}
                                     />
                                     <TimePicker
                                         label={t("components.steps.space.until")}
                                         value={toTime(checkInUntil)}
-                                        onChange={(d) => set("checkInUntil", fromTime(d) as FormState["checkInUntil"])}
+                                        onChange={(d) => { set("checkInUntil", fromTime(d) as FormState["checkInUntil"]); clearError("checkInUntil"); }}
                                         slotProps={timePickerProps()}
                                     />
                                 </Box>
                             </Box>
-                            <Box sx={{ p: 2, borderRadius: 2.5, bgcolor: "rgba(239,68,68,0.04)", border: "1px solid rgba(239,68,68,0.15)", display: "flex", flexDirection: "column", gap: 1.5, overflow: "hidden" }}>
+                            <Box sx={{ p: 2, borderRadius: 2.5, bgcolor: "rgba(239,68,68,0.04)", border: `1px solid ${(errors.checkOutFrom || errors.checkOutUntil) ? "#d32f2f" : "rgba(239,68,68,0.15)"}`, display: "flex", flexDirection: "column", gap: 1.5, overflow: "hidden" }}>
                                 <Typography variant="caption" fontWeight={700} color="error.main">Check-out</Typography>
                                 <Box sx={{ display: "flex", gap: 1, minWidth: 0 }}>
                                     <TimePicker
                                         label={t("components.steps.space.from")}
                                         value={toTime(checkOutFrom)}
-                                        onChange={(d) => set("checkOutFrom", fromTime(d) as FormState["checkOutFrom"])}
+                                        onChange={(d) => { set("checkOutFrom", fromTime(d) as FormState["checkOutFrom"]); clearError("checkOutFrom"); }}
                                         slotProps={timePickerProps()}
                                     />
                                     <TimePicker
                                         label={t("components.steps.space.until")}
                                         value={toTime(checkOutUntil)}
-                                        onChange={(d) => set("checkOutUntil", fromTime(d) as FormState["checkOutUntil"])}
+                                        onChange={(d) => { set("checkOutUntil", fromTime(d) as FormState["checkOutUntil"]); clearError("checkOutUntil"); }}
                                         slotProps={timePickerProps()}
                                     />
                                 </Box>
