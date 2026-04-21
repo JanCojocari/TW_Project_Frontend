@@ -25,6 +25,7 @@ export const privateRoutes = [
     { path: paths.dashboard,     element: <Dashboard /> },
     { path: paths.payment,       element: <PaymentPage /> },
     { path: paths.createListing, element: <CreateListing /> },
+    { path: paths.editListing,   element: <CreateListing /> }, // aceeasi componenta, mod edit
     { path: paths.settings,      element: <Settings /> },
 ];
 

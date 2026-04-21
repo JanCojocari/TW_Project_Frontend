@@ -8,4 +8,6 @@ public class MapLocation
     public string City { get; set; } = string.Empty;
     public string Country { get; set; } = string.Empty;
     public string FullAddress { get; set; } = string.Empty;
+    public string Region { get; set; } = string.Empty;
+    public string PostalCode { get; set; } = string.Empty;
 }

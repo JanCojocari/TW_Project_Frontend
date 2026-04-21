@@ -9,9 +9,11 @@ interface Props {
     favoriteIds:      number[];
     onToggleFavorite: (id: number) => void;
     getUserName:      (id: number) => string;
+    onEdit:           (apartment: Apartment) => void;
+    onDelete:         (apartment: Apartment) => void;
 }
 
-export default function MyListingsTab({ myListings, favoriteIds, onToggleFavorite, getUserName }: Props) {
+export default function MyListingsTab({ myListings, favoriteIds, onToggleFavorite, getUserName, onEdit, onDelete }: Props) {
     const { t } = useTranslation();
 
     if (myListings.length === 0) return (
@@ -31,8 +33,10 @@ export default function MyListingsTab({ myListings, favoriteIds, onToggleFavorit
                     favorites={favoriteIds}
                     toggleFavorite={onToggleFavorite}
                     getUserName={getUserName}
+                    isOwner
+                    onEdit={onEdit}
+                    onDelete={onDelete}
                     getStatus={(a) => {
-                        // Pending si Declined au prioritate fata de ocupat/disponibil
                         if (a.status === "pending")  return t("dashboard.myListings.status.pending");
                         if (a.status === "declined") return t("dashboard.myListings.status.declined");
                         return a.Id_Renter ? t("listings.occupied") : t("listings.available");

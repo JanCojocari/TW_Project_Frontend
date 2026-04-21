@@ -1,6 +1,6 @@
 ﻿// src/pages/CreateListing.tsx
-import { useCallback, useRef, useState } from "react";
-import { useNavigate }    from "react-router-dom";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth }        from "../auth/AuthContext.tsx";
 import { useTranslation } from "react-i18next";
 import {
@@ -18,6 +18,7 @@ import {
     ArrowForward as ArrowForwardIcon,
 } from "@mui/icons-material";
 import { apartmentService, buildCreatePayload } from "../services/apartmentService.ts";
+import type { Apartment } from "../types/apartment.types.ts";
 import { uploadService }   from "../services/uploadService.ts";
 import { gradients, colors } from "../theme/gradients.ts";
 import { paths }           from "../app/paths.ts";
@@ -53,8 +54,13 @@ const STEPS: StepMeta[] = [
 
 const CreateListing = () => {
     const navigate        = useNavigate();
+    const location        = useLocation();
     const { t }           = useTranslation();
     const { currentUser } = useAuth();
+
+    // detecteaza modul edit — apartamentul vine prin navigate(..., { state })
+    const editApt    = (location.state as { apartment?: Apartment } | null)?.apartment ?? null;
+    const isEditMode = !!editApt;
 
     const {
         form, errors, submitted,
@@ -62,6 +68,48 @@ const CreateListing = () => {
         handleImages, removeImage, addLandmark, removeLandmark,
         submit,
     } = useListingForm();
+
+    // pre-populeaza form-ul o singura data cand suntem in modul edit
+    const editInitialized = useRef(false);
+    useEffect(() => {
+        if (!editApt || editInitialized.current) return;
+        editInitialized.current = true;
+        set("address",            editApt.Address);
+        set("cost",               String(editApt.Cost_per_interval));
+        set("currency",           editApt.Currency);
+        set("interval",           editApt.Interval);
+        set("city",               editApt.location.city);
+        set("region",             editApt.location.region     ?? "");
+        set("postalCode",         editApt.location.postalCode ?? "");
+        set("latitude",           String(editApt.location.latitude  ?? ""));
+        set("longitude",          String(editApt.location.longitude ?? ""));
+        set("description",        editApt.additionalInfo.description);
+        set("houseRules",         editApt.additionalInfo.houseRules        ?? "");
+        set("cancellationPolicy", editApt.additionalInfo.cancellationPolicy);
+        set("rooms",              String(editApt.additionalInfo.rooms));
+        set("bedrooms",           String(editApt.additionalInfo.bedrooms   ?? ""));
+        set("bathrooms",          String(editApt.additionalInfo.bathrooms));
+        set("beds",               String(editApt.additionalInfo.beds       ?? ""));
+        set("floor",              String(editApt.additionalInfo.floor));
+        set("totalFloors",        String(editApt.additionalInfo.totalFloors));
+        set("surfaceArea",        String(editApt.additionalInfo.surfaceArea));
+        set("maxGuests",          String(editApt.additionalInfo.maxGuests));
+        set("checkInFrom",        editApt.additionalInfo.checkInFrom   || "14:00");
+        set("checkInUntil",       editApt.additionalInfo.checkInUntil  || "22:00");
+        set("checkOutFrom",       editApt.additionalInfo.checkOutFrom  || "08:00");
+        set("checkOutUntil",      editApt.additionalInfo.checkOutUntil || "12:00");
+        set("selfCheckIn",        editApt.additionalInfo.selfCheckIn   ?? false);
+        if (editApt.facilities) {
+            // setFacility face toggle, deci setam direct in form prin set()
+            set("facilities", { ...editApt.facilities });
+        }
+        // afiseaza imaginile existente ca preview -- form.images ramane gol
+        // la submit, daca nu s-au incarcat imagini noi, se pastreaza URL-urile originale
+        if (editApt.image_urls.length > 0) {
+            set("imagePreviewUrls", editApt.image_urls);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // intentionat fara dependente — ruleaza o singura data la mount
 
     const [activeStep, setActiveStep] = useState(0);
     const [visitedSteps, setVisitedSteps] = useState<Set<number>>(new Set([0]));
@@ -84,7 +132,7 @@ const CreateListing = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const goToStep = (idx: number, fromSidebar = false) => {
-        // navigare inapoi: fara validare
+        // navigare inapoi: fara validare in ambele moduri
         if (idx < activeStep) {
             setErrors({});
             setActiveStep(idx);
@@ -92,12 +140,25 @@ const CreateListing = () => {
             if (contentRef.current) contentRef.current.scrollTop = 0;
             return;
         }
-        // din sidebar, salt inainte: validam toate step-urile intermediare
-        const targetStep = fromSidebar ? idx : activeStep + 1;
-        const stepErrors = validateStep(form, activeStep);
-        if (Object.keys(stepErrors).length > 0) {
-            setErrors(stepErrors);
+        // in modul edit: navigare libera fara restrictii
+        if (isEditMode) {
+            setErrors({});
+            setActiveStep(idx);
+            setVisitedSteps(prev => new Set([...prev, idx]));
+            if (contentRef.current) contentRef.current.scrollTop = 0;
             return;
+        }
+        // in modul create: valideaza toate step-urile de la activeStep pana la idx (exclusiv)
+        for (let step = activeStep; step < idx; step++) {
+            const stepErrors = validateStep(form, step, false);
+            if (Object.keys(stepErrors).length > 0) {
+                // sari la primul step cu erori si afiseaza-le
+                setErrors(stepErrors);
+                setActiveStep(step);
+                setVisitedSteps(prev => new Set([...prev, step]));
+                if (contentRef.current) contentRef.current.scrollTop = 0;
+                return;
+            }
         }
         setErrors({});
         setActiveStep(idx);
@@ -111,22 +172,31 @@ const CreateListing = () => {
             setApiError(null);
             setIsSubmitting(true);
             try {
-                let imageUrls: string[] = [];
-                if (form.images.length > 0) {
-                    imageUrls = await uploadService.images(form.images);
+                // daca nu s-au incarcat imagini noi, pastreaza URL-urile existente
+                const imageUrls = form.images.length > 0
+                    ? await uploadService.images(form.images)
+                    : editApt?.image_urls ?? [];
+
+                const payload = buildCreatePayload(form, imageUrls);
+
+                if (isEditMode && editApt) {
+                    await apartmentService.update({ id: editApt.Id_Apartment, ...payload });
+                } else {
+                    await apartmentService.create(currentUser?.id ?? 0, payload);
                 }
-                await apartmentService.create(
-                    currentUser?.id ?? 0,
-                    buildCreatePayload(form, imageUrls),
-                );
                 markDone();
-                setTimeout(() => navigate(paths.dashboard), 1500);
+                if (isEditMode) {
+                    // forteaza re-fetch in Dashboard pentru a reflecta statusul Pending
+                    setTimeout(() => navigate(paths.dashboard, { state: { refreshListings: true } }), 1500);
+                } else {
+                    setTimeout(() => navigate(paths.dashboard), 1500);
+                }
             } catch {
                 setApiError("Eroare la salvarea anunțului. Verificați conexiunea și încercați din nou.");
                 setIsSubmitting(false);
             }
-        }),
-        [submit, navigate, form, currentUser, isSubmitting],
+        }, isEditMode),
+        [submit, navigate, form, currentUser, isSubmitting, isEditMode, editApt],
     );
 
     if (submitted) return <SuccessScreen />;
@@ -164,7 +234,7 @@ const CreateListing = () => {
                             <HomeIcon sx={{ fontSize: 18 }} />
                         </Box>
                         <Typography fontWeight={800} fontSize={15} sx={{ letterSpacing: "-0.3px" }}>
-                            {t("createListing.title")}
+                            {isEditMode ? "Editare anunț" : t("createListing.title")}
                         </Typography>
                     </Box>
                     <Typography variant="caption" color="text.secondary">
@@ -468,7 +538,12 @@ const CreateListing = () => {
                                     boxShadow: `0 4px 14px ${colors.primaryAlpha25}`,
                                 }}
                             >
-                                {isSubmitting ? (t("createListing.publishing") ?? "Se publică...") : t("createListing.publish")}
+                                {isSubmitting
+                                    ? (t("createListing.publishing") ?? "Se publică...")
+                                    : isEditMode
+                                        ? "Salvează modificările"
+                                        : t("createListing.publish")
+                                }
                             </Button>
                         )}
                     </Box>

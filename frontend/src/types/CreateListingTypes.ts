@@ -65,7 +65,7 @@ const isPositiveInt = (val: string) => !!val && !isNaN(Number(val)) && Number(va
 const isPositiveNum = (val: string) => !!val && !isNaN(Number(val)) && Number(val) > 0;
 
 // Validare per-step: verifica doar campurile relevante pentru step-ul curent
-export const validateStep = (form: FormState, step: number): Errors => {
+export const validateStep = (form: FormState, step: number, isEditMode = false): Errors => {
     const e: Errors = {};
     if (step === 0) {
         if (!form.address.trim())
@@ -73,7 +73,8 @@ export const validateStep = (form: FormState, step: number): Errors => {
         if (!isPositiveNum(form.cost))
             e.cost = "Introduceți un preț valid";
     }
-    if (step === 1) {
+    if (step === 1 && !isEditMode) {
+        // in edit mode imaginile existente sunt deja in imagePreviewUrls -- nu mai cerem fisiere noi
         if (form.images.length === 0)
             e.images = "Adăugați cel puțin o imagine";
     }
@@ -119,11 +120,11 @@ export const validateStep = (form: FormState, step: number): Errors => {
     return e;
 };
 
-export const validate = (form: FormState): Errors => {
+export const validate = (form: FormState, isEditMode = false): Errors => {
     const e: Errors = {};
     if (!form.address.trim())          e.address     = "Adresa este obligatorie";
     if (!isPositiveNum(form.cost))     e.cost        = "Introduceți un preț valid";
-    if (form.images.length === 0)      e.images      = "Adăugați cel puțin o imagine";
+    if (!isEditMode && form.images.length === 0) e.images = "Adăugați cel puțin o imagine";
     if (!form.city.trim())             e.city        = "Orașul este obligatoriu";
     if (!form.region.trim())           e.region      = "Districtul este obligatoriu";
     if (!form.postalCode.trim())       e.postalCode  = "Codul poștal este obligatoriu";
