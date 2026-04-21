@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Rentora.BusinessLayer;
 using Rentora.Domain.Models.Apartment;
+using Rentora.Domain.Models;
 
 [Route("api/apartments")]
 [ApiController]
@@ -23,6 +24,13 @@ public class ApartmentController : ControllerBase
     {
         var apartments = _apartmentAction.GetAll();
         return Ok(apartments);
+    }
+
+    [HttpGet("paged")]
+    public IActionResult GetPaged([FromQuery] ApartmentQueryParams p)
+    {
+        var result = _apartmentAction.GetPaged(p);
+        return Ok(result);
     }
 
     [HttpGet("{id}")]
