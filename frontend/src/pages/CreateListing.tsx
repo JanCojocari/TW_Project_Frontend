@@ -22,6 +22,7 @@ import { uploadService }   from "../services/uploadService.ts";
 import { gradients, colors } from "../theme/gradients.ts";
 import { paths }           from "../app/paths.ts";
 import { useListingForm }  from "../types/UseListingForm.ts";
+import { validateStep }   from "../types/CreateListingTypes.ts";
 import SuccessScreen       from "../components/createListing/SuccessScreen.tsx";
 import StepBasicInfo       from "../components/createListing/StepBasicInfo.tsx";
 import StepPhotos          from "../components/createListing/StepPhotos.tsx";
@@ -57,7 +58,7 @@ const CreateListing = () => {
 
     const {
         form, errors, submitted,
-        set, clearError, setFacility,
+        set, clearError, setFacility, setErrors,
         handleImages, removeImage, addLandmark, removeLandmark,
         submit,
     } = useListingForm();
@@ -82,10 +83,25 @@ const CreateListing = () => {
     const [apiError, setApiError]         = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const goToStep = (idx: number) => {
+    const goToStep = (idx: number, fromSidebar = false) => {
+        // navigare inapoi: fara validare
+        if (idx < activeStep) {
+            setErrors({});
+            setActiveStep(idx);
+            setVisitedSteps(prev => new Set([...prev, idx]));
+            if (contentRef.current) contentRef.current.scrollTop = 0;
+            return;
+        }
+        // din sidebar, salt inainte: validam toate step-urile intermediare
+        const targetStep = fromSidebar ? idx : activeStep + 1;
+        const stepErrors = validateStep(form, activeStep);
+        if (Object.keys(stepErrors).length > 0) {
+            setErrors(stepErrors);
+            return;
+        }
+        setErrors({});
         setActiveStep(idx);
         setVisitedSteps(prev => new Set([...prev, idx]));
-        // scroll content to top
         if (contentRef.current) contentRef.current.scrollTop = 0;
     };
 
@@ -191,7 +207,7 @@ const CreateListing = () => {
                         return (
                             <Tooltip key={step.key} title={t(step.descKey)} placement="right" arrow>
                                 <Box
-                                    onClick={() => goToStep(idx)}
+                                    onClick={() => goToStep(idx, true)}
                                     sx={{
                                         display: "flex",
                                         alignItems: "center",
@@ -362,7 +378,7 @@ const CreateListing = () => {
                             floor={form.floor} totalFloors={form.totalFloors}
                             checkInFrom={form.checkInFrom} checkInUntil={form.checkInUntil}
                             checkOutFrom={form.checkOutFrom} checkOutUntil={form.checkOutUntil}
-                            selfCheckIn={form.selfCheckIn} set={set}
+                            selfCheckIn={form.selfCheckIn} errors={errors} set={set} clearError={clearError}
                         />
                     )}
                     {activeStep === 5 && (

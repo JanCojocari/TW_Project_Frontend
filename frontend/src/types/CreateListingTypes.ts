@@ -61,14 +61,85 @@ export const initialForm: FormState = {
     cancellationPolicy: "flexible",
 };
 
+const isPositiveInt = (val: string) => !!val && !isNaN(Number(val)) && Number(val) > 0;
+const isPositiveNum = (val: string) => !!val && !isNaN(Number(val)) && Number(val) > 0;
+
+// Validare per-step: verifica doar campurile relevante pentru step-ul curent
+export const validateStep = (form: FormState, step: number): Errors => {
+    const e: Errors = {};
+    if (step === 0) {
+        if (!form.address.trim())
+            e.address = "Adresa este obligatorie";
+        if (!isPositiveNum(form.cost))
+            e.cost = "Introduceți un preț valid";
+    }
+    if (step === 1) {
+        if (form.images.length === 0)
+            e.images = "Adăugați cel puțin o imagine";
+    }
+    if (step === 2) {
+        if (!form.city.trim())
+            e.city = "Orașul este obligatoriu";
+        if (!form.region.trim())
+            e.region = "Districtul este obligatoriu";
+        if (!form.postalCode.trim())
+            e.postalCode = "Codul poștal este obligatoriu";
+    }
+    // step 3 (facilities) este optional
+    if (step === 4) {
+        if (!isPositiveInt(form.rooms))
+            e.rooms = "Numărul de camere este obligatoriu";
+        if (!isPositiveInt(form.bedrooms))
+            e.bedrooms = "Numărul de dormitoare este obligatoriu";
+        if (!isPositiveInt(form.bathrooms))
+            e.bathrooms = "Numărul de băi este obligatoriu";
+        if (!isPositiveInt(form.beds))
+            e.beds = "Numărul de paturi este obligatoriu";
+        if (!isPositiveInt(form.floor))
+            e.floor = "Etajul este obligatoriu";
+        if (!isPositiveInt(form.totalFloors))
+            e.totalFloors = "Numărul total de etaje este obligatoriu";
+        if (!isPositiveNum(form.surfaceArea))
+            e.surfaceArea = "Suprafața este obligatorie";
+        if (!isPositiveInt(form.maxGuests))
+            e.maxGuests = "Numărul maxim de oaspeți este obligatoriu";
+        if (!form.checkInFrom.trim())
+            e.checkInFrom = "Ora de check-in (de la) este obligatorie";
+        if (!form.checkInUntil.trim())
+            e.checkInUntil = "Ora de check-in (până la) este obligatorie";
+        if (!form.checkOutFrom.trim())
+            e.checkOutFrom = "Ora de check-out (de la) este obligatorie";
+        if (!form.checkOutUntil.trim())
+            e.checkOutUntil = "Ora de check-out (până la) este obligatorie";
+    }
+    if (step === 5) {
+        if (!form.description.trim())
+            e.description = "Descrierea este obligatorie";
+    }
+    return e;
+};
+
 export const validate = (form: FormState): Errors => {
     const e: Errors = {};
-    if (!form.address.trim())     e.address     = "Adresa este obligatorie";
-    if (!form.cost || isNaN(Number(form.cost)) || Number(form.cost) <= 0)
-        e.cost        = "Introduceți un preț valid";
-    if (!form.city.trim())        e.city        = "Orașul este obligatoriu";
-    if (!form.description.trim()) e.description = "Descrierea este obligatorie";
-    if (form.images.length === 0) e.images      = "Adăugați cel puțin o imagine";
+    if (!form.address.trim())          e.address     = "Adresa este obligatorie";
+    if (!isPositiveNum(form.cost))     e.cost        = "Introduceți un preț valid";
+    if (form.images.length === 0)      e.images      = "Adăugați cel puțin o imagine";
+    if (!form.city.trim())             e.city        = "Orașul este obligatoriu";
+    if (!form.region.trim())           e.region      = "Districtul este obligatoriu";
+    if (!form.postalCode.trim())       e.postalCode  = "Codul poștal este obligatoriu";
+    if (!isPositiveInt(form.rooms))    e.rooms       = "Numărul de camere este obligatoriu";
+    if (!isPositiveInt(form.bedrooms)) e.bedrooms    = "Numărul de dormitoare este obligatoriu";
+    if (!isPositiveInt(form.bathrooms))e.bathrooms   = "Numărul de băi este obligatoriu";
+    if (!isPositiveInt(form.beds))     e.beds        = "Numărul de paturi este obligatoriu";
+    if (!isPositiveInt(form.floor))    e.floor       = "Etajul este obligatoriu";
+    if (!isPositiveInt(form.totalFloors)) e.totalFloors = "Numărul total de etaje este obligatoriu";
+    if (!isPositiveNum(form.surfaceArea)) e.surfaceArea = "Suprafața este obligatorie";
+    if (!isPositiveInt(form.maxGuests))   e.maxGuests   = "Numărul maxim de oaspeți este obligatoriu";
+    if (!form.checkInFrom.trim())      e.checkInFrom  = "Ora de check-in (de la) este obligatorie";
+    if (!form.checkInUntil.trim())     e.checkInUntil = "Ora de check-in (până la) este obligatorie";
+    if (!form.checkOutFrom.trim())     e.checkOutFrom = "Ora de check-out (de la) este obligatorie";
+    if (!form.checkOutUntil.trim())    e.checkOutUntil = "Ora de check-out (până la) este obligatorie";
+    if (!form.description.trim())      e.description  = "Descrierea este obligatorie";
     return e;
 };
 
