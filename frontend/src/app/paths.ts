@@ -1,5 +1,5 @@
 ﻿export const paths = {
-    home: "/",              
+    home: "/",
     login: "/login",
     register: "/register",
     dashboard: "/dashboard",
@@ -12,6 +12,7 @@
     support: "/support",
     payment: "/payments",
     createListing: "/createListing",
+    editListing: "/createListing/edit",
     settings: "/settings",
     serverError: "/500",
     admin: "/admin",

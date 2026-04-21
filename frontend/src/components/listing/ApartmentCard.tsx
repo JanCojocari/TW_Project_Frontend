@@ -1,6 +1,6 @@
 ﻿// components/listing/ApartmentCard.tsx
 import { Box, Card, Typography, Button, Chip } from "@mui/material";
-import { LocationOn as LocationOnIcon, FavoriteBorder as FavoriteBorderIcon, Favorite as FavoriteIcon } from "@mui/icons-material";
+import { LocationOn as LocationOnIcon, FavoriteBorder as FavoriteBorderIcon, Favorite as FavoriteIcon, Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import { memo }              from "react";
 import { useNavigate }       from "react-router-dom";
 import { useTranslation }    from "react-i18next";
@@ -14,6 +14,9 @@ interface Props {
     toggleFavorite: (id: number) => void;
     getUserName:    (id: number) => string;
     getStatus:      (apartment: Apartment) => string;
+    isOwner?:       boolean;
+    onEdit?:        (apartment: Apartment) => void;
+    onDelete?:      (apartment: Apartment) => void;
 }
 
 // Culoarea chip-ului in functie de status si ocupare
@@ -24,14 +27,14 @@ function getChipColor(apartment: Apartment): string {
     return "#16a34a";                                      // verde — disponibil
 }
 
-const ApartmentCard = ({ apartment, favorites, toggleFavorite, getUserName, getStatus }: Props) => {
+const ApartmentCard = ({ apartment, favorites, toggleFavorite, getUserName, getStatus, isOwner = false, onEdit, onDelete }: Props) => {
     const navigate    = useNavigate();
     const { t, i18n } = useTranslation();
     const isFav       = favorites.includes(apartment.Id_Apartment);
     const isOccupied  = apartment.Id_Renter !== null;
 
-    // Butonul de detalii e dezactivat daca anuntul nu e aprobat
-    const canViewDetails = apartment.status === "approved";
+    // owner-ul poate vedea detaliile indiferent de status; altii doar daca e approved
+    const canViewDetails = apartment.status === "approved" || isOwner;
 
     const intervalLabelMap: Record<string, string> = i18n.language === "en"
         ? { hour: "Hourly cost", day: "Daily cost",  month: "Monthly cost" }
@@ -62,6 +65,34 @@ const ApartmentCard = ({ apartment, favorites, toggleFavorite, getUserName, getS
                               letterSpacing: "0.5px", backdropFilter: "blur(8px)",
                               bgcolor: getChipColor(apartment), color: "white" }} />
                 </Box>
+
+                {/* Owner actions — Edit + Delete (lower right corner) */}
+                {isOwner && (
+                    <Box sx={{ position: "absolute", bottom: 12, right: 12, display: "flex", flexDirection: "column", gap: 0.8 }}>
+                        <Button
+                            onClick={(e) => { e.stopPropagation(); onEdit?.(apartment); }}
+                            sx={{ minWidth: "auto", width: 36, height: 36, borderRadius: "50%",
+                                bgcolor: "background.paper", color: "primary.main",
+                                border: `1px solid ${colors.border}`, backdropFilter: "blur(8px)",
+                                boxShadow: 1, p: 0,
+                                "&:hover": { bgcolor: "background.paper", color: colors.primaryDark, transform: "scale(1.1)", boxShadow: 2 },
+                            }}
+                        >
+                            <EditIcon sx={{ fontSize: 16 }} />
+                        </Button>
+                        <Button
+                            onClick={(e) => { e.stopPropagation(); onDelete?.(apartment); }}
+                            sx={{ minWidth: "auto", width: 36, height: 36, borderRadius: "50%",
+                                bgcolor: "background.paper", color: "error.main",
+                                border: `1px solid ${colors.border}`, backdropFilter: "blur(8px)",
+                                boxShadow: 1, p: 0,
+                                "&:hover": { bgcolor: "background.paper", color: "error.dark", transform: "scale(1.1)", boxShadow: 2 },
+                            }}
+                        >
+                            <DeleteIcon sx={{ fontSize: 16 }} />
+                        </Button>
+                    </Box>
+                )}
             </Box>
 
             {/* Content */}

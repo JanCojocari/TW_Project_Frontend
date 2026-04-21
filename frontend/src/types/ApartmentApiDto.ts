@@ -21,16 +21,21 @@ export interface MapLocationApi {
     city:        string;
     country:     string;
     fullAddress: string;
+    region?:     string;
+    postalCode?: string;
 }
 
 export interface AdditionalInfoApi {
     rooms:              number;
+    bedrooms:           number;
     bathrooms:          number;
+    beds:               number;
     floor:              number;
     totalFloors:        number;
     area:               number;
     maxGuests:          number;
     description:        string;
+    houseRules:         string;
     cancellationPolicy: CancellationPolicyApi;
 }
 
@@ -38,17 +43,29 @@ export interface FacilitiesApiDto {
     apartmentId:     number;
     wifi:            boolean;
     parking:         boolean;
+    parkingFree:     boolean;
     airConditioning: boolean;
     heating:         boolean;
     washer:          boolean;
     dryer:           boolean;
+    dishwasher:      boolean;
+    refrigerator:    boolean;
+    microwave:       boolean;
+    oven:            boolean;
+    stove:           boolean;
     kitchen:         boolean;
     tv:              boolean;
+    balcony:         boolean;
+    terrace:         boolean;
+    garden:          boolean;
     pool:            boolean;
     gym:             boolean;
     elevator:        boolean;
     petsAllowed:     boolean;
-    balcony:         boolean;
+    smokingAllowed:  boolean;
+    securityCamera:  boolean;
+    keypadEntry:     boolean;
+    safe:            boolean;
 }
 
 export interface ApartmentApiDto {
@@ -78,6 +95,7 @@ export interface ApartmentCreateApiDto {
     rentMode:        RentModeApi;
     location:        MapLocationApi;
     additionalInfo:  AdditionalInfoApi;
+    facilities?:     FacilitiesApiDto;
 }
 
 export interface ApartmentUpdateApiDto {
@@ -90,4 +108,5 @@ export interface ApartmentUpdateApiDto {
     rentMode:        RentModeApi;
     location:        MapLocationApi;
     additionalInfo:  AdditionalInfoApi;
+    facilities?:     FacilitiesApiDto;
 }

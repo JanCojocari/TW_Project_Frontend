@@ -1,7 +1,8 @@
 ﻿// pages/Listings.tsx
-import { Box, Container, Typography, Button, Badge } from "@mui/material";
+import { Box, Container, Typography, Button, Badge, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress, Snackbar, Alert } from "@mui/material";
 import { Home as HomeIcon, TrendingUp as TrendingUpIcon, FilterList as FilterListIcon } from "@mui/icons-material";
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate }    from "react-router-dom";
 import { useTranslation }    from "react-i18next";
 import type { Apartment }    from "../types/apartment.types.ts";
 import ApartmentCard         from "../components/listing/ApartmentCard.tsx";
@@ -12,12 +13,33 @@ import { gradients, colors } from "../theme/gradients.ts";
 import { apartmentService }  from "../services/apartmentService.ts";
 import { favoriteService }    from "../services/favoriteService.ts";
 import { useAuth }            from "../auth/AuthContext";
+import { paths }              from "../app/paths.ts";
 
 const LISTINGS_PER_PAGE = 24;
 
 const Listings = () => {
     const { t } = useTranslation();
+    const navigate        = useNavigate();
     const { currentUser } = useAuth();
+
+    const [deleteTarget, setDeleteTarget] = useState<Apartment | null>(null);
+    const [deleteBusy, setDeleteBusy]     = useState(false);
+    const [snack, setSnack]               = useState<{ msg: string; sev: "success" | "error" } | null>(null);
+
+    const handleDeleteConfirm = async () => {
+        if (!deleteTarget) return;
+        setDeleteBusy(true);
+        try {
+            await apartmentService.delete(deleteTarget.Id_Apartment);
+            setApartments(prev => prev.filter(a => a.Id_Apartment !== deleteTarget.Id_Apartment));
+            setSnack({ msg: "Anunțul a fost șters.", sev: "success" });
+        } catch {
+            setSnack({ msg: "Eroare la ștergere. Încearcă din nou.", sev: "error" });
+        } finally {
+            setDeleteBusy(false);
+            setDeleteTarget(null);
+        }
+    };
     const [apartments, setApartments]         = useState<Apartment[]>([]);
     const [searchQuery, setSearchQuery]      = useState("");
     const [favorites, setFavorites]          = useState<number[]>([]);
@@ -206,7 +228,16 @@ const Listings = () => {
                     <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", lg: "1fr 1fr 1fr" }, gap: 5, width: "100%" }}>
                         {visibleApartments.map((apt, idx) => (
                             <Box key={apt.Id_Apartment} sx={{ animation: `fadeInUp 0.5s cubic-bezier(0.165,0.84,0.44,1) ${idx * 0.08}s both`, "@keyframes fadeInUp": { from: { opacity: 0, transform: "translateY(28px)" }, to: { opacity: 1, transform: "translateY(0)" } } }}>
-                                <ApartmentCard apartment={apt} toggleFavorite={toggleFavorite} favorites={favorites} getStatus={getStatus} getUserName={(id: number) => `User #${id}`} />
+                                <ApartmentCard
+                                    apartment={apt}
+                                    toggleFavorite={toggleFavorite}
+                                    favorites={favorites}
+                                    getStatus={getStatus}
+                                    getUserName={(id: number) => `User #${id}`}
+                                    isOwner={currentUser?.id === apt.Id_Owner}
+                                    onEdit={(a) => navigate(paths.editListing, { state: { apartment: a } })}
+                                    onDelete={(a) => setDeleteTarget(a)}
+                                />
                             </Box>
                         ))}
                     </Box>
@@ -246,6 +277,36 @@ const Listings = () => {
                     </Box>
                 )}
             </Container>
+
+            {/* ── Dialog confirmare delete ─────────────────────────────── */}
+            <Dialog open={!!deleteTarget} onClose={() => !deleteBusy && setDeleteTarget(null)}>
+                <DialogTitle fontWeight={700}>Stergi anuntul?</DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        Esti sigur ca vrei sa stergi anuntul <strong>{deleteTarget?.Address}</strong>? Aceasta actiune este ireversibila.
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteTarget(null)} disabled={deleteBusy}>
+                        Anuleaza
+                    </Button>
+                    <Button onClick={handleDeleteConfirm} color="error" variant="contained" disabled={deleteBusy}>
+                        {deleteBusy ? <CircularProgress size={16} /> : "Sterge"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* ── Snackbar notificare ──────────────────────────────────── */}
+            <Snackbar
+                open={!!snack}
+                autoHideDuration={4000}
+                onClose={() => setSnack(null)}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            >
+                <Alert severity={snack?.sev ?? "success"} onClose={() => setSnack(null)} sx={{ fontWeight: 600 }}>
+                    {snack?.msg}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 };

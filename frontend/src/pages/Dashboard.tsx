@@ -1,10 +1,12 @@
 // pages/Dashboard.tsx — sidebar desktop + bottom nav mobile
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate }       from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation }    from "react-i18next";
 import {
     Avatar, Box, Typography, BottomNavigation, BottomNavigationAction, Paper,
     useMediaQuery, useTheme,
+    Dialog, DialogTitle, DialogContent, DialogActions,
+    Button, CircularProgress, Snackbar, Alert,
 } from "@mui/material";
 import PersonIcon    from "@mui/icons-material/Person";
 import ApartmentIcon from "@mui/icons-material/Apartment";
@@ -115,7 +117,6 @@ function PageHeading({ title, subtitle }: { title: string; subtitle?: string }) 
 }
 
 export default function Dashboard() {
-    const navigate        = useNavigate();
     const { t }           = useTranslation();
     const { currentUser } = useAuth();
     const theme           = useTheme();
@@ -125,20 +126,36 @@ export default function Dashboard() {
         () => (localStorage.getItem("rentora_dash_tab") as NavKey) ?? "profile"
     );
 
+    const navigate        = useNavigate();
+    const location        = useLocation();
+
     const currentUserId = currentUser?.id ?? 0;
 
     const [myListings, setMyListings]       = useState<Apartment[]>([]);
     const [allApartments, setAllApartments] = useState<Apartment[]>([]);
     const [favoriteIds, setFavoriteIds]     = useState<number[]>([]);
 
-    useEffect(() => {
+    const fetchListings = () => {
         if (!currentUserId) return;
         apartmentService.getByOwner(currentUserId).then(setMyListings).catch(() => setMyListings([]));
         apartmentService.getAll().then(setAllApartments).catch(() => setAllApartments([]));
         favoriteService.getByUser(currentUserId)
             .then(favs => setFavoriteIds(favs.map(f => f.apartmentId)))
             .catch(() => setFavoriteIds([]));
+    };
+
+    useEffect(() => {
+        fetchListings();
     }, [currentUserId]);
+
+    // re-fetch dupa redirect de la editare listing
+    useEffect(() => {
+        if ((location.state as { refreshListings?: boolean } | null)?.refreshListings) {
+            fetchListings();
+            // curata state-ul ca sa nu re-fetch-uim la fiecare render
+            navigate(paths.dashboard, { replace: true, state: {} });
+        }
+    }, [location.state]);
 
     const favoriteApartments = useMemo(() => {
         const set = new Set(favoriteIds);
@@ -160,6 +177,31 @@ export default function Dashboard() {
     const go = (key: NavKey) => {
         setActive(key);
         localStorage.setItem("rentora_dash_tab", key);
+    };
+
+    // ── Delete listing ────────────────────────────────────────────────────────
+    const [deleteTarget, setDeleteTarget] = useState<Apartment | null>(null);
+    const [deletebusy, setDeleteBusy]     = useState(false);
+    const [snack, setSnack]               = useState<{ msg: string; sev: "success" | "error" } | null>(null);
+
+    const handleDeleteConfirm = async () => {
+        if (!deleteTarget) return;
+        setDeleteBusy(true);
+        try {
+            await apartmentService.delete(deleteTarget.Id_Apartment);
+            setMyListings(prev => prev.filter(a => a.Id_Apartment !== deleteTarget.Id_Apartment));
+            setSnack({ msg: "Anunțul a fost șters.", sev: "success" });
+        } catch {
+            setSnack({ msg: "Eroare la ștergere. Încearcă din nou.", sev: "error" });
+        } finally {
+            setDeleteBusy(false);
+            setDeleteTarget(null);
+        }
+    };
+
+    // ── Edit listing ──────────────────────────────────────────────────────────
+    const handleEdit = (apt: Apartment) => {
+        navigate(paths.editListing, { state: { apartment: apt } });
     };
 
     const initials = currentUser
@@ -276,6 +318,8 @@ export default function Dashboard() {
                             favoriteIds={favoriteIds}
                             onToggleFavorite={toggleFavorite}
                             getUserName={(id) => `User #${id}`}
+                            onEdit={handleEdit}
+                            onDelete={setDeleteTarget}
                         />
                     </>
                 )}
@@ -346,6 +390,36 @@ export default function Dashboard() {
                     </BottomNavigation>
                 </Paper>
             )}
+
+            {/* ── Dialog confirmare delete ─────────────────────────────── */}
+            <Dialog open={!!deleteTarget} onClose={() => !deletebusy && setDeleteTarget(null)}>
+                <DialogTitle fontWeight={700}>Stergi anuntul?</DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        Esti sigur ca vrei sa stergi anuntul <strong>{deleteTarget?.Address}</strong>? Aceasta actiune este ireversibila.
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteTarget(null)} disabled={deletebusy}>
+                        Anuleaza
+                    </Button>
+                    <Button onClick={handleDeleteConfirm} color="error" variant="contained" disabled={deletebusy}>
+                        {deletebusy ? <CircularProgress size={16} /> : "Sterge"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* ── Snackbar notificare ──────────────────────────────────── */}
+            <Snackbar
+                open={!!snack}
+                autoHideDuration={4000}
+                onClose={() => setSnack(null)}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            >
+                <Alert severity={snack?.sev ?? "success"} onClose={() => setSnack(null)} sx={{ fontWeight: 600 }}>
+                    {snack?.msg}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }

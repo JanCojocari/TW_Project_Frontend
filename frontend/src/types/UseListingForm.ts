@@ -8,6 +8,8 @@ export const useListingForm = () => {
     const [errors, setErrors]       = useState<Errors>({});
     const [submitted, setSubmitted] = useState(false);
 
+    // ✅ FIX: useCallback previne crearea de referințe noi la fiecare render,
+    //         ceea ce oprea React.memo din componentele copil să funcționeze.
     const set = useCallback(<K extends keyof FormState>(key: K, value: FormState[K]) =>
         setForm(prev => ({ ...prev, [key]: value })), []);
 
@@ -29,6 +31,7 @@ export const useListingForm = () => {
             images:           [...prev.images, ...newFiles],
             imagePreviewUrls: [...prev.imagePreviewUrls, ...newUrls],
         }));
+        // ✅ Nu mai apelăm clearError (referință externă) — actualizăm direct
         setErrors(prev => ({ ...prev, images: undefined }));
     }, []);
 
@@ -50,8 +53,8 @@ export const useListingForm = () => {
     const removeLandmark = useCallback((i: number) =>
         setForm(prev => ({ ...prev, landmarks: prev.landmarks.filter((_, j) => j !== i) })), []);
 
-    const submit = useCallback((onSuccess: (markDone: () => void) => void) => {
-        const e = validate(form);
+    const submit = useCallback((onSuccess: (markDone: () => void) => void, isEditMode = false) => {
+        const e = validate(form, isEditMode);
         setErrors(e);
         if (Object.keys(e).length === 0) {
             onSuccess(() => setSubmitted(true));

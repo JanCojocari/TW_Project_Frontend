@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Rentora.DataAccess;
 
@@ -11,9 +12,11 @@ using Rentora.DataAccess;
 namespace Rentora.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260421163215_AddBedroomsBedsHouseRulesRegionPostalCode")]
+    partial class AddBedroomsBedsHouseRulesRegionPostalCode
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -84,16 +87,10 @@ namespace Rentora.DataAccess.Migrations
                     b.Property<bool>("Balcony")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("Dishwasher")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("Dryer")
                         .HasColumnType("bit");
 
                     b.Property<bool>("Elevator")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("Garden")
                         .HasColumnType("bit");
 
                     b.Property<bool>("Gym")
@@ -102,22 +99,10 @@ namespace Rentora.DataAccess.Migrations
                     b.Property<bool>("Heating")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("KeypadEntry")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("Kitchen")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("Microwave")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("Oven")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("Parking")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("ParkingFree")
                         .HasColumnType("bit");
 
                     b.Property<bool>("PetsAllowed")
@@ -126,25 +111,7 @@ namespace Rentora.DataAccess.Migrations
                     b.Property<bool>("Pool")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("Refrigerator")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("Safe")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("SecurityCamera")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("SmokingAllowed")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("Stove")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("TV")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("Terrace")
                         .HasColumnType("bit");
 
                     b.Property<bool>("Washer")

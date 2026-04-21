@@ -81,8 +81,8 @@ const StepPhotos = memo(({ images, imagePreviewUrls, errors, onAddImages, onRemo
                 <Typography variant="caption" color="text.secondary">
                     {t("components.steps.photos.hint")}
                     {" · "}
-                    <Box component="span" sx={{ fontWeight: 700, color: images.length > 0 ? colors.primaryDark : "text.secondary" }}>
-                        {images.length}/8 {t("components.steps.photos.added")}
+                    <Box component="span" sx={{ fontWeight: 700, color: imagePreviewUrls.length > 0 ? colors.primaryDark : "text.secondary" }}>
+                        {imagePreviewUrls.length}/8 {t("components.steps.photos.added")}
                     </Box>
                 </Typography>
                 {hasError && (
@@ -163,7 +163,7 @@ const StepPhotos = memo(({ images, imagePreviewUrls, errors, onAddImages, onRemo
                     ))}
 
                     {/* Add more button */}
-                    {images.length < 8 && (
+                    {imagePreviewUrls.length < 8 && (
                         <Box
                             onClick={() => fileInputRef.current?.click()}
                             sx={{
