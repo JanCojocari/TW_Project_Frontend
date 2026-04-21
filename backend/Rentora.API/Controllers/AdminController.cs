@@ -91,15 +91,15 @@ public class AdminController : ControllerBase
         var apartments = db.Apartments
             .Include(a => a.Owner)
             .OrderByDescending(a => a.Id)
+            .ToList()
             .Select(a => new {
                 a.Id, a.OwnedId, a.RenterId, a.Address, a.ImageUrl,
                 a.Interval, a.CostPerInterval, a.Currency, a.RentMode, a.Status,
                 a.Location, a.AdditionlaInfo,
-                OwnerName    = a.Owner != null ? a.Owner.Name    : string.Empty,
-                OwnerSurname = a.Owner != null ? a.Owner.Surname : string.Empty,
-                OwnerEmail   = a.Owner != null ? a.Owner.Email   : string.Empty,
-            })
-            .ToList();
+                OwnerName    = a.Owner?.Name    ?? string.Empty,
+                OwnerSurname = a.Owner?.Surname ?? string.Empty,
+                OwnerEmail   = a.Owner?.Email   ?? string.Empty,
+            });
         return Ok(apartments);
     }
 
