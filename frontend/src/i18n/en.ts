@@ -387,6 +387,7 @@ export default {
             submit:          "Log in now",
             noAccount:       "Don't have an account?",
             registerLink:    "Create account",
+            loading:         "Loading...",
         },
     },
 

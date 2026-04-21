@@ -386,6 +386,7 @@ export default {
             submit:          "Creează Contul",
             haveAccount:     "Ai deja un cont activ?",
             loginLink:       "Autentifică-te",
+            loading:         "Se încarcă..."
         },
         login: {
             tabLandlord:     "Proprietari",
@@ -401,6 +402,7 @@ export default {
             submit:          "Conectează-te acum",
             noAccount:       "Nu ai un cont valid?",
             registerLink:    "Creează cont",
+            loading:         "Se încarcă...",
         },
     },
 
