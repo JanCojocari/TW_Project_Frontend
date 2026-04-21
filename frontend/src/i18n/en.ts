@@ -127,7 +127,7 @@ export default {
         location:     "Location",
         locationPlaceholder: "e.g. Center, Buiucani...",
         rating:       "Rating & Reviews",
-        minRating:    "Minimum rating (out of 10)",
+        minRating:    "Minimum rating (out of 5)",
         minReviews:   "Minimum number of reviews",
         facilities:   "Facilities",
         selected:     "selected",

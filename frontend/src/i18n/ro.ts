@@ -134,7 +134,7 @@ export default {
         location:     "Locație",
         locationPlaceholder: "ex: Centru, Buiucani...",
         rating:       "Rating & Recenzii",
-        minRating:    "Rating minim (din 10)",
+        minRating:    "Rating minim (din 5)",
         minReviews:   "Nr. minim recenzii",
         facilities:   "Facilități",
         selected:     "selectate",
