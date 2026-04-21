@@ -2,6 +2,7 @@ namespace Rentora.BusinessLayer.Structure;
 
 using Rentora.BusinessLayer.Core;
 using Rentora.BusinessLayer.Interfaces;
+using Rentora.Domain.Models;
 using Rentora.Domain.Models.Apartment;
 using Rentora.Domain.Models.Responses;
 
@@ -9,6 +10,9 @@ public class ApartmentActionExecution : ApartmentActions, IApartmentAction
 {
     public List<ApartmentDto> GetAll()
         => GetAllExecution();
+
+    public PagedResult<ApartmentDto> GetPaged(ApartmentQueryParams p)
+        => GetPagedExecution(p);
 
     public ApartmentDto? GetById(int id)
         => GetByIdExecution(id);

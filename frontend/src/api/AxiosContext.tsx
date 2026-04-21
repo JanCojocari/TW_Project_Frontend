@@ -1,8 +1,7 @@
 import { createContext, useContext, useEffect } from "react";
 import type { AxiosInstance } from "axios";
 import axiosInstance from "./axiosInstance";
-
-const TOKEN_KEY = "token";
+import { tokenStore } from "../auth/tokenStore";
 
 const AxiosContext = createContext<AxiosInstance>(axiosInstance);
 
@@ -10,7 +9,7 @@ export const AxiosProvider = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         const requestInterceptor = axiosInstance.interceptors.request.use(
             (config) => {
-                const token = localStorage.getItem(TOKEN_KEY);
+                const token = tokenStore.get();
 
                 if (token) {
                     config.headers = config.headers || {};
@@ -28,10 +27,9 @@ export const AxiosProvider = ({ children }: { children: React.ReactNode }) => {
                 const status = error.response?.status;
 
                 if (status === 401) {
-                    localStorage.removeItem(TOKEN_KEY);
-                    localStorage.removeItem("rentora_user");
-
-                    window.location.href = "/login";
+                    tokenStore.clear();
+                    sessionStorage.removeItem("rentora_user");
+                    window.dispatchEvent(new Event("rentora:unauthorized"));
                 }
 
                 const isNetworkError = !error.response;

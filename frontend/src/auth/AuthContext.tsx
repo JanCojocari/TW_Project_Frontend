@@ -1,11 +1,11 @@
 // AuthContext.tsx
 import { createContext, useContext, useState, useEffect } from "react";
 import { useAxios } from "../api/AxiosContext";
+import { tokenStore } from "./tokenStore";
 import type { UserApiDto } from "../services/userService";
 import type { AxiosError } from "axios";
 
 const STORAGE_KEY = "rentora_user";
-const TOKEN_KEY   = "token";
 
 type AuthContextType = {
     isAuthenticated:   boolean;
@@ -23,19 +23,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<UserApiDto | null>(null);
 
     useEffect(() => {
-        const rawUser = localStorage.getItem(STORAGE_KEY);
-        const token   = localStorage.getItem(TOKEN_KEY);
-        if (rawUser && token) {
+        const rawUser = sessionStorage.getItem(STORAGE_KEY);
+        if (rawUser) {
             setCurrentUser(JSON.parse(rawUser));
-            axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         }
     }, [axios]);
 
     useEffect(() => {
+        const handleUnauthorized = () => {
+            delete axios.defaults.headers.common["Authorization"];
+            setCurrentUser(null);
+        };
+        window.addEventListener("rentora:unauthorized", handleUnauthorized);
+        return () => window.removeEventListener("rentora:unauthorized", handleUnauthorized);
+    }, [axios]);
+
+    useEffect(() => {
         if (currentUser) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
         } else {
-            localStorage.removeItem(STORAGE_KEY);
+            sessionStorage.removeItem(STORAGE_KEY);
         }
     }, [currentUser]);
 
@@ -43,7 +50,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
             const res = await axios.post("/auth/login", { email, password });
             const { user, accessToken } = res.data;
-            localStorage.setItem(TOKEN_KEY, accessToken);
+            tokenStore.set(accessToken);
             axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
             setCurrentUser(user);
         } catch (err) {
@@ -54,7 +61,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     const logout = () => {
-        localStorage.removeItem(TOKEN_KEY);
+        tokenStore.clear();
         delete axios.defaults.headers.common["Authorization"];
         setCurrentUser(null);
     };
