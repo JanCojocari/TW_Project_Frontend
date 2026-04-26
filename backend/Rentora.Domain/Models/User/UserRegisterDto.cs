@@ -9,4 +9,5 @@ public class UserRegisterDto
     public string Phone { get; set; } = string.Empty;
     public DateTime Birthday { get; set; }
     public string? Gender { get; set; }
+    public string? Role { get; set; }
 }

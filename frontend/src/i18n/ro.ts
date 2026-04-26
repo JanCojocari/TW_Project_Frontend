@@ -14,6 +14,14 @@ export default {
         logout:        "Deconectare",
     },
 
+    roleSelection: {
+        question: "Dispui de un imobil pe care vrei să-l monetizezi?",
+        question2: "Ești gata să dispui de cele mai avantajoase oferte imobiliare din țară?",
+        yes: "Da",
+        no: "Nu",
+        redirecting: "Redirecționare..."
+    },
+
     // ── Footer ───────────────────────────────────────────────────────────────
     footer: {
         tagline:  "Platforma ta de încredere pentru găsirea și gestionarea proprietăților imobiliare în Moldova.",
