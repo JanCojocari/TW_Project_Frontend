@@ -220,7 +220,7 @@ export default {
             nights:       "nights",
             elapsed:      "elapsed",
             badgePast:    "Past",
-       },
+        },
         previousStays: {
             empty:     "You have no previous stays.",
             badgeDone: "Completed",
@@ -230,10 +230,10 @@ export default {
             nights:       "nights",
         },
         recentViewed: {
-            empty:     "You haven't viewed any apartments yet.", 
-            clearAll:  "Clear history", 
-            clearing:  "Clearing...", 
-            viewedOn:  "Viewed on", 
+            empty:     "You haven't viewed any apartments yet.",
+            clearAll:  "Clear history",
+            clearing:  "Clearing...",
+            viewedOn:  "Viewed on",
             errorLoad: "Failed to load recently viewed apartments.",
             groups: {
                 all: "All",
@@ -497,6 +497,17 @@ export default {
         successScreen: {
             title:    "Request submitted successfully!",
             subtitle: "Administrators will review and validate your listing shortly.",
+        },
+        stayPeriodSelector: {
+            title:          "Stay Period",
+            hoursLabel:     "Number of hours",
+            arrivalLabel:   "Arrival date",
+            departureLabel: "Departure date",
+            monthsLabel:    "Number of months",
+            nightsSelected: "nights selected",
+            luna:           "month",
+            luni:           "months",
+            bookedHint:     "Days marked in red are not available.",
         },
     },
     admin: {

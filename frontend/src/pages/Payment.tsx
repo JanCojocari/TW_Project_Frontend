@@ -14,10 +14,11 @@ import PaymentSuccessScreen         from "../components/payment/PaymentSuccessSc
 import MobileSummaryAccordion       from "../components/payment/MobileSummaryAccordion.tsx";
 import PayPalButton from "../components/payment/PayPalButton.tsx";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import StayPeriodSelector from "../components/payment/StayPeriodSelector";
 import type { Dayjs } from "dayjs";
 import { useAuth } from "../auth/AuthContext";
+import { paymentHistoryService, type BookedPeriodDto } from "../services/paymentHistoryService";
 
 interface Props {
     summary?:              OrderSummary;
@@ -38,10 +39,18 @@ const PaymentPage = ({ summary: summaryProp, defaultPaymentMethod = "card", onPa
     const [months, setMonths] = useState<number>(1);
     const [monthsInput, setMonthsInput] = useState<string>("1");
     const [hoursInput, setHoursInput] = useState<string>("1");
+    const [bookedPeriods, setBookedPeriods] = useState<BookedPeriodDto[]>([]);
     const navigate = useNavigate();
     const { currentUser } = useAuth();
     const renterId = currentUser?.id ?? 0;
-    const apartmentId     = searchParams.get("apartmentId");
+    const apartmentId = searchParams.get("apartmentId");
+
+    useEffect(() => {
+        if (!apartmentId) return;
+        paymentHistoryService.getBookedPeriods(Number(apartmentId))
+            .then(setBookedPeriods)
+            .catch(() => {});
+    }, [apartmentId]);
     const summary         = useOrderSummary(
         summaryProp,
         apartmentId,
@@ -108,7 +117,12 @@ const PaymentPage = ({ summary: summaryProp, defaultPaymentMethod = "card", onPa
                     months={months}
                     monthsInput={monthsInput}
                     dateError={dateError}
-                    onStartChange={(val) => { setStartDate(val); setEndDate(null); setDateError(null); }}
+                    bookedPeriods={bookedPeriods}
+                    onStartChange={(val) => {
+                        setStartDate(val);
+                        setEndDate(interval === "month" && val ? val.add(months, "month") : null);
+                        setDateError(null);
+                    }}
                     onEndChange={(val) => { setEndDate(val); setDateError(null); }}
                     onHoursChange={(input, value) => { setHoursInput(input); setHours(value); }}
                     onMonthsChange={(input, value) => {

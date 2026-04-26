@@ -1,59 +1,79 @@
-// components/admin/ReviewsTab.tsx
+// components/admin/SupportTab.tsx
 import { useEffect, useState, useMemo } from "react";
 import {
     Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     Paper, IconButton, Tooltip, Dialog, DialogTitle, DialogContent,
-    DialogActions, Button, Typography, CircularProgress, Alert, Rating,
-    TextField, InputAdornment,
+    DialogActions, Button, Typography, CircularProgress, Alert,
+    TextField, InputAdornment, Chip, Select, MenuItem,
 } from "@mui/material";
-import DeleteIcon         from "@mui/icons-material/Delete";
-import SearchIcon         from "@mui/icons-material/Search";
-import { useTranslation } from "react-i18next";
-import { adminService, type AdminReview } from "../../services/adminService";
-import { formatDate } from "../../utils/formatDate.ts"
+import DeleteIcon from "@mui/icons-material/Delete";
+import SearchIcon from "@mui/icons-material/Search";
+import { adminService, type AdminSupportRequest } from "../../services/adminService";
+import { formatDate } from "../../utils/formatDate.ts";
 
-export default function ReviewsTab() {
-    const { t }                   = useTranslation();
-    const [reviews, setReviews]   = useState<AdminReview[]>([]);
-    const [loading, setLoading]   = useState(true);
-    const [error, setError]       = useState<string | null>(null);
-    const [confirmDelete, setConfirmDelete] = useState<AdminReview | null>(null);
-    const [busy, setBusy]         = useState(false);
-    const [query, setQuery]       = useState("");
+const STATUS_LABELS: Record<number, string> = {
+    0: "Open",
+    1: "In Progress",
+    2: "Resolved",
+    3: "Closed",
+};
 
-    const load = async () => {
-        setLoading(true);
-        try {
-            setReviews(await adminService.getReviews());
-            setError(null);
-        } catch {
-            setError(t("admin.reviews.errorLoad"));
-        } finally {
-            setLoading(false);
-        }
-    };
+const STATUS_COLORS: Record<number, "warning" | "info" | "success" | "default"> = {
+    0: "warning",
+    1: "info",
+    2: "success",
+    3: "default",
+};
 
-    useEffect(() => { load(); }, []);
+const STATUS_API_VALUES: Record<number, string> = {
+    0: "Open",
+    1: "InProgress",
+    2: "Resolved",
+    3: "Closed",
+};
 
-    // filtrare client-side: id, userId (renterId), apartmentId
+export default function SupportTab() {
+    const [requests, setRequests]       = useState<AdminSupportRequest[]>([]);
+    const [loading, setLoading]         = useState(true);
+    const [error, setError]             = useState<string | null>(null);
+    const [confirmDelete, setConfirmDelete] = useState<AdminSupportRequest | null>(null);
+    const [busy, setBusy]               = useState(false);
+    const [query, setQuery]             = useState("");
+
+    useEffect(() => {
+        adminService.getSupportRequests()
+            .then(setRequests)
+            .catch(() => setError("Nu s-au putut incarca cererile de suport."))
+            .finally(() => setLoading(false));
+    }, []);
+
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
-        if (!q) return reviews;
-        return reviews.filter(r =>
+        if (!q) return requests;
+        return requests.filter(r =>
             String(r.id).includes(q) ||
-            String(r.userId).includes(q) ||
-            String(r.apartmentId).includes(q)
+            r.email.toLowerCase().includes(q) ||
+            r.subject.toLowerCase().includes(q)
         );
-    }, [reviews, query]);
+    }, [requests, query]);
+
+    const handleStatusChange = async (id: number, newStatus: number) => {
+        try {
+            await adminService.updateSupportStatus(id, STATUS_API_VALUES[newStatus]);
+            setRequests(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r));
+        } catch {
+            setError("Eroare la actualizarea statusului.");
+        }
+    };
 
     const handleDelete = async () => {
         if (!confirmDelete) return;
         setBusy(true);
         try {
-            await adminService.deleteReview(confirmDelete.id);
-            setReviews(prev => prev.filter(r => r.id !== confirmDelete.id));
+            await adminService.deleteSupport(confirmDelete.id);
+            setRequests(prev => prev.filter(r => r.id !== confirmDelete.id));
         } catch {
-            setError(t("admin.reviews.errorDelete"));
+            setError("Eroare la stergerea cererii.");
         } finally {
             setBusy(false);
             setConfirmDelete(null);
@@ -67,7 +87,7 @@ export default function ReviewsTab() {
         <>
             <TextField
                 fullWidth size="small"
-                placeholder={t("admin.reviews.searchPlaceholder")}
+                placeholder="Cauta dupa ID, email sau subiect..."
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 sx={{ mb: 2 }}
@@ -84,31 +104,45 @@ export default function ReviewsTab() {
                 <Table size="small">
                     <TableHead>
                         <TableRow sx={{ "& th": { fontWeight: 700, bgcolor: "background.default" } }}>
-                            <TableCell>{t("admin.reviews.colId")}</TableCell>
-                            <TableCell>{t("admin.reviews.colApartment")}</TableCell>
-                            <TableCell>{t("admin.reviews.colUserId")}</TableCell>
-                            <TableCell>{t("admin.reviews.colRating")}</TableCell>
-                            <TableCell>{t("admin.reviews.colComment")}</TableCell>
-                            <TableCell>{t("admin.reviews.colCreated")}</TableCell>
-                            <TableCell align="right">{t("admin.reviews.colActions")}</TableCell>
+                            <TableCell>ID</TableCell>
+                            <TableCell>Email</TableCell>
+                            <TableCell>Subiect</TableCell>
+                            <TableCell>Status</TableCell>
+                            <TableCell>Data</TableCell>
+                            <TableCell align="right">Actiuni</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filtered.map(review => (
-                            <TableRow key={review.id} hover>
-                                <TableCell>{review.id}</TableCell>
-                                <TableCell>#{review.apartmentId}</TableCell>
-                                <TableCell>{review.userId}</TableCell>
+                        {filtered.map(req => (
+                            <TableRow key={req.id} hover>
+                                <TableCell>{req.id}</TableCell>
+                                <TableCell>{req.email}</TableCell>
+                                <TableCell sx={{ maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                    {req.subject}
+                                </TableCell>
                                 <TableCell>
-                                    <Rating value={review.rating} readOnly size="small" />
+                                    <Select
+                                        size="small"
+                                        value={req.status}
+                                        onChange={e => handleStatusChange(req.id, Number(e.target.value))}
+                                        renderValue={(val) => (
+                                            <Chip
+                                                label={STATUS_LABELS[val as number]}
+                                                size="small"
+                                                color={STATUS_COLORS[val as number]}
+                                            />
+                                        )}
+                                        sx={{ minWidth: 130, "& .MuiOutlinedInput-notchedOutline": { border: "none" } }}
+                                    >
+                                        {Object.entries(STATUS_LABELS).map(([val, label]) => (
+                                            <MenuItem key={val} value={Number(val)}>{label}</MenuItem>
+                                        ))}
+                                    </Select>
                                 </TableCell>
-                                <TableCell sx={{ maxWidth: 250, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                    {review.comment ?? <em style={{ opacity: 0.5 }}>{t("admin.reviews.noComment")}</em>}
-                                </TableCell>
-                                <TableCell>{formatDate(review.createdAt)}</TableCell>
+                                <TableCell>{formatDate(req.createdAt)}</TableCell>
                                 <TableCell align="right">
-                                    <Tooltip title={t("admin.common.delete")}>
-                                        <IconButton size="small" color="error" onClick={() => setConfirmDelete(review)}>
+                                    <Tooltip title="Sterge">
+                                        <IconButton size="small" color="error" onClick={() => setConfirmDelete(req)}>
                                             <DeleteIcon fontSize="small" />
                                         </IconButton>
                                     </Tooltip>
@@ -117,8 +151,8 @@ export default function ReviewsTab() {
                         ))}
                         {filtered.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={7} align="center" sx={{ py: 4, color: "text.disabled" }}>
-                                    {t("admin.reviews.noResults")}
+                                <TableCell colSpan={6} align="center" sx={{ py: 4, color: "text.disabled" }}>
+                                    <Typography variant="body2">Nicio cerere de suport gasita.</Typography>
                                 </TableCell>
                             </TableRow>
                         )}
@@ -127,16 +161,16 @@ export default function ReviewsTab() {
             </TableContainer>
 
             <Dialog open={!!confirmDelete} onClose={() => setConfirmDelete(null)}>
-                <DialogTitle fontWeight={700}>{t("admin.reviews.deleteTitle")}</DialogTitle>
+                <DialogTitle fontWeight={700}>Sterge cererea de suport</DialogTitle>
                 <DialogContent>
                     <Typography>
-                        {t("admin.reviews.deleteDesc", { id: confirmDelete?.id, userId: confirmDelete?.userId })}
+                        Sigur vrei sa stergi cererea #{confirmDelete?.id} de la {confirmDelete?.email}?
                     </Typography>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setConfirmDelete(null)} disabled={busy}>{t("admin.common.cancel")}</Button>
+                    <Button onClick={() => setConfirmDelete(null)} disabled={busy}>Anuleaza</Button>
                     <Button onClick={handleDelete} color="error" variant="contained" disabled={busy}>
-                        {busy ? <CircularProgress size={16} /> : t("admin.common.delete")}
+                        {busy ? <CircularProgress size={16} /> : "Sterge"}
                     </Button>
                 </DialogActions>
             </Dialog>
