@@ -1,21 +1,26 @@
-// pages/Register.tsx
+// src/pages/Register.tsx
 import { Box, Button, Container, Paper, TextField, Typography, MenuItem, Stack } from "@mui/material";
 import ApartmentIcon from "@mui/icons-material/Apartment";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link }            from "react-router-dom";
+import { useTranslation }  from "react-i18next";
+import { DatePicker }      from "@mui/x-date-pickers/DatePicker";
+import { AdapterDayjs }    from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { useState } from "react";
-import { type Dayjs } from "dayjs";
+import { useState }        from "react";
+import { type Dayjs }      from "dayjs";
 import { gradients, colors } from "../theme/gradients.ts";
-import { useAxios } from "../api/AxiosContext.tsx";
+import { useAxios }        from "../api/AxiosContext.tsx";
 
 const Register = () => {
-    const navigate = useNavigate();
-    const { t }    = useTranslation();
-    const axios    = useAxios();
+    const navigate         = useNavigate();
+    const { t }            = useTranslation();
+    const axios            = useAxios();
+    const [searchParams]   = useSearchParams();
+
+    // role vine din query param (?role=owner | ?role=renter)
+    // fallback la "renter" daca lipseste
+    const role = (searchParams.get("role") === "owner" ? "owner" : "renter") as "owner" | "renter";
 
     const [formData, setFormData] = useState({
         name:            "",
@@ -54,7 +59,8 @@ const Register = () => {
             password: formData.password,
             phone:    formData.phone,
             birthday: birthday.format("YYYY-MM-DD"),
-            gender:   formData.gender, // "male" | "female" — chei neutre
+            gender:   formData.gender,
+            role,                          // "owner" | "renter" din query param
         };
 
         setLoading(true);
@@ -149,7 +155,6 @@ const Register = () => {
                                     onChange={handleChange}
                                     fullWidth required
                                 >
-                                    {/* Valori neutre — nu depind de limba activa */}
                                     <MenuItem value="">{t("auth.register.genderDefault")}</MenuItem>
                                     <MenuItem value="male">{t("auth.register.genderMale")}</MenuItem>
                                     <MenuItem value="female">{t("auth.register.genderFemale")}</MenuItem>

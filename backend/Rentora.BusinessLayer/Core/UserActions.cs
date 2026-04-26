@@ -36,7 +36,9 @@ public class UserActions
             Phone        = data.Phone,
             Birthday     = data.Birthday,
             Gender       = data.Gender,
-            Role         = Rentora.Domain.Enums.Role.Renter
+            Role = data.Role?.ToLower() == "owner"
+                ? Rentora.Domain.Enums.Role.Owner
+                : Rentora.Domain.Enums.Role.Renter
         };
 
         db.Users.Add(user);

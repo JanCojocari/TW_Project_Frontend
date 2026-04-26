@@ -13,6 +13,14 @@ export default {
         logout:        "Log Out",
     },
 
+    roleSelection: {
+        question: "Do you own a property you want to monetize?",
+        question2: "Ready to get access to the best real estate deals in the country?",
+        yes: "Yes",
+        no: "No",
+        redirecting: "Redirecting..."
+    },
+
     footer: {
         tagline:  "Your trusted platform for finding and managing real estate properties in Moldova.",
         terms:    "Terms & Conditions",
