@@ -152,6 +152,16 @@ public class ApartmentActions
         if (apartment == null)
             return new ActionResponse { IsSuccess = false, Message = "Apartment not found." };
 
+        // blocheaza editarea daca exista un payment activ (viitor) sau in curs
+        var now = DateTime.UtcNow;
+        var hasActivePayment = db.Payments.Any(p =>
+            p.ApartmentId == data.Id &&
+            p.StartDate != null && p.EndDate != null &&
+            p.EndDate > now);
+
+        if (hasActivePayment)
+            return new ActionResponse { IsSuccess = false, Message = "Cannot edit apartment with an active or upcoming booking." };
+
         apartment.Address        = data.Address;
         apartment.ImageUrl       = data.ImageUrl;
         apartment.Interval       = data.Interval;
@@ -210,6 +220,16 @@ public class ApartmentActions
         var apartment = db.Apartments.FirstOrDefault(a => a.Id == id);
         if (apartment == null)
             return new ActionResponse { IsSuccess = false, Message = "Apartment not found." };
+
+        // blocheaza stergerea daca exista un payment activ (viitor) sau in curs
+        var now = DateTime.UtcNow;
+        var hasActivePayment = db.Payments.Any(p =>
+            p.ApartmentId == id &&
+            p.StartDate != null && p.EndDate != null &&
+            p.EndDate > now);
+
+        if (hasActivePayment)
+            return new ActionResponse { IsSuccess = false, Message = "Cannot delete apartment with an active or upcoming booking." };
 
         var payments = db.Payments.Where(p => p.ApartmentId == id).ToList();
         foreach (var p in payments) p.ApartmentId = null;

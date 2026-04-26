@@ -7,6 +7,8 @@ import type { InvoiceData } from "./invoiceTypes";
 export interface PaymentDto {
     id:               number;
     apartmentId:      number;
+    ownerId:          number;
+    renterId:         number;
     apartmentAddress: string;
     ownerName?:       string;
     renterName:       string;

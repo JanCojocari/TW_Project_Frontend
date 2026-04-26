@@ -199,6 +199,9 @@ export default {
         },
         payments: {
             title:        "Arhivă Plăți & Facturi",
+            sent:         "Plăți efectuate",
+            received:     "Plăți primite",
+            empty:        "Nu există plăți înregistrate.",
             download:     "Descarcă PDF",
             generating:   "Se generează...",
             success:      "Succes",
@@ -217,6 +220,16 @@ export default {
                 approved: "Aprobat",
                 declined: "Respins",
             },
+            deleteDialog: {
+                title:   "Ștergi anunțul?",
+                body:    "Ești sigur că vrei să ștergi anunțul {{address}}? Această acțiune este ireversibilă.",
+                cancel:  "Anulează",
+                confirm: "Șterge",
+            },
+            deleteSuccess:     "Anunțul a fost șters.",
+            editErrorActive:   "Nu poți edita anunțul cât timp apartamentul are o rezervare activă sau în curs.",
+            deleteErrorActive: "Nu poți șterge anunțul cât timp apartamentul are o rezervare activă sau viitoare.",
+            deleteError:       "Eroare la ștergere. Încearcă din nou.",
         },
         upcomingStays: {
             empty:   "Nu ai niciun sejur viitor programat.",
@@ -334,6 +347,7 @@ export default {
         subtitle:    "Completează detaliile apartamentului tău",
         progress:    "Completare formular",
         errorsAlert: "Te rugăm să completezi câmpurile obligatorii marcate mai jos.",
+        saveError:   "Eroare la salvarea anunțului. Verificați conexiunea și încercați din nou.",
         cancel:      "Anulează",
         publish:     "Publică anunțul",
         next:        "Inainte",
@@ -397,6 +411,7 @@ export default {
             loading:         "Se încarcă..."
         },
         login: {
+            title:           "Autentificare",
             tabLandlord:     "Proprietari",
             tabTenant:       "Chiriași",
             portalLandlord:  "Portal Proprietar",

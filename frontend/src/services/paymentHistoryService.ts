@@ -32,6 +32,8 @@ export function mapToPaymentDto(api: PaymentApiDto): PaymentDto {
     return {
         id:               api.id,
         apartmentId:      api.apartmentId,
+        ownerId:          api.ownerId,
+        renterId:         api.renterId,
         apartmentAddress: `Apartment #${api.apartmentId}`,
         renterName:       "User",
         renterSurname:    `#${api.renterId}`,

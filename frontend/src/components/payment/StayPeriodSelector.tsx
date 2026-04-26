@@ -1,4 +1,5 @@
-﻿import { useState } from "react";
+﻿// components/payment/StayPeriodSelector.tsx
+import { useState } from "react";
 import { Box, Typography, Alert, TextField } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { PickersDay, type PickersDayProps } from "@mui/x-date-pickers/PickersDay";
@@ -61,6 +62,9 @@ function BookedDay(
     );
 }
 
+// startDate nu poate fi niciodata azi — minim ziua urmatoare (UTC)
+const tomorrow = dayjs().add(1, "day").startOf("day");
+
 const StayPeriodSelector = ({
                                 interval, startDate, endDate, hours, hoursInput,
                                 months, monthsInput, dateError, bookedPeriods,
@@ -87,6 +91,7 @@ const StayPeriodSelector = ({
                     {t("components.stayPeriodSelector.title")}
                 </Typography>
 
+                {/* Interval: ora — se alege numarul de ore, fara calendar */}
                 {interval === "hour" && (
                     <TextField
                         label={t("components.stayPeriodSelector.hoursLabel")}
@@ -102,13 +107,14 @@ const StayPeriodSelector = ({
                     />
                 )}
 
+                {/* Interval: zi — data de start minim maine */}
                 {interval === "day" && (
                     <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2 }}>
                         <DatePicker
                             label={t("components.stayPeriodSelector.arrivalLabel")}
                             value={startDate}
                             onChange={val => { setShowBookedHint(false); onStartChange(val); }}
-                            minDate={dayjs().add(1, "day")}
+                            minDate={tomorrow}
                             {...sharedDatePickerProps}
                             slotProps={{
                                 ...sharedDatePickerProps.slotProps,
@@ -120,7 +126,7 @@ const StayPeriodSelector = ({
                             value={endDate}
                             onChange={val => { setShowBookedHint(false); onEndChange(val); }}
                             disablePast
-                            minDate={startDate ?? dayjs()}
+                            minDate={startDate ?? tomorrow}
                             {...sharedDatePickerProps}
                             slotProps={{
                                 ...sharedDatePickerProps.slotProps,
@@ -130,13 +136,14 @@ const StayPeriodSelector = ({
                     </Box>
                 )}
 
+                {/* Interval: luna — data de start minim maine */}
                 {interval === "month" && (
                     <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2 }}>
                         <DatePicker
                             label={t("components.stayPeriodSelector.arrivalLabel")}
                             value={startDate}
                             onChange={val => { setShowBookedHint(false); onStartChange(val); }}
-                            disablePast
+                            minDate={tomorrow}
                             {...sharedDatePickerProps}
                             slotProps={{
                                 ...sharedDatePickerProps.slotProps,

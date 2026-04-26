@@ -66,7 +66,11 @@ public class ApartmentController : ControllerBase
     {
         var result = _apartmentAction.Update(data);
         if (!result.IsSuccess)
-            return NotFound(result.Message);
+        {
+            if (result.Message != null && result.Message.Contains("booking"))
+                return BadRequest(new { message = result.Message });
+            return NotFound(new { message = result.Message });
+        }
         return Ok(result.Message);
     }
 
@@ -76,7 +80,12 @@ public class ApartmentController : ControllerBase
     {
         var result = _apartmentAction.Delete(id);
         if (!result.IsSuccess)
-            return NotFound(result.Message);
+        {
+            // apartament inexistent -> 404; booking activ -> 400
+            if (result.Message != null && result.Message.Contains("booking"))
+                return BadRequest(new { message = result.Message });
+            return NotFound(new { message = result.Message });
+        }
         return Ok(result.Message);
     }
 
