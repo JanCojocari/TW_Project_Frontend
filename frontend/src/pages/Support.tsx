@@ -9,6 +9,7 @@ import { useTranslation }    from "react-i18next";
 import { gradients, colors } from "../theme/gradients.ts";
 import DebouncedTextField    from "../components/common/DebouncedTextField.tsx";
 import { supportService }    from "../services/supportService.ts";
+import { pushAdminQueueNotif } from "../utils/adminNotifHelper.ts";
 
 const FaqItem = ({ question, answer }: { question: string; answer: string }) => {
     const [open, setOpen] = useState(false);
@@ -46,6 +47,11 @@ const Support = () => {
             .then(() => {
                 setSubmitted(true);
                 setFormData({ subject: "", message: "", email: "" });
+                // Notificare admin: cerere noua de suport
+                pushAdminQueueNotif(
+                    "admin_new_support",
+                    `Cerere noua de suport: "${formData.subject}".`,
+                );
                 setTimeout(() => setSubmitted(false), 5000);
             })
             .catch(() => setError("Eroare la trimiterea mesajului. Încearcă din nou."))

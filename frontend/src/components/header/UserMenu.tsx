@@ -19,6 +19,7 @@ import { resolveMediaUrl } from "../../utils/mediaUrl";
 const UserMenu = () => {
     const navigate             = useNavigate();
     const { currentUser, isAdmin, logout } = useAuth();
+    const isRenter = currentUser?.role === 2;
     const { t }                = useTranslation();
     const [anchor, setAnchor]  = useState<null | HTMLElement>(null);
 
@@ -105,10 +106,12 @@ const UserMenu = () => {
                     {t("nav.dashboard")}
                 </MenuItem>
 
-                <MenuItem onClick={() => go(paths.createListing)}>
-                    <ListItemIcon><AddHomeIcon fontSize="small" /></ListItemIcon>
-                    {t("nav.createListing")}
-                </MenuItem>
+                {!isRenter && (
+                    <MenuItem onClick={() => go(paths.createListing)}>
+                        <ListItemIcon><AddHomeIcon fontSize="small" /></ListItemIcon>
+                        {t("nav.createListing")}
+                    </MenuItem>
+                )}
 
                 <MenuItem onClick={() => go(paths.settings)}>
                     <ListItemIcon><SettingsIcon fontSize="small" /></ListItemIcon>

@@ -81,6 +81,8 @@ const ApartmentDetail = () => {
     );
 
     const isAvailable = apartment.Id_Renter === null;
+    // ownerul nu poate inchiria propriul apartament
+    const canRent = isAvailable && currentUser?.id !== apartment.Id_Owner;
 
     // Folosim image_urls (array) — fallback la image_url simplu daca exista
     const images = apartment.image_urls.length > 0
@@ -89,9 +91,13 @@ const ApartmentDetail = () => {
             ? [apartment.image_url]
             : [];
 
+    // culorile sunt identice cu cele din ApartmentCard.getChipColor()
     const statusChip = (
         <Chip label={isAvailable ? t("listings.available") : t("listings.occupied")}
-              sx={{ fontWeight: 700, fontSize: "14px", px: 2, py: 2.5, bgcolor: isAvailable ? "rgba(22,163,74,0.3)" : "rgba(220,38,38,0.3)", color: "white" }} />
+              size="small"
+              sx={{ fontWeight: 800, fontSize: "11px", textTransform: "uppercase",
+                  letterSpacing: "0.5px", backdropFilter: "blur(8px)",
+                  bgcolor: isAvailable ? "#16a34a" : "#dc2626", color: "white" }} />
     );
 
     return (
@@ -129,7 +135,7 @@ const ApartmentDetail = () => {
                         <ImageCarousel images={images} altBase={apartment.Address} statusChip={statusChip} />
                     </Box>
                     <Box>
-                        <ApartmentInfoPanel apartment={apartment} owner={owner} renter={renter} isAvailable={isAvailable} />
+                        <ApartmentInfoPanel apartment={apartment} owner={owner} renter={renter} isAvailable={canRent} isOwner={currentUser?.id === apartment.Id_Owner} />
                     </Box>
                 </Box>
 

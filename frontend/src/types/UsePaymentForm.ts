@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { FIELDS_BY_METHOD, BILLING_ADDRESS_FIELDS } from "./paymentPageConfig";
 import { paymentService } from "../services/paymentService";
 import type { PaymentMethodId, OrderSummary, PaymentPayload, PaymentResult } from "./paymentPageConfig";
+import { pushAdminQueueNotif } from "../utils/adminNotifHelper";
 
 type FieldErrors = Record<string, string>;
 type FormState   = Record<string, string>;
@@ -97,10 +98,25 @@ export const usePaymentForm = ({ summary, apartmentId, onPay, onSuccess, onError
         };
         try {
             const result = onPay ? await onPay(payload) : await paymentService.createPayment(payload, renterId);
-            if (result.success) { setSubmitted(true); setSnackOpen(true); onSuccess?.(result); setTimeout(() => navigate("/dashboard"), 2500); }
-            else { const msg = result.error ?? "Plata a eșuat. Încearcă din nou."; setSubmitError(msg); onError?.(msg); }
-        } catch { const msg = "A apărut o eroare neașteptată. Încearcă din nou."; setSubmitError(msg); onError?.(msg); }
-        finally { setSubmitting(false); }
+            if (result.success) {
+                setSubmitted(true);
+                setSnackOpen(true);
+                onSuccess?.(result);
+                // Notificare admin: plata noua
+                pushAdminQueueNotif("admin_new_payment", "O noua plata a fost inregistrata pe platforma.");
+                setTimeout(() => navigate("/dashboard"), 2500);
+            } else {
+                const msg = result.error ?? "Plata a eșuat. Încearcă din nou.";
+                setSubmitError(msg);
+                onError?.(msg);
+            }
+        } catch {
+            const msg = "A apărut o eroare neașteptată. Încearcă din nou.";
+            setSubmitError(msg);
+            onError?.(msg);
+        } finally {
+            setSubmitting(false);
+        }
     }, [validate, method, formState, sameAddress, summary, appliedPromo, apartmentId, onPay, onSuccess, onError, navigate]);
 
     const handleBack = useCallback(() => { if (onBack) onBack(); else navigate(-1); }, [onBack, navigate]);

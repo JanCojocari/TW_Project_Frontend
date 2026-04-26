@@ -343,21 +343,21 @@ export default function UpcomingStaysTab() {
         if (!currentUser?.id) return;
         const now = new Date();
 
-        Promise.all([
-            fetchRenterPayments(currentUser.id),
-            apartmentService.getAll(),
-        ])
-            .then(([payments, apartments]) => {
-                const aptMap = new Map<number, Apartment>(apartments.map(a => [a.Id_Apartment, a]));
-                const upcoming = payments
-                    .filter(p => p.startDate != null && p.endDate != null && new Date(p.endDate) >= now)
-                    .sort((a, b) => new Date(a.startDate!).getTime() - new Date(b.startDate!).getTime())
-                    .reduce<StayEntry[]>((acc, p) => {
-                        const apt = aptMap.get(p.apartmentId);
-                        if (apt) acc.push({ apartment: apt, startDate: new Date(p.startDate!), endDate: new Date(p.endDate!) });
-                        return acc;
-                    }, []);
-                setStays(upcoming);
+        fetchRenterPayments(currentUser.id)
+            .then(async (payments) => {
+                const active = payments.filter(
+                    p => p.startDate != null && p.endDate != null && new Date(p.endDate) >= now
+                ).sort((a, b) => new Date(a.startDate!).getTime() - new Date(b.startDate!).getTime());
+
+                // getById in loc de getAll — apartamentele ocupate nu apar in getAll
+                const entries = await Promise.all(
+                    active.map(p =>
+                        apartmentService.getById(p.apartmentId)
+                            .then(apt => apt ? { apartment: apt, startDate: new Date(p.startDate!), endDate: new Date(p.endDate!) } : null)
+                            .catch(() => null)
+                    )
+                );
+                setStays(entries.filter((e): e is StayEntry => e !== null));
             })
             .catch(() => setError(true))
             .finally(() => setLoading(false));

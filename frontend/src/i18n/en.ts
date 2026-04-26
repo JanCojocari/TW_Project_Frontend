@@ -151,6 +151,7 @@ export default {
             reviews:    "Reviews",
         },
         owner:       "Owner",
+        ownApartment: "You cannot rent your own apartment.",
         renter:      "Current Tenant",
         address:     "Address",
         price:       "Price",
@@ -630,5 +631,13 @@ export default {
             confirm: "Confirm",
             delete:  "Delete",
         },
+    },
+    
+    notifications: {
+        title:       "Notifications",
+        unread:      "unread",
+        empty:       "You have no new notifications.",
+        markAllRead: "Mark all as read",
+        clearAll:    "Clear all",
     },
 } as const;

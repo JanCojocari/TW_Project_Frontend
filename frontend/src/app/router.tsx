@@ -1,16 +1,18 @@
-﻿import {BrowserRouter, Routes, Route} from "react-router-dom";
-import {publicRoutes, privateRoutes, notAuthRoutes, adminRoutes} from "./routes";
-import {RequireAuth}  from "../auth/RequireAuth";
-import {RequireAdmin} from "../auth/RequireAdmin";
+﻿// src/app/router.tsx
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { publicRoutes, privateRoutes, notAuthRoutes, adminRoutes, ownerRoutes } from "./routes";
+import { RequireAuth }  from "../auth/RequireAuth";
+import { RequireAdmin } from "../auth/RequireAdmin";
+import { RequireOwner } from "../auth/RequireOwner";
 import App from "../App.tsx";
-import {OnlyNotAuth} from "../auth/OnlyNotAuth.tsx";
+import { OnlyNotAuth } from "../auth/OnlyNotAuth.tsx";
 import ScrollToTop from "../components/general/ScrollToTop.tsx";
 
 export const AppRouter = () => (
     <BrowserRouter>
         <ScrollToTop />
         <Routes>
-            <Route element={<App/>}>
+            <Route element={<App />}>
                 {publicRoutes.map((route) => (
                     <Route key={route.path} {...route} />
                 ))}
@@ -23,6 +25,19 @@ export const AppRouter = () => (
                             <RequireAuth>
                                 {route.element}
                             </RequireAuth>
+                        }
+                    />
+                ))}
+
+                {/* createListing si editListing — doar Admin si Owner */}
+                {ownerRoutes.map((route) => (
+                    <Route
+                        key={route.path}
+                        path={route.path}
+                        element={
+                            <RequireOwner>
+                                {route.element}
+                            </RequireOwner>
                         }
                     />
                 ))}

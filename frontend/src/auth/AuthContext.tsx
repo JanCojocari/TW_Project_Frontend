@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<UserApiDto | null>(null);
 
     useEffect(() => {
-        const rawUser = sessionStorage.getItem(STORAGE_KEY);
+        const rawUser = localStorage.getItem(STORAGE_KEY);
         if (rawUser) {
             setCurrentUser(JSON.parse(rawUser));
         }
@@ -40,9 +40,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
         if (currentUser) {
-            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
         } else {
-            sessionStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem(STORAGE_KEY);
         }
     }, [currentUser]);
 

@@ -31,6 +31,9 @@ import StepLocation        from "../components/createListing/StepLocation.tsx";
 import StepFacilities      from "../components/createListing/StepFacilities.tsx";
 import StepSpaceInfo       from "../components/createListing/StepSpaceInfo.tsx";
 import StepDescription     from "../components/createListing/StepDescription.tsx";
+import { useNotifications } from "../context/NotificationContext.tsx";
+import { ownerNotifications } from "../services/notificationService.ts";
+import { pushAdminQueueNotif } from "../utils/adminNotifHelper.ts";
 
 /* ─── step config ─────────────────────────────────────────────────────── */
 const NAVBAR_H = 64;
@@ -57,6 +60,7 @@ const CreateListing = () => {
     const location        = useLocation();
     const { t }           = useTranslation();
     const { currentUser } = useAuth();
+    const { addNotification } = useNotifications();
 
     // detecteaza modul edit — apartamentul vine prin navigate(..., { state })
     const editApt    = (location.state as { apartment?: Apartment } | null)?.apartment ?? null;
@@ -100,16 +104,13 @@ const CreateListing = () => {
         set("checkOutUntil",      editApt.additionalInfo.checkOutUntil || "12:00");
         set("selfCheckIn",        editApt.additionalInfo.selfCheckIn   ?? false);
         if (editApt.facilities) {
-            // setFacility face toggle, deci setam direct in form prin set()
             set("facilities", { ...editApt.facilities });
         }
-        // afiseaza imaginile existente ca preview -- form.images ramane gol
-        // la submit, daca nu s-au incarcat imagini noi, se pastreaza URL-urile originale
         if (editApt.image_urls.length > 0) {
             set("imagePreviewUrls", editApt.image_urls);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // intentionat fara dependente — ruleaza o singura data la mount
+    }, []);
 
     const [activeStep, setActiveStep] = useState(0);
     const [visitedSteps, setVisitedSteps] = useState<Set<number>>(new Set([0]));
@@ -132,7 +133,6 @@ const CreateListing = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const goToStep = (idx: number, fromSidebar = false) => {
-        // navigare inapoi: fara validare in ambele moduri
         if (idx < activeStep) {
             setErrors({});
             setActiveStep(idx);
@@ -140,7 +140,6 @@ const CreateListing = () => {
             if (contentRef.current) contentRef.current.scrollTop = 0;
             return;
         }
-        // in modul edit: navigare libera fara restrictii
         if (isEditMode) {
             setErrors({});
             setActiveStep(idx);
@@ -148,11 +147,9 @@ const CreateListing = () => {
             if (contentRef.current) contentRef.current.scrollTop = 0;
             return;
         }
-        // in modul create: valideaza toate step-urile de la activeStep pana la idx (exclusiv)
         for (let step = activeStep; step < idx; step++) {
             const stepErrors = validateStep(form, step, false);
             if (Object.keys(stepErrors).length > 0) {
-                // sari la primul step cu erori si afiseaza-le
                 setErrors(stepErrors);
                 setActiveStep(step);
                 setVisitedSteps(prev => new Set([...prev, step]));
@@ -172,7 +169,6 @@ const CreateListing = () => {
             setApiError(null);
             setIsSubmitting(true);
             try {
-                // daca nu s-au incarcat imagini noi, pastreaza URL-urile existente
                 const imageUrls = form.images.length > 0
                     ? await uploadService.images(form.images)
                     : editApt?.image_urls ?? [];
@@ -181,12 +177,17 @@ const CreateListing = () => {
 
                 if (isEditMode && editApt) {
                     await apartmentService.update({ id: editApt.Id_Apartment, ...payload });
+                    // Notificare owner: anunt modificat
+                    ownerNotifications.listingEdited(addNotification, form.address);
                 } else {
                     await apartmentService.create(currentUser?.id ?? 0, payload);
+                    // Notificare owner: anunt trimis spre evaluare
+                    ownerNotifications.listingSubmitted(addNotification, form.address);
+                    // Notificare admin: anunt nou
+                    pushAdminQueueNotif("admin_new_listing", `Anunt nou spre evaluare: "${form.address}".`);
                 }
                 markDone();
                 if (isEditMode) {
-                    // forteaza re-fetch in Dashboard pentru a reflecta statusul Pending
                     setTimeout(() => navigate(paths.dashboard, { state: { refreshListings: true } }), 1500);
                 } else {
                     setTimeout(() => navigate(paths.dashboard), 1500);
@@ -199,20 +200,17 @@ const CreateListing = () => {
                 setApiError(
                     isActiveBooking
                         ? t("dashboard.myListings.editErrorActive")
-                        : t("createListing.saveError")
+                        : t("createListing.saveError"),
                 );
                 setIsSubmitting(false);
             }
         }, isEditMode),
-        [submit, navigate, form, currentUser, isSubmitting, isEditMode, editApt],
+        [submit, navigate, form, currentUser, isSubmitting, isEditMode, editApt, addNotification],
     );
 
     if (submitted) return <SuccessScreen />;
 
-    /* progress = how far we've advanced / total steps */
     const progress = Math.round(((activeStep) / (STEPS.length - 1)) * 100);
-
-    /* summary bar values */
     const summaryAddress  = form.address  || "—";
     const summaryPrice    = form.cost     ? `${form.cost} ${form.currency}` : "—";
     const summaryInterval = form.interval ? `/${form.interval}` : "";
@@ -249,7 +247,6 @@ const CreateListing = () => {
                         {t("createListing.subtitle")}
                     </Typography>
 
-                    {/* Progress bar */}
                     <Box sx={{ mt: 2 }}>
                         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
                             <Typography variant="caption" fontWeight={600} color="text.secondary">
@@ -297,7 +294,6 @@ const CreateListing = () => {
                                         transition: "all 0.15s",
                                         bgcolor: isActive ? colors.primaryAlpha10 : "transparent",
                                         "&:hover": { bgcolor: isActive ? colors.primaryAlpha10 : colors.primaryAlpha06 },
-                                        // left accent bar for active
                                         "&::before": isActive ? {
                                             content: '""',
                                             position: "absolute",
@@ -308,7 +304,6 @@ const CreateListing = () => {
                                         } : {},
                                     }}
                                 >
-                                    {/* Step number / check icon */}
                                     <Box sx={{
                                         width: 28, height: 28, borderRadius: "50%",
                                         display: "flex", alignItems: "center", justifyContent: "center",
@@ -331,7 +326,6 @@ const CreateListing = () => {
                                         }
                                     </Box>
 
-                                    {/* Label */}
                                     <Typography
                                         variant="body2"
                                         fontWeight={isActive ? 700 : 400}
@@ -349,7 +343,6 @@ const CreateListing = () => {
                     })}
                 </Box>
 
-                {/* Back to listings button */}
                 <Box sx={{ p: 2, borderTop: `1px solid ${colors.border}` }}>
                     <Button
                         startIcon={<ArrowBackIcon />}
@@ -376,7 +369,6 @@ const CreateListing = () => {
                     height: `calc(100vh - ${NAVBAR_H}px)`,
                 }}
             >
-                {/* Top progress bar (thin, full-width) */}
                 <LinearProgress
                     variant="determinate"
                     value={progress}
@@ -390,7 +382,6 @@ const CreateListing = () => {
                     }}
                 />
 
-                {/* Error alert */}
                 {(Object.values(errors).some(Boolean) || apiError) && (
                     <Box sx={{ px: { xs: 3, md: 5 }, pt: 3 }}>
                         <Alert severity="error" sx={{ borderRadius: 3 }}>
@@ -399,16 +390,7 @@ const CreateListing = () => {
                     </Box>
                 )}
 
-                {/* Step content */}
-                <Box
-                    sx={{
-                        flex: 1,
-                        px: { xs: 3, md: 5 },
-                        py: 4,
-                        pb: 12, // space for floating summary
-                    }}
-                >
-                    {/* Step heading */}
+                <Box sx={{ flex: 1, px: { xs: 3, md: 5 }, py: 4, pb: 12 }}>
                     <Box sx={{ mb: 3 }}>
                         <Typography variant="h5" fontWeight={900} sx={{
                             letterSpacing: "-0.5px",
@@ -423,7 +405,6 @@ const CreateListing = () => {
                         </Typography>
                     </Box>
 
-                    {/* Rendered step */}
                     {activeStep === 0 && (
                         <StepBasicInfo
                             address={form.address} cost={form.cost}
@@ -483,7 +464,6 @@ const CreateListing = () => {
                     zIndex: 10,
                     boxShadow: "0 -4px 24px rgba(0,0,0,0.06)",
                 }}>
-                    {/* Live summary */}
                     <Box sx={{ flex: 1, display: { xs: "none", sm: "flex" }, gap: 3 }}>
                         {form.address && (
                             <Box>
@@ -507,7 +487,6 @@ const CreateListing = () => {
                         )}
                     </Box>
 
-                    {/* Navigation buttons */}
                     <Box sx={{ display: "flex", gap: 1.5, ml: "auto" }}>
                         {activeStep > 0 && (
                             <Button
