@@ -145,10 +145,10 @@ const ApartmentCard = ({ apartment, favorites, toggleFavorite, getUserName, getS
                         </Box>
                     </Box>
                     <Button variant="contained"
-                            disabled={!canViewDetails || isOccupied}
+                            disabled={!canViewDetails}
                             onClick={() => navigate(paths.apartmentDetail(apartment.Id_Apartment))}
-                            sx={{ px: 3, color: (!canViewDetails || isOccupied) ? "#071A1D" : "#FFF", fontWeight: 800, textTransform: "none", borderRadius: 2,
-                                boxShadow: (!canViewDetails || isOccupied) ? "none" : "0 0 12px rgba(0,224,198,0.3)",
+                            sx={{ px: 3, color: !canViewDetails ? "#071A1D" : "#FFF", fontWeight: 800, textTransform: "none", borderRadius: 2,
+                                boxShadow: !canViewDetails ? "none" : "0 0 12px rgba(0,224,198,0.3)",
                                 "&:hover": { boxShadow: "0 0 20px rgba(0,224,198,0.4)" } }}>
                         {isOccupied ? t("listings.occupied") : t("listings.details")}
                     </Button>

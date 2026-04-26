@@ -22,6 +22,8 @@ import { favoriteService }   from "../services/favoriteService";
 import { paymentHistoryService } from "../services/paymentHistoryService";
 import { paths }             from "../app/paths";
 import { gradients, colors } from "../theme/gradients";
+import { useNotifications } from "../context/NotificationContext";
+import { ownerNotifications } from "../services/notificationService";
 import { resolveMediaUrl }   from "../utils/mediaUrl";
 import ProfileTab       from "../components/dashboard/ProfileTab";
 import MyListingsTab    from "../components/dashboard/MyListingsTab";
@@ -127,6 +129,7 @@ export default function Dashboard() {
     const isMobile        = useMediaQuery(theme.breakpoints.down("md"));
 
     const isRenter = currentUser?.role === RENTER_ROLE;
+    const { addNotification } = useNotifications();
 
     // Renter nu are tab "Proprietatile Mele"
     const NAV = isRenter
@@ -177,6 +180,15 @@ export default function Dashboard() {
         }
     }, [location.state]);
 
+    // re-fetch cand userul revine pe acest tab (ex: admin a aprobat din alt tab)
+    useEffect(() => {
+        const handleVisibility = () => {
+            if (document.visibilityState === "visible") fetchListings();
+        };
+        document.addEventListener("visibilitychange", handleVisibility);
+        return () => document.removeEventListener("visibilitychange", handleVisibility);
+    }, [currentUserId]);
+
     const favoriteApartments = useMemo(() => {
         const set = new Set(favoriteIds);
         return allApartments.filter(a => set.has(a.Id_Apartment));
@@ -210,6 +222,8 @@ export default function Dashboard() {
         try {
             await apartmentService.delete(deleteTarget.Id_Apartment);
             setMyListings(prev => prev.filter(a => a.Id_Apartment !== deleteTarget.Id_Apartment));
+            // notificare owner: anunt sters
+            ownerNotifications.listingDeleted(addNotification, deleteTarget.Address);
             setDeleteTarget(null);
             setSnack({ msg: t("dashboard.myListings.deleteSuccess"), sev: "success" });
         } catch (err: any) {
@@ -425,7 +439,7 @@ export default function Dashboard() {
                                 sx={{
                                     minWidth: 0,
                                     color: "text.disabled",
-                                    "& .MuiBottomNavigationAction-label": { fontSize: 10, fontWeight: 600, mt: 0.3 },
+                                    "& .MuiBottomNavigationAction-label": { fontSize: 10, fontWeight: 600, mt: 0.3, minHeight: 28, display: "flex", alignItems: "flex-start", justifyContent: "center" },
                                     "&.Mui-selected .MuiBottomNavigationAction-label": { fontSize: 10, fontWeight: 800 },
                                 }}
                             />

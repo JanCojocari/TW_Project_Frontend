@@ -14,11 +14,14 @@ import PaymentSuccessScreen         from "../components/payment/PaymentSuccessSc
 import MobileSummaryAccordion       from "../components/payment/MobileSummaryAccordion.tsx";
 import PayPalButton from "../components/payment/PayPalButton.tsx";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import StayPeriodSelector from "../components/payment/StayPeriodSelector";
 import type { Dayjs } from "dayjs";
 import { useAuth } from "../auth/AuthContext";
 import { paymentHistoryService, type BookedPeriodDto } from "../services/paymentHistoryService";
+import { useNotifications } from "../context/NotificationContext";
+import { renterNotifications } from "../services/notificationService";
+import { apartmentService } from "../services/apartmentService";
 
 interface Props {
     summary?:              OrderSummary;
@@ -35,15 +38,17 @@ const PaymentPage = ({ summary: summaryProp, defaultPaymentMethod = "card", onPa
     const [hours, setHours]         = useState<number>(1);
     const [dateError, setDateError] = useState<string | null>(null);
     const [searchParams]  = useSearchParams();
-    const interval    = searchParams.get("interval") ?? "day"; // "hour" | "day" | "month"
+    const interval    = searchParams.get("interval") ?? "day";
     const [months, setMonths] = useState<number>(1);
     const [monthsInput, setMonthsInput] = useState<string>("1");
     const [hoursInput, setHoursInput] = useState<string>("1");
     const [bookedPeriods, setBookedPeriods] = useState<BookedPeriodDto[]>([]);
     const navigate = useNavigate();
     const { currentUser } = useAuth();
+    const { addNotification } = useNotifications();
     const renterId = currentUser?.id ?? 0;
     const apartmentId = searchParams.get("apartmentId");
+    const notifSentRef = useRef(false);
 
     useEffect(() => {
         if (!apartmentId) return;
@@ -51,7 +56,8 @@ const PaymentPage = ({ summary: summaryProp, defaultPaymentMethod = "card", onPa
             .then(setBookedPeriods)
             .catch(() => {});
     }, [apartmentId]);
-    const summary         = useOrderSummary(
+
+    const summary = useOrderSummary(
         summaryProp,
         apartmentId,
         interval === "hour" ? null : startDate?.toDate() ?? null,
@@ -83,6 +89,44 @@ const PaymentPage = ({ summary: summaryProp, defaultPaymentMethod = "card", onPa
         startDate: startDate?.toDate() ?? null, endDate: endDate?.toDate() ?? null,
         defaultMethod: defaultPaymentMethod, renterId,
     });
+
+    // Emite notificari renter + owner o singura data dupa payment reusit
+    useEffect(() => {
+        if (!submitted || notifSentRef.current) return;
+        notifSentRef.current = true;
+
+        const rawTitle = summary.items?.[0]?.title ?? "";
+        const address  = rawTitle.replace(/^Apartament\s*[–-]\s*/i, "").trim()
+            || `Apartament #${apartmentId}`;
+        const startJs  = startDate?.toDate() ?? null;
+        const endJs    = endDate?.toDate()   ?? null;
+
+        // Notificare pentru renter (userul curent)
+        renterNotifications.paymentSuccess(addNotification, address, startJs, endJs);
+
+        // Notificare pentru owner — scriem direct in localStorage-ul sau
+        if (apartmentId) {
+            apartmentService.getById(Number(apartmentId)).then(apt => {
+                if (!apt) return;
+                const period = startJs && endJs
+                    ? `${startJs.toLocaleDateString("ro-RO")} - ${endJs.toLocaleDateString("ro-RO")}`
+                    : "—";
+                const ownerKey = `rentora_notifications_${apt.Id_Owner}`;
+                const notif = {
+                    id:        `${Date.now()}_owner_rented`,
+                    type:      "owner_rented" as const,
+                    message:   `${apt.Address} a fost inchiriat pe perioada ${period}.`,
+                    createdAt: new Date().toISOString(),
+                    read:      false,
+                };
+                try {
+                    const prev = JSON.parse(localStorage.getItem(ownerKey) ?? "[]");
+                    localStorage.setItem(ownerKey, JSON.stringify([notif, ...prev].slice(0, 50)));
+                } catch { /* ignore */ }
+            }).catch(() => {});
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [submitted]);
 
     const wrappedSubmit = (e: React.FormEvent) => { if (!validateDates()) { e.preventDefault(); return; } handleSubmit(e); };
 

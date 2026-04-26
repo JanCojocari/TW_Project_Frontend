@@ -1,5 +1,5 @@
 ﻿// components/apartmentDetail/ApartmentInfoPanel.tsx
-import { Box, Typography, Button, Paper, Divider, Card, CardContent } from "@mui/material";
+import { Box, Typography, Button, Paper, Divider, Card, CardContent, Tooltip } from "@mui/material";
 import { LocationOn as LocationOnIcon, AttachMoney as AttachMoneyIcon, Person as PersonIcon } from "@mui/icons-material";
 import { useNavigate }    from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -7,7 +7,7 @@ import { gradients, colors } from "../../theme/gradients.ts";
 import type { Apartment } from "../../types/apartment.types";
 
 interface User { Id_User: number; Name: string; Surname: string; Email?: string | null; Phone: string; }
-interface Props { apartment: Apartment; owner: User | null | undefined; renter: User | null | undefined; isAvailable: boolean; }
+interface Props { apartment: Apartment; owner: User | null | undefined; renter: User | null | undefined; isAvailable: boolean; isOwner: boolean; }
 
 const iconBoxSx = { background: "", p: 1.5, borderRadius: 2, display: "flex", color: "#FFFFFF" };
 
@@ -34,7 +34,7 @@ const UserCard = ({ user, label, color }: { user: User; label: string; color: st
     );
 };
 
-const ApartmentInfoPanel = ({ apartment, owner, renter, isAvailable }: Props) => {
+const ApartmentInfoPanel = ({ apartment, owner, renter, isAvailable, isOwner }: Props) => {
     const navigate    = useNavigate();
     const { t }       = useTranslation();
     const gradientBox = { ...iconBoxSx, background: gradients.primary, boxShadow: `0 4px 12px ${colors.primaryAlpha25}` };
@@ -76,12 +76,24 @@ const ApartmentInfoPanel = ({ apartment, owner, renter, isAvailable }: Props) =>
             {owner  && <UserCard user={owner}  label={t("apartment.owner")}  color="primary.main" />}
             {!isAvailable && renter && <UserCard user={renter} label={t("apartment.renter")} color="error.main" />}
 
-            <Button variant="contained" fullWidth size="large"
-                    onClick={() => navigate(`/payments?apartmentId=${apartment.Id_Apartment}&interval=${apartment.Interval}`)}
-                    disabled={!isAvailable}
-                    sx={{ py: 1.8, borderRadius: 2, fontWeight: 700, fontSize: 16 }}>
-                {isAvailable ? t("apartment.rentNow") : t("apartment.unavailable")}
-            </Button>
+            <Tooltip
+                title={isOwner ? t("apartment.ownApartment") : ""}
+                placement="top"
+                arrow
+                disableHoverListener={!isOwner}
+                disableFocusListener={!isOwner}
+                disableTouchListener={!isOwner}
+            >
+                {/* span necesar ca Tooltip sa functioneze pe butoane disabled */}
+                <span style={{ display: "block", width: "100%" }}>
+                    <Button variant="contained" fullWidth size="large"
+                            onClick={() => navigate(`/payments?apartmentId=${apartment.Id_Apartment}&interval=${apartment.Interval}`)}
+                            disabled={!isAvailable}
+                            sx={{ py: 1.8, borderRadius: 2, fontWeight: 700, fontSize: 16 }}>
+                        {isAvailable ? t("apartment.rentNow") : t("apartment.unavailable")}
+                    </Button>
+                </span>
+            </Tooltip>
 
             {isAvailable && (
                 <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 2, textAlign: "center" }}>

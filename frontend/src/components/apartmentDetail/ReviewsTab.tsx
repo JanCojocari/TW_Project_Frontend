@@ -10,6 +10,7 @@ import { useTranslation }    from "react-i18next";
 import { gradients, colors } from "../../theme/gradients.ts";
 import { resolveMediaUrl }   from "../../utils/mediaUrl.ts";
 import { reviewService }     from "../../services/reviewService.ts";
+import { pushAdminQueueNotif } from "../../utils/adminNotifHelper.ts";
 import { paymentHistoryService } from "../../services/paymentHistoryService.ts";
 import { useAuth }           from "../../auth/AuthContext.tsx";
 import type { ReviewApiDto } from "../../services/reviewService.ts";
@@ -223,6 +224,8 @@ const ReviewForm = ({ apartmentId, onSubmitted }: { apartmentId: number; onSubmi
                 comment: comment.trim() || undefined,
             });
             setSuccess(true);
+            // Notificare admin: recenzie noua
+            pushAdminQueueNotif("admin_new_review", `Recenzie noua adaugata pe platforma.`);
             setTimeout(() => {
                 onSubmitted();
             }, 1500);

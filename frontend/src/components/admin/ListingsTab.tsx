@@ -16,6 +16,22 @@ import { useNavigate }     from "react-router-dom";
 import { adminService, type AdminApartment } from "../../services/adminService";
 import { paths } from "../../app/paths";
 
+// scrie o notificare in localStorage-ul unui owner
+function pushOwnerNotif(ownerId: number, type: string, message: string) {
+    const key = `rentora_notifications_${ownerId}`;
+    const notif = {
+        id:        `${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        type,
+        message,
+        createdAt: new Date().toISOString(),
+        read:      false,
+    };
+    try {
+        const prev = JSON.parse(localStorage.getItem(key) ?? "[]");
+        localStorage.setItem(key, JSON.stringify([notif, ...prev].slice(0, 50)));
+    } catch { /* ignore */ }
+}
+
 const statusConfig = (status: number, t: (k: string) => string) => {
     if (status === 0) return { label: t("admin.listings.statusPending"),  color: "default" as const };
     if (status === 1) return { label: t("admin.listings.statusApproved"), color: "success" as const };
@@ -63,6 +79,15 @@ export default function ListingsTab() {
         try {
             await adminService.approveApartment(id);
             setApartments(prev => prev.map(a => a.id === id ? { ...a, status: 1 } : a));
+            // notificare owner: anunt aprobat
+            const apt = apartments.find(a => a.id === id);
+            if (apt?.ownedId) {
+                pushOwnerNotif(
+                    apt.ownedId,
+                    "owner_listing_approved",
+                    `Administratorii au acceptat anuntul tau "${apt.address}".`,
+                );
+            }
         } catch {
             setError(t("admin.listings.errorApprove"));
         }
@@ -72,6 +97,15 @@ export default function ListingsTab() {
         try {
             await adminService.declineApartment(id);
             setApartments(prev => prev.map(a => a.id === id ? { ...a, status: 2 } : a));
+            // notificare owner: anunt refuzat
+            const apt = apartments.find(a => a.id === id);
+            if (apt?.ownedId) {
+                pushOwnerNotif(
+                    apt.ownedId,
+                    "owner_listing_declined",
+                    `Administratorii au refuzat anuntul tau "${apt.address}".`,
+                );
+            }
         } catch {
             setError(t("admin.listings.errorDecline"));
         }
@@ -80,9 +114,19 @@ export default function ListingsTab() {
     const handleDelete = async () => {
         if (!confirmDelete) return;
         setBusy(true);
+        // salvam datele inainte de stergere
+        const { id, ownedId, address } = confirmDelete;
         try {
-            await adminService.deleteApartment(confirmDelete.id);
-            setApartments(prev => prev.filter(a => a.id !== confirmDelete.id));
+            await adminService.deleteApartment(id);
+            setApartments(prev => prev.filter(a => a.id !== id));
+            // notificare owner: anunt sters
+            if (ownedId) {
+                pushOwnerNotif(
+                    ownedId,
+                    "owner_listing_deleted",
+                    `Anuntul tau "${address}" a fost sters de catre administratori.`,
+                );
+            }
         } catch {
             setError(t("admin.listings.errorDelete"));
         } finally {

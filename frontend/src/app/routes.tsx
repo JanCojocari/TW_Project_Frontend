@@ -24,11 +24,15 @@ export const publicRoutes = [
 ];
 
 export const privateRoutes = [
-    { path: paths.dashboard,     element: <Dashboard /> },
-    { path: paths.payment,       element: <PaymentPage /> },
+    { path: paths.dashboard, element: <Dashboard /> },
+    { path: paths.payment,   element: <PaymentPage /> },
+    { path: paths.settings,  element: <Settings /> },
+];
+
+// Accesibile doar de Admin si Owner (nu Renter)
+export const ownerRoutes = [
     { path: paths.createListing, element: <CreateListing /> },
     { path: paths.editListing,   element: <CreateListing /> },
-    { path: paths.settings,      element: <Settings /> },
 ];
 
 export const adminRoutes = [
@@ -38,7 +42,7 @@ export const adminRoutes = [
 export const notAuthRoutes = [
     { path: paths.home,         element: <Home /> },
     { path: paths.login,        element: <Login /> },
-    { path: paths.register,     element: <RoleSelection /> },  // /register -> selectie rol
-    { path: paths.registerForm, element: <Register /> },       // /register/form?role=... -> formular
+    { path: paths.register,     element: <RoleSelection /> },
+    { path: paths.registerForm, element: <Register /> },
     { path: paths.about,        element: <About /> },
 ];

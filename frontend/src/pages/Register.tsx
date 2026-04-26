@@ -12,6 +12,7 @@ import { type Dayjs }      from "dayjs";
 import "dayjs/locale/en-gb";
 import { gradients, colors } from "../theme/gradients.ts";
 import { useAxios }        from "../api/AxiosContext.tsx";
+import { pushAdminQueueNotif } from "../utils/adminNotifHelper.ts";
 
 // coduri de tara comune
 const COUNTRY_CODES = [
@@ -80,6 +81,8 @@ const Register = () => {
         setLoading(true);
         try {
             await axios.post("/auth/register", payload);
+            // Notificare admin: user nou inregistrat
+            pushAdminQueueNotif("admin_new_user", `Utilizator nou inregistrat pe platforma.`);
             navigate("/login");
         } catch (err: unknown) {
             const axiosErr = err as import("axios").AxiosError<{ message?: string }>;

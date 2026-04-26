@@ -77,7 +77,6 @@ public class PaymentActions
             if (end <= start)
                 return new ActionResponse { IsSuccess = false, Message = "End date must be after start date." };
 
-            // Verificare overlap cu platile existente pentru acest apartament
             var overlap = db.Payments.Any(p =>
                 p.ApartmentId == data.ApartmentId &&
                 p.StartDate.HasValue && p.EndDate.HasValue &&
@@ -95,7 +94,7 @@ public class PaymentActions
                 _ => apartment.CostPerInterval
             };
 
-            var payment = new Payment
+            db.Payments.Add(new Payment
             {
                 OwnerId     = apartment.OwnedId,
                 RenterId    = renterId,
@@ -105,16 +104,17 @@ public class PaymentActions
                 StartDate   = data.StartDate,
                 EndDate     = data.EndDate,
                 CreatedAt   = DateTime.UtcNow
-            };
+            });
 
-            db.Payments.Add(payment);
+            // marcheaza apartamentul ca ocupat
+            apartment.RenterId = renterId;
+
             db.SaveChanges();
-
             return new ActionResponse { IsSuccess = true, Message = "Payment recorded." };
         }
 
-        // Interval de tip ora - fara date calendaristice
-        var paymentHour = new Payment
+        // interval orar — fara date calendaristice
+        db.Payments.Add(new Payment
         {
             OwnerId     = apartment.OwnedId,
             RenterId    = renterId,
@@ -124,15 +124,15 @@ public class PaymentActions
             StartDate   = null,
             EndDate     = null,
             CreatedAt   = DateTime.UtcNow
-        };
+        });
 
-        db.Payments.Add(paymentHour);
+        // marcheaza apartamentul ca ocupat
+        apartment.RenterId = renterId;
+
         db.SaveChanges();
-
         return new ActionResponse { IsSuccess = true, Message = "Payment recorded." };
     }
 
-    // Returneaza perioadele ocupate pentru calendar
     protected List<BookedPeriodDto> GetBookedPeriodsExecution(int apartmentId)
     {
         using var db = new AppDbContext();

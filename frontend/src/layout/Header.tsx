@@ -1,4 +1,4 @@
-﻿// layout/Header.tsx
+﻿// layout/Header.tsx  [MODIFICAT - adaugat NotificationCenter]
 import {
     AppBar, Avatar, Box, Container, Toolbar, Button, Typography,
     Drawer, IconButton, List, ListItem, ListItemButton,
@@ -24,7 +24,9 @@ import { useThemeMode }       from "../theme/ThemeContext.tsx";
 import { gradients, colors }  from "../theme/gradients.ts";
 import LanguageSwitcher       from "../components/general/LanguageSwitcher.tsx";
 import UserMenu               from "../components/header/UserMenu.tsx";
+import NotificationCenter     from "../components/notifications/NotificationCenter.tsx"; // NOU
 import { resolveMediaUrl }    from "../utils/mediaUrl.ts";
+import { useStayExpiryCheck } from "../hooks/useStayExpiryCheck.ts"; // NOU
 
 const Header = () => {
     const navigate = useNavigate();
@@ -33,7 +35,9 @@ const Header = () => {
     const { isDark, toggleMode } = useThemeMode();
     const { t } = useTranslation();
 
-    // Linkuri publice (pentru userii neautentificati) - apar si in desktop si in mobile drawer
+    // verifica sejururi care expira maine, o data la mount
+    useStayExpiryCheck();
+
     const publicItems = [
         { label: t("nav.home"),     path: paths.home     },
         { label: t("nav.listings"), path: paths.listings  },
@@ -41,10 +45,11 @@ const Header = () => {
         { label: t("nav.support"),  path: paths.support   },
     ];
 
-    // Linkuri pentru mobile drawer cand userul e autentificat
+    const isRenter = currentUser?.role === 2;
+
     const authMobileItems = [
         { label: t("nav.dashboard"),     path: paths.dashboard,     icon: <DashboardIcon    fontSize="small" /> },
-        { label: t("nav.createListing"), path: paths.createListing, icon: <AddHomeIcon      fontSize="small" /> },
+        ...(!isRenter ? [{ label: t("nav.createListing"), path: paths.createListing, icon: <AddHomeIcon fontSize="small" /> }] : []),
         { label: t("nav.settings"),      path: paths.settings,      icon: <SettingsIcon     fontSize="small" /> },
         { label: t("nav.support"),       path: paths.support,       icon: <SupportAgentIcon fontSize="small" /> },
     ];
@@ -65,11 +70,9 @@ const Header = () => {
         </IconButton>
     );
 
-    // Drawer pentru mobile - autentificat
     const authDrawer = (
         <Box sx={{ width: 260, p: 3, height: "100%" }}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                {/* Info user in drawer */}
                 <Box display="flex" alignItems="center" gap={1.5}>
                     <Avatar
                         src={resolveMediaUrl(currentUser?.avatarUrl)}
@@ -144,7 +147,6 @@ const Header = () => {
         </Box>
     );
 
-    // Drawer pentru mobile - neautentificat (comportament original)
     const publicDrawer = (
         <Box sx={{ width: 260, p: 3, height: "100%" }}>
             <Box display="flex" justifyContent="flex-end" mb={4}>
@@ -196,9 +198,8 @@ const Header = () => {
                             </Typography>
                         </Box>
 
-                        {/* Desktop nav - folosim flex: 1 pentru a centra linkurile */}
+                        {/* Desktop nav */}
                         <Stack direction="row" spacing={1} sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", flex: 1, justifyContent: "center" }}>
-                            {/* Anunturi - vizibil pentru toti */}
                             <Button
                                 sx={{ color: location.pathname === paths.listings ? "primary.main" : "text.secondary",
                                     fontWeight: 700, fontSize: "15px", px: 2, py: 1, position: "relative",
@@ -211,7 +212,6 @@ const Header = () => {
                                 {t("nav.listings")}
                             </Button>
 
-                            {/* Suport si Home/About - doar pentru neautentificati */}
                             {!isAuthenticated && [
                                 { label: t("nav.support"), path: paths.support },
                                 { label: t("nav.home"),    path: paths.home    },
@@ -231,14 +231,15 @@ const Header = () => {
                             ))}
                         </Stack>
 
-                        {/* Dreapta: theme, lang, auth */}
+                        {/* Dreapta: theme, lang, notificari, auth */}
                         <Stack direction="row" spacing={1} sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}>
                             <Divider orientation="vertical" flexItem sx={{ mx: 1, height: 24, alignSelf: "center" }} />
                             <ThemeToggleButton />
                             <LanguageSwitcher />
+                            {/* NotificationCenter - vizibil doar pentru utilizatori autentificati */}
+                            {isAuthenticated && <NotificationCenter />}
                             <Divider orientation="vertical" flexItem sx={{ mx: 1, height: 24, alignSelf: "center" }} />
 
-                            {/* Auth zone */}
                             {!isAuthenticated ? (
                                 <Stack direction="row" spacing={1.5}>
                                     <Button variant="text" onClick={() => navigate(paths.login)}
@@ -247,12 +248,11 @@ const Header = () => {
                                             sx={{ px: 3 }}>{t("nav.register")}</Button>
                                 </Stack>
                             ) : (
-                                // Avatar + dropdown menu
                                 <UserMenu />
                             )}
                         </Stack>
 
-                        {/* Mobile: burger (neautentificat) sau avatar (autentificat) */}
+                        {/* Mobile: burger sau avatar */}
                         {isAuthenticated ? (
                             <Box sx={{ display: { md: "none" } }}>
                                 <IconButton onClick={() => setMobileOpen(true)} size="small" sx={{ p: 0 }}>

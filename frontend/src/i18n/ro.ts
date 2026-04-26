@@ -159,6 +159,7 @@ export default {
             reviews:    "Recenzii",
         },
         owner:       "Proprietar",
+        ownApartment: "Nu îți poți închiria propriul apartament.",
         renter:      "Chiriaș Curent",
         address:     "Adresă",
         price:       "Preț",
@@ -646,5 +647,13 @@ export default {
             confirm: "Confirma",
             delete:  "Sterge",
         },
+    },
+
+    notifications: {
+        title:       "Notificari",
+        unread:      "necitite",
+        empty:       "Nu ai notificari noi.",
+        markAllRead: "Marcheaza toate ca citite",
+        clearAll:    "Sterge toate",
     },
 } as const;
