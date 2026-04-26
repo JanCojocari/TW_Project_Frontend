@@ -19,6 +19,7 @@ import type { Apartment }    from "../types/apartment.types";
 import { useAuth }           from "../auth/AuthContext";
 import { apartmentService }  from "../services/apartmentService";
 import { favoriteService }   from "../services/favoriteService";
+import { paymentHistoryService } from "../services/paymentHistoryService";
 import { paths }             from "../app/paths";
 import { gradients, colors } from "../theme/gradients";
 import { resolveMediaUrl }   from "../utils/mediaUrl";
@@ -34,11 +35,14 @@ const SIDEBAR_W    = 130;
 const NAVBAR_H     = 64;
 const BOTTOM_NAV_H = 64;
 
+// Role enum: Admin=0, Owner=1, Renter=2
+const RENTER_ROLE = 2;
+
 type NavKey = "profile" | "listings" | "recent" | "favorites" | "upcoming" | "previous" | "payments";
 
 interface NavItem { key: NavKey; labelKey: string; icon: React.ReactNode }
 
-const NAV: NavItem[] = [
+const ALL_NAV: NavItem[] = [
     { key: "profile",   labelKey: "dashboard.tabs.profile",       icon: <PersonIcon     sx={{ fontSize: 22 }} /> },
     { key: "listings",  labelKey: "dashboard.tabs.apartments",     icon: <ApartmentIcon  sx={{ fontSize: 22 }} /> },
     { key: "recent",    labelKey: "dashboard.tabs.recentViewed",   icon: <VisibilityIcon sx={{ fontSize: 22 }} /> },
@@ -122,9 +126,18 @@ export default function Dashboard() {
     const theme           = useTheme();
     const isMobile        = useMediaQuery(theme.breakpoints.down("md"));
 
-    const [active, setActive] = useState<NavKey>(
-        () => (localStorage.getItem("rentora_dash_tab") as NavKey) ?? "profile"
-    );
+    const isRenter = currentUser?.role === RENTER_ROLE;
+
+    // Renter nu are tab "Proprietatile Mele"
+    const NAV = isRenter
+        ? ALL_NAV.filter(item => item.key !== "listings")
+        : ALL_NAV;
+
+    const [active, setActive] = useState<NavKey>(() => {
+        const saved = localStorage.getItem("rentora_dash_tab") as NavKey | null;
+        if (saved === "listings" && isRenter) return "profile";
+        return saved ?? "profile";
+    });
 
     const navigate        = useNavigate();
     const location        = useLocation();
@@ -137,7 +150,9 @@ export default function Dashboard() {
 
     const fetchListings = () => {
         if (!currentUserId) return;
-        apartmentService.getByOwner(currentUserId).then(setMyListings).catch(() => setMyListings([]));
+        if (!isRenter) {
+            apartmentService.getByOwner(currentUserId).then(setMyListings).catch(() => setMyListings([]));
+        }
         apartmentService.getAll().then(setAllApartments).catch(() => setAllApartments([]));
         favoriteService.getByUser(currentUserId)
             .then(favs => setFavoriteIds(favs.map(f => f.apartmentId)))
@@ -147,6 +162,11 @@ export default function Dashboard() {
     useEffect(() => {
         fetchListings();
     }, [currentUserId]);
+
+    // reseteaza tabul activ daca rolul nu permite "listings"
+    useEffect(() => {
+        if (isRenter && active === "listings") setActive("profile");
+    }, [isRenter]);
 
     // re-fetch dupa redirect de la editare listing
     useEffect(() => {
@@ -190,17 +210,40 @@ export default function Dashboard() {
         try {
             await apartmentService.delete(deleteTarget.Id_Apartment);
             setMyListings(prev => prev.filter(a => a.Id_Apartment !== deleteTarget.Id_Apartment));
-            setSnack({ msg: "Anunțul a fost șters.", sev: "success" });
-        } catch {
-            setSnack({ msg: "Eroare la ștergere. Încearcă din nou.", sev: "error" });
+            setDeleteTarget(null);
+            setSnack({ msg: t("dashboard.myListings.deleteSuccess"), sev: "success" });
+        } catch (err: any) {
+            const data = err?.response?.data;
+            const isActiveBooking =
+                (typeof data === "object" && data?.message?.toLowerCase().includes("booking")) ||
+                (typeof data === "string" && data.toLowerCase().includes("booking"));
+            const msg = isActiveBooking
+                ? t("dashboard.myListings.deleteErrorActive")
+                : t("dashboard.myListings.deleteError");
+            setDeleteTarget(null);
+            setSnack({ msg, sev: "error" });
         } finally {
             setDeleteBusy(false);
-            setDeleteTarget(null);
         }
     };
 
     // ── Edit listing ──────────────────────────────────────────────────────────
-    const handleEdit = (apt: Apartment) => {
+    const handleEdit = async (apt: Apartment) => {
+        // verifica daca exista un sejur in desfasurare (startDate < now < endDate)
+        try {
+            const payments = await paymentHistoryService.getByApartment(apt.Id_Apartment);
+            const now = new Date();
+            const hasOngoing = payments.some(p => {
+                if (!p.rentedFrom || !p.rentedTo) return false;
+                return new Date(p.rentedFrom) <= now && now <= new Date(p.rentedTo);
+            });
+            if (hasOngoing) {
+                setSnack({ msg: t("dashboard.myListings.editErrorActive"), sev: "error" });
+                return;
+            }
+        } catch {
+            // daca requestul esueaza, permitem accesul — backend-ul va bloca oricum
+        }
         navigate(paths.editListing, { state: { apartment: apt } });
     };
 
@@ -310,7 +353,7 @@ export default function Dashboard() {
                     </>
                 )}
 
-                {active === "listings" && (
+                {active === "listings" && !isRenter && (
                     <>
                         <PageHeading title={t("dashboard.tabs.apartments")} />
                         <MyListingsTab
@@ -393,18 +436,18 @@ export default function Dashboard() {
 
             {/* ── Dialog confirmare delete ─────────────────────────────── */}
             <Dialog open={!!deleteTarget} onClose={() => !deletebusy && setDeleteTarget(null)}>
-                <DialogTitle fontWeight={700}>Stergi anuntul?</DialogTitle>
+                <DialogTitle fontWeight={700}>{t("dashboard.myListings.deleteDialog.title")}</DialogTitle>
                 <DialogContent>
                     <Typography>
-                        Esti sigur ca vrei sa stergi anuntul <strong>{deleteTarget?.Address}</strong>? Aceasta actiune este ireversibila.
+                        {t("dashboard.myListings.deleteDialog.body", { address: deleteTarget?.Address ?? "" })}
                     </Typography>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setDeleteTarget(null)} disabled={deletebusy}>
-                        Anuleaza
+                        {t("dashboard.myListings.deleteDialog.cancel")}
                     </Button>
                     <Button onClick={handleDeleteConfirm} color="error" variant="contained" disabled={deletebusy}>
-                        {deletebusy ? <CircularProgress size={16} /> : "Sterge"}
+                        {deletebusy ? <CircularProgress size={16} /> : t("dashboard.myListings.deleteDialog.confirm")}
                     </Button>
                 </DialogActions>
             </Dialog>

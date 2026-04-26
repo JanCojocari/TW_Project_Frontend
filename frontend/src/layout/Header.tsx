@@ -14,6 +14,7 @@ import AddHomeIcon            from "@mui/icons-material/AddHome";
 import SettingsIcon           from "@mui/icons-material/Settings";
 import LogoutIcon             from "@mui/icons-material/Logout";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import SupportAgentIcon       from "@mui/icons-material/SupportAgent";
 import { useNavigate }        from "react-router-dom";
 import { useState }           from "react";
 import { useTranslation }     from "react-i18next";
@@ -42,11 +43,10 @@ const Header = () => {
 
     // Linkuri pentru mobile drawer cand userul e autentificat
     const authMobileItems = [
-        { label: t("nav.listings"),      path: paths.listings,      icon: null               },
-        { label: t("nav.support"),       path: paths.support,       icon: null               },
-        { label: t("nav.dashboard"),     path: paths.dashboard,     icon: <DashboardIcon fontSize="small" /> },
-        { label: t("nav.createListing"), path: paths.createListing, icon: <AddHomeIcon   fontSize="small" /> },
-        { label: t("nav.settings"),      path: paths.settings,      icon: <SettingsIcon  fontSize="small" /> },
+        { label: t("nav.dashboard"),     path: paths.dashboard,     icon: <DashboardIcon    fontSize="small" /> },
+        { label: t("nav.createListing"), path: paths.createListing, icon: <AddHomeIcon      fontSize="small" /> },
+        { label: t("nav.settings"),      path: paths.settings,      icon: <SettingsIcon     fontSize="small" /> },
+        { label: t("nav.support"),       path: paths.support,       icon: <SupportAgentIcon fontSize="small" /> },
     ];
 
     const handleNav = (path: string) => { navigate(path); setMobileOpen(false); };

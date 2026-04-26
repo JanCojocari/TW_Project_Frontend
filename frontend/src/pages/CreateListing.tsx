@@ -191,8 +191,16 @@ const CreateListing = () => {
                 } else {
                     setTimeout(() => navigate(paths.dashboard), 1500);
                 }
-            } catch {
-                setApiError("Eroare la salvarea anunțului. Verificați conexiunea și încercați din nou.");
+            } catch (err: any) {
+                const data = err?.response?.data;
+                const isActiveBooking =
+                    (typeof data === "object" && data?.message?.toLowerCase().includes("booking")) ||
+                    (typeof data === "string" && data.toLowerCase().includes("booking"));
+                setApiError(
+                    isActiveBooking
+                        ? t("dashboard.myListings.editErrorActive")
+                        : t("createListing.saveError")
+                );
                 setIsSubmitting(false);
             }
         }, isEditMode),

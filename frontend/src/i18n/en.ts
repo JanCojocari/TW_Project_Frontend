@@ -190,6 +190,9 @@ export default {
         },
         payments: {
             title:        "Payments & Invoices Archive",
+            sent:         "Payments made",
+            received:     "Payments received",
+            empty:        "No payments recorded.",
             download:     "Download PDF",
             generating:   "Generating...",
             success:      "Success",
@@ -208,6 +211,16 @@ export default {
                 approved: "Approved",
                 declined: "Declined",
             },
+            deleteDialog: {
+                title:   "Delete listing?",
+                body:    "Are you sure you want to delete {{address}}? This action is irreversible.",
+                cancel:  "Cancel",
+                confirm: "Delete",
+            },
+            deleteSuccess:     "Listing deleted successfully.",
+            editErrorActive:   "You cannot edit a listing that has an active or ongoing booking.",
+            deleteErrorActive: "You cannot delete a listing that has an active or upcoming booking.",
+            deleteError:       "Failed to delete. Please try again.",
         },
         upcomingStays: {
             empty:   "You have no upcoming stays.",
@@ -321,6 +334,7 @@ export default {
         title:       "Post a listing",
         subtitle:    "Fill in your apartment details",
         progress:    "Form completion",
+        saveError:   "Failed to save listing. Please check your connection and try again.",
         errorsAlert: "Please fill in the required fields marked below.",
         cancel:      "Cancel",
         publish:     "Publish listing",
@@ -382,6 +396,7 @@ export default {
             loginLink:       "Log in",
         },
         login: {
+            title:           "Sign In",
             tabLandlord:     "Landlords",
             tabTenant:       "Tenants",
             portalLandlord:  "Landlord Portal",
