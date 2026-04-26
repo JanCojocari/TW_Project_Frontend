@@ -1,19 +1,34 @@
 ﻿// components/settings/ContactSection.tsx
 import { useState, useMemo }   from "react";
-import { Button, Grid, InputAdornment, Typography } from "@mui/material";
+import { Button, Grid, InputAdornment, Typography, Select, MenuItem, FormControl } from "@mui/material";
 import { useTranslation }      from "react-i18next";
 import SettingsSectionWrapper  from "./SettingsSectionWraper.tsx";
 import DebouncedTextField      from "../common/DebouncedTextField.tsx";
 import type { UserSettingsDto } from "../../hooks/useSettingsForm";
 
-const PREFIX      = "+373";
-const MAX_DIGITS  = 8; // cifre dupa prefix
+// coduri de tara comune
+const COUNTRY_CODES = [
+    { code: "+373", label: "🇲🇩 +373" },
+    { code: "+40",  label: "🇷🇴 +40"  },
+    { code: "+380", label: "🇺🇦 +380" },
+    { code: "+7",   label: "🇷🇺 +7"   },
+    { code: "+49",  label: "🇩🇪 +49"  },
+    { code: "+33",  label: "🇫🇷 +33"  },
+    { code: "+44",  label: "🇬🇧 +44"  },
+    { code: "+1",   label: "🇺🇸 +1"   },
+    { code: "+39",  label: "🇮🇹 +39"  },
+    { code: "+34",  label: "🇪🇸 +34"  },
+];
 
-/** Extrage doar cifrele locale din numarul stocat in backend (ex: "+37369050220" -> "69050220") */
-function stripPrefix(phone: string): string {
-    if (phone.startsWith(PREFIX)) return phone.slice(PREFIX.length);
-    // daca nu are prefix, returnam ce avem (max MAX_DIGITS)
-    return phone.replace(/\D/g, "").slice(0, MAX_DIGITS);
+/** Detecteaza codul de tara din numarul stocat si returneaza { prefix, local } */
+function splitPhone(phone: string): { prefix: string; local: string } {
+    for (const { code } of [...COUNTRY_CODES].sort((a, b) => b.code.length - a.code.length)) {
+        if (phone.startsWith(code)) {
+            return { prefix: code, local: phone.slice(code.length) };
+        }
+    }
+    // fallback: niciun prefix recunoscut
+    return { prefix: "+373", local: phone.replace(/\D/g, "") };
 }
 
 interface Props {
@@ -29,19 +44,32 @@ export default function ContactSection({ profile, saving, onUpdate, onSave }: Pr
     const [emailError, setEmailError] = useState("");
     const [phoneError, setPhoneError] = useState("");
 
-    // cifrele locale (fara prefix) derivate din profile.phone
-    const localDigits = useMemo(() => stripPrefix(profile.phone ?? ""), [profile.phone]);
+    // initializeaza prefix si cifre locale din profile.phone
+    const { prefix: initPrefix, local: initLocal } = useMemo(
+        () => splitPhone(profile.phone ?? ""),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [] // doar la mount
+    );
+
+    const [countryCode, setCountryCode] = useState(initPrefix);
+
+    const localDigits = useMemo(() => {
+        const { prefix, local } = splitPhone(profile.phone ?? "");
+        // daca prefixul curent e diferit de ce s-a ales in UI, recalculeaza
+        return prefix === countryCode ? local : splitPhone(profile.phone ?? "").local;
+    }, [profile.phone, countryCode]);
+
+    const handleCountryCode = (newCode: string) => {
+        setCountryCode(newCode);
+        // reconstruim numarul cu noul prefix
+        const digits = splitPhone(profile.phone ?? "").local;
+        onUpdate("phone", newCode + digits);
+    };
 
     const handlePhoneDigits = (v: string) => {
-        // permite doar cifre
         const digits = v.replace(/\D/g, "");
-        if (digits.length > MAX_DIGITS) {
-            setPhoneError(t("settings.contact.phoneMax"));
-            return;
-        }
         setPhoneError("");
-        // stocam in state numarul complet cu prefix
-        onUpdate("phone", PREFIX + digits);
+        onUpdate("phone", countryCode + digits);
     };
 
     const handleEmail = (v: string) => {
@@ -64,7 +92,7 @@ export default function ContactSection({ profile, saving, onUpdate, onSave }: Pr
             description={t("settings.contact.description")}
         >
             <Grid container spacing={2.5}>
-                {/* Telefon cu prefix fix */}
+                {/* Telefon cu selector cod de tara */}
                 <Grid size={{ xs: 12, sm: 6 }}>
                     <DebouncedTextField
                         fullWidth
@@ -73,14 +101,22 @@ export default function ContactSection({ profile, saving, onUpdate, onSave }: Pr
                         value={localDigits}
                         onChange={handlePhoneDigits}
                         error={!!phoneError}
-                        helperText={phoneError || t("settings.contact.phoneHint")}
-                        inputProps={{ maxLength: MAX_DIGITS, inputMode: "numeric" }}
+                        inputProps={{ inputMode: "numeric" }}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
-                                    <Typography variant="body2" sx={{ fontWeight: 600, color: "text.primary", userSelect: "none" }}>
-                                        {PREFIX}
-                                    </Typography>
+                                    <FormControl variant="standard" sx={{ minWidth: 90 }}>
+                                        <Select
+                                            value={countryCode}
+                                            onChange={e => handleCountryCode(e.target.value as string)}
+                                            disableUnderline
+                                            sx={{ fontSize: "0.875rem", fontWeight: 600 }}
+                                        >
+                                            {COUNTRY_CODES.map(c => (
+                                                <MenuItem key={c.code} value={c.code}>{c.label}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
                                 </InputAdornment>
                             ),
                         }}

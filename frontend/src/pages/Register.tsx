@@ -1,5 +1,5 @@
 // src/pages/Register.tsx
-import { Box, Button, Container, Paper, TextField, Typography, MenuItem, Stack } from "@mui/material";
+import { Box, Button, Container, Paper, TextField, Typography, MenuItem, Stack, Select, FormControl, InputAdornment } from "@mui/material";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Link }            from "react-router-dom";
@@ -9,8 +9,23 @@ import { AdapterDayjs }    from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { useState }        from "react";
 import { type Dayjs }      from "dayjs";
+import "dayjs/locale/en-gb";
 import { gradients, colors } from "../theme/gradients.ts";
 import { useAxios }        from "../api/AxiosContext.tsx";
+
+// coduri de tara comune
+const COUNTRY_CODES = [
+    { code: "+373", label: "🇲🇩 +373" },
+    { code: "+40",  label: "🇷🇴 +40"  },
+    { code: "+380", label: "🇺🇦 +380" },
+    { code: "+7",   label: "🇷🇺 +7"   },
+    { code: "+49",  label: "🇩🇪 +49"  },
+    { code: "+33",  label: "🇫🇷 +33"  },
+    { code: "+44",  label: "🇬🇧 +44"  },
+    { code: "+1",   label: "🇺🇸 +1"   },
+    { code: "+39",  label: "🇮🇹 +39"  },
+    { code: "+34",  label: "🇪🇸 +34"  },
+];
 
 const Register = () => {
     const navigate         = useNavigate();
@@ -18,8 +33,6 @@ const Register = () => {
     const axios            = useAxios();
     const [searchParams]   = useSearchParams();
 
-    // role vine din query param (?role=owner | ?role=renter)
-    // fallback la "renter" daca lipseste
     const role = (searchParams.get("role") === "owner" ? "owner" : "renter") as "owner" | "renter";
 
     const [formData, setFormData] = useState({
@@ -32,6 +45,7 @@ const Register = () => {
         gender:          "",
     });
 
+    const [countryCode, setCountryCode] = useState("+373");
     const [birthday, setBirthday] = useState<Dayjs | null>(null);
     const [loading, setLoading]   = useState(false);
     const [error, setError]       = useState<string | null>(null);
@@ -57,10 +71,10 @@ const Register = () => {
             surname:  formData.surname,
             email:    formData.email,
             password: formData.password,
-            phone:    formData.phone,
+            phone:    countryCode + formData.phone,
             birthday: birthday.format("YYYY-MM-DD"),
             gender:   formData.gender,
-            role,                          // "owner" | "renter" din query param
+            role,
         };
 
         setLoading(true);
@@ -77,7 +91,7 @@ const Register = () => {
     };
 
     return (
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
             <Box sx={{
                 pt: 15, pb: 10, minHeight: "100vh", bgcolor: "background.default",
                 display: "flex", alignItems: "center", justifyContent: "center",
@@ -127,13 +141,33 @@ const Register = () => {
                                 onChange={handleChange}
                                 fullWidth required
                             />
+
+                            {/* Camp telefon cu selector cod de tara */}
                             <TextField
                                 name="phone"
                                 label={t("auth.register.phone")}
                                 type="tel"
                                 value={formData.phone}
-                                onChange={handleChange}
+                                onChange={e => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, "") })}
                                 fullWidth required
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <FormControl variant="standard" sx={{ minWidth: 90 }}>
+                                                <Select
+                                                    value={countryCode}
+                                                    onChange={e => setCountryCode(e.target.value as string)}
+                                                    disableUnderline
+                                                    sx={{ fontSize: "0.875rem", fontWeight: 600 }}
+                                                >
+                                                    {COUNTRY_CODES.map(c => (
+                                                        <MenuItem key={c.code} value={c.code}>{c.label}</MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                        </InputAdornment>
+                                    ),
+                                }}
                             />
 
                             <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2.5 }}>
@@ -142,8 +176,9 @@ const Register = () => {
                                     value={birthday}
                                     onChange={(d) => setBirthday(d)}
                                     disableFuture
+                                    format="DD/MM/YYYY"
                                     slotProps={{
-                                        textField: { fullWidth: true, required: true },
+                                        textField: { fullWidth: true, required: true, placeholder: "DD/MM/YYYY" },
                                         popper:    { sx: { zIndex: 1400 } },
                                     }}
                                 />
