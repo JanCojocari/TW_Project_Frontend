@@ -62,7 +62,6 @@ function BookedDay(
     );
 }
 
-// startDate nu poate fi niciodata azi — minim ziua urmatoare (UTC)
 const tomorrow = dayjs().add(1, "day").startOf("day");
 
 const StayPeriodSelector = ({
@@ -77,6 +76,7 @@ const StayPeriodSelector = ({
     const handleBookedClick = () => setShowBookedHint(true);
 
     const sharedDatePickerProps = {
+        format: "DD/MM/YYYY",
         shouldDisableDate: (day: Dayjs) => isDayBooked(day, bookedPeriods),
         slots: { day: BookedDay },
         slotProps: {
@@ -91,7 +91,6 @@ const StayPeriodSelector = ({
                     {t("components.stayPeriodSelector.title")}
                 </Typography>
 
-                {/* Interval: ora — se alege numarul de ore, fara calendar */}
                 {interval === "hour" && (
                     <TextField
                         label={t("components.stayPeriodSelector.hoursLabel")}
@@ -107,7 +106,6 @@ const StayPeriodSelector = ({
                     />
                 )}
 
-                {/* Interval: zi — data de start minim maine */}
                 {interval === "day" && (
                     <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2 }}>
                         <DatePicker
@@ -118,7 +116,7 @@ const StayPeriodSelector = ({
                             {...sharedDatePickerProps}
                             slotProps={{
                                 ...sharedDatePickerProps.slotProps,
-                                textField: { fullWidth: true },
+                                textField: { fullWidth: true, placeholder: "DD/MM/YYYY" },
                             }}
                         />
                         <DatePicker
@@ -130,13 +128,12 @@ const StayPeriodSelector = ({
                             {...sharedDatePickerProps}
                             slotProps={{
                                 ...sharedDatePickerProps.slotProps,
-                                textField: { fullWidth: true },
+                                textField: { fullWidth: true, placeholder: "DD/MM/YYYY" },
                             }}
                         />
                     </Box>
                 )}
 
-                {/* Interval: luna — data de start minim maine */}
                 {interval === "month" && (
                     <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2 }}>
                         <DatePicker
@@ -147,7 +144,7 @@ const StayPeriodSelector = ({
                             {...sharedDatePickerProps}
                             slotProps={{
                                 ...sharedDatePickerProps.slotProps,
-                                textField: { fullWidth: true },
+                                textField: { fullWidth: true, placeholder: "DD/MM/YYYY" },
                             }}
                         />
                         <TextField
