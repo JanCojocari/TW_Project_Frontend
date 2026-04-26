@@ -9,10 +9,10 @@ public class PaymentActionExecution : PaymentActions, IPaymentAction
 {
     public List<PaymentDto> GetAll()
         => GetAllExecution();
-    
+
     public List<PaymentDto> GetByUser(int userId)
         => GetByUserExecution(userId);
-    
+
     public List<PaymentDto> GetByOwner(int ownerId)
         => GetByOwnerExecution(ownerId);
 
@@ -27,4 +27,7 @@ public class PaymentActionExecution : PaymentActions, IPaymentAction
 
     public ActionResponse Create(int renterId, PaymentCreateDto data)
         => CreateExecution(renterId, data);
+
+    public List<BookedPeriodDto> GetBookedPeriods(int apartmentId)
+        => GetBookedPeriodsExecution(apartmentId);
 }

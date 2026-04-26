@@ -12,14 +12,13 @@ public class PaymentActions
     protected List<PaymentDto> GetByUserExecution(int userId)
     {
         using var db = new AppDbContext();
-
         return db.Payments
             .Where(p => p.RenterId == userId || p.OwnerId == userId)
             .OrderByDescending(p => p.CreatedAt)
             .Select(p => MapToDto(p))
             .ToList();
     }
-    
+
     protected List<PaymentDto> GetByOwnerExecution(int ownerId)
     {
         using var db = new AppDbContext();
@@ -43,7 +42,6 @@ public class PaymentActions
     protected List<PaymentDto> GetByApartmentExecution(int apartmentId)
     {
         using var db = new AppDbContext();
-
         return db.Payments
             .Where(p => p.ApartmentId == apartmentId)
             .OrderByDescending(p => p.CreatedAt)
@@ -54,10 +52,8 @@ public class PaymentActions
     protected PaymentDto? GetByIdExecution(int id)
     {
         using var db = new AppDbContext();
-
         var payment = db.Payments.FirstOrDefault(p => p.Id == id);
         if (payment == null) return null;
-
         return MapToDto(payment);
     }
 
@@ -72,8 +68,6 @@ public class PaymentActions
         var apartment = db.Apartments.FirstOrDefault(a => a.Id == data.ApartmentId);
         if (apartment == null)
             return new ActionResponse { IsSuccess = false, Message = "Apartment not found." };
-        
-        decimal totalCost = apartment.CostPerInterval;
 
         if (data.StartDate.HasValue && data.EndDate.HasValue)
         {
@@ -83,9 +77,17 @@ public class PaymentActions
             if (end <= start)
                 return new ActionResponse { IsSuccess = false, Message = "End date must be after start date." };
 
-            var diff = end - start;
+            // Verificare overlap cu platile existente pentru acest apartament
+            var overlap = db.Payments.Any(p =>
+                p.ApartmentId == data.ApartmentId &&
+                p.StartDate.HasValue && p.EndDate.HasValue &&
+                p.StartDate < end && p.EndDate > start);
 
-            totalCost = apartment.Interval switch
+            if (overlap)
+                return new ActionResponse { IsSuccess = false, Message = "This period is already booked." };
+
+            var diff = end - start;
+            var totalCost = apartment.Interval switch
             {
                 Rentora.Domain.Enums.RentInterval.Hour  => apartment.CostPerInterval * (decimal)diff.TotalHours,
                 Rentora.Domain.Enums.RentInterval.Day   => apartment.CostPerInterval * (decimal)diff.TotalDays,
@@ -93,27 +95,58 @@ public class PaymentActions
                 _ => apartment.CostPerInterval
             };
 
-            totalCost = Math.Round(totalCost, 2);
+            var payment = new Payment
+            {
+                OwnerId     = apartment.OwnedId,
+                RenterId    = renterId,
+                ApartmentId = data.ApartmentId,
+                TotalCost   = Math.Round(totalCost, 2),
+                Currency    = data.Currency,
+                StartDate   = data.StartDate,
+                EndDate     = data.EndDate,
+                CreatedAt   = DateTime.UtcNow
+            };
+
+            db.Payments.Add(payment);
+            db.SaveChanges();
+
+            return new ActionResponse { IsSuccess = true, Message = "Payment recorded." };
         }
 
-        var payment = new Payment
+        // Interval de tip ora - fara date calendaristice
+        var paymentHour = new Payment
         {
             OwnerId     = apartment.OwnedId,
             RenterId    = renterId,
             ApartmentId = data.ApartmentId,
             TotalCost   = apartment.CostPerInterval,
             Currency    = data.Currency,
-            StartDate   = data.StartDate,
-            EndDate     = data.EndDate,
+            StartDate   = null,
+            EndDate     = null,
             CreatedAt   = DateTime.UtcNow
         };
 
-        db.Payments.Add(payment);
+        db.Payments.Add(paymentHour);
         db.SaveChanges();
 
         return new ActionResponse { IsSuccess = true, Message = "Payment recorded." };
     }
-    
+
+    // Returneaza perioadele ocupate pentru calendar
+    protected List<BookedPeriodDto> GetBookedPeriodsExecution(int apartmentId)
+    {
+        using var db = new AppDbContext();
+        return db.Payments
+            .Where(p => p.ApartmentId == apartmentId &&
+                        p.StartDate.HasValue && p.EndDate.HasValue)
+            .Select(p => new BookedPeriodDto
+            {
+                StartDate = p.StartDate!.Value,
+                EndDate   = p.EndDate!.Value
+            })
+            .ToList();
+    }
+
     protected List<PaymentDto> GetAllExecution()
     {
         using var db = new AppDbContext();
@@ -129,8 +162,8 @@ public class PaymentActions
         OwnerId     = p.OwnerId ?? 0,
         RenterId    = p.RenterId ?? 0,
         ApartmentId = p.ApartmentId ?? 0,
-        StartDate = p.StartDate,
-        EndDate   = p.EndDate,
+        StartDate   = p.StartDate,
+        EndDate     = p.EndDate,
         TotalCost   = p.TotalCost,
         Currency    = p.Currency,
         CreatedAt   = p.CreatedAt,

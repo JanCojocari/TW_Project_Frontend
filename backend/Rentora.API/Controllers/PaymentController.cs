@@ -74,4 +74,12 @@ public class PaymentController : ControllerBase
         var hasPaid = db.Payments.Any(p => p.ApartmentId == apartmentId && p.RenterId == userId);
         return Ok(new { hasPaid });
     }
+
+    // Returneaza perioadele ocupate pentru un apartament - folosit de calendar
+    [HttpGet("booked-periods/{apartmentId}")]
+    public IActionResult GetBookedPeriods(int apartmentId)
+    {
+        var periods = _paymentAction.GetBookedPeriods(apartmentId);
+        return Ok(periods);
+    }
 }

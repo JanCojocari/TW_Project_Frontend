@@ -239,10 +239,10 @@ export default {
             nights:       "nopti",
         },
         recentViewed: {
-            empty:     "Nu ai vizualizat niciun apartament inca.", 
-            clearAll:  "Sterge istoricul", 
-            clearing:  "Se sterge...", 
-            viewedOn:  "Vizualizat pe", 
+            empty:     "Nu ai vizualizat niciun apartament inca.",
+            clearAll:  "Sterge istoricul",
+            clearing:  "Se sterge...",
+            viewedOn:  "Vizualizat pe",
             errorLoad: "Eroare la incarcarea apartamentelor vizualizate recent.",
             groups: {
                 all: "Toate",
@@ -513,6 +513,17 @@ export default {
         successScreen: {
             title:    "Cerere trimisă cu succes!",
             subtitle: "Administratorii vor verifica și valida anunțul tău în scurt timp.",
+        },
+        stayPeriodSelector: {
+            title:          "Perioada sejurului",
+            hoursLabel:     "Număr de ore",
+            arrivalLabel:   "Data sosirii",
+            departureLabel: "Data plecării",
+            monthsLabel:    "Număr de luni",
+            nightsSelected: "nopți selectate",
+            luna:           "lună",
+            luni:           "luni",
+            bookedHint:     "Zilele marcate cu roșu nu sunt disponibile.",
         },
     },
     admin: {

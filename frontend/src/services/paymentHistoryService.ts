@@ -17,6 +17,11 @@ export interface PaymentApiDto {
     invoiceUrl?: string | null;
 }
 
+export interface BookedPeriodDto {
+    startDate: string;
+    endDate:   string;
+}
+
 const CURRENCY_MAP: Record<number, "USD" | "EUR" | "MDL"> = {
     0: "USD",
     1: "EUR",
@@ -57,4 +62,8 @@ export const paymentHistoryService = {
     hasPaid: (apartmentId: number): Promise<boolean> =>
         axiosInstance.get<{ hasPaid: boolean }>(`${BASE}/has-paid/${apartmentId}`)
             .then(r => r.data.hasPaid),
+
+    getBookedPeriods: (apartmentId: number): Promise<BookedPeriodDto[]> =>
+        axiosInstance.get<BookedPeriodDto[]>(`${BASE}/booked-periods/${apartmentId}`)
+            .then(r => r.data),
 };
