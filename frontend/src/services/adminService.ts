@@ -34,6 +34,7 @@ export interface AdminApartment {
     ownerSurname: string;
     ownerEmail: string;
 }
+
 export interface AdminSupportRequest {
     id: number;
     userId: number | null;
@@ -62,6 +63,8 @@ export interface AdminPayment {
     totalCost: number;
     currency: number;
     createdAt: string;
+    startDate: string | null;
+    endDate: string | null;
     invoiceUrl: string | null;
 }
 
@@ -123,4 +126,6 @@ export const adminService = {
     // Payments
     getPayments: () =>
         axiosInstance.get<AdminPayment[]>(`${BASE}/payments`).then(r => r.data),
+    releaseExpiredApartments: () =>
+        axiosInstance.post(`${BASE}/payments/release-expired`),
 };

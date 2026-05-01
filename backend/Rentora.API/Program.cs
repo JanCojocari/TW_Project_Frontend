@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Rentora.BusinessLayer.Interfaces;
 using Rentora.BusinessLayer.Structure;
 using Rentora.DataAccess;
+using Rentora.API;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,6 +69,9 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IPayPalLogic, PayPalLogicExecution>();
+
+// elibereaza automat apartamentele cu EndDate expirat, la fiecare ora
+builder.Services.AddHostedService<ReleaseExpiredService>();
 
 var app = builder.Build();
 

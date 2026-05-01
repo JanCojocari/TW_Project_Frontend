@@ -82,8 +82,9 @@ public class AdminController : ControllerBase
         if (!result.IsSuccess) return BadRequest(result.Message);
         return Ok(result.Message);
     }
+
     // ── LISTING MANAGEMENT ───────────────────────────────────────────────────
-    
+
     [HttpGet("apartments")]
     public IActionResult GetAllApartments()
     {
@@ -201,14 +202,14 @@ public class AdminController : ControllerBase
     }
 
     // ── PAYMENT MANAGEMENT ───────────────────────────────────────────────────
-    
+
     [HttpGet("payments")]
     public IActionResult GetAllPayments()
     {
         var payments = _bl.PaymentAction().GetAll();
         return Ok(payments);
     }
-    
+
     [HttpGet("payments/owner/{ownerId}")]
     public IActionResult GetPaymentsByOwner(int ownerId)
     {
@@ -228,5 +229,13 @@ public class AdminController : ControllerBase
     {
         var payments = _bl.PaymentAction().GetByApartment(apartmentId);
         return Ok(payments);
+    }
+
+    // elibereaza manual apartamentele cu EndDate expirat (util pentru debug/fix rapid)
+    [HttpPost("payments/release-expired")]
+    public IActionResult ReleaseExpiredApartments()
+    {
+        var result = _bl.PaymentAction().ReleaseExpired();
+        return Ok(result.Message);
     }
 }
