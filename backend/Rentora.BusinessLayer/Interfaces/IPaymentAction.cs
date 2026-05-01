@@ -13,5 +13,7 @@ namespace Rentora.BusinessLayer.Interfaces
         PaymentDto? GetById(int id);
         ActionResponse Create(int renterId, PaymentCreateDto data);
         List<BookedPeriodDto> GetBookedPeriods(int apartmentId);
+        ActionResponse Delete(int id);
+        ActionResponse ReleaseExpired();
     }
 }

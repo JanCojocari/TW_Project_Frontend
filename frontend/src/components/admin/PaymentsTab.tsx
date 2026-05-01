@@ -63,6 +63,7 @@ export default function PaymentsTab() {
                             <TableCell>Renter ID</TableCell>
                             <TableCell>Owner ID</TableCell>
                             <TableCell>Total</TableCell>
+                            <TableCell>Perioada</TableCell>
                             <TableCell>Data platii</TableCell>
                         </TableRow>
                     </TableHead>
@@ -81,12 +82,17 @@ export default function PaymentsTab() {
                                         variant="outlined"
                                     />
                                 </TableCell>
+                                <TableCell>
+                                    {p.startDate && p.endDate
+                                        ? `${formatDate(p.startDate)} - ${formatDate(p.endDate)}`
+                                        : "—"}
+                                </TableCell>
                                 <TableCell>{formatDate(p.createdAt)}</TableCell>
                             </TableRow>
                         ))}
                         {filtered.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={6} align="center" sx={{ py: 4, color: "text.disabled" }}>
+                                <TableCell colSpan={7} align="center" sx={{ py: 4, color: "text.disabled" }}>
                                     <Typography variant="body2">Nicio plata gasita.</Typography>
                                 </TableCell>
                             </TableRow>

@@ -156,6 +156,71 @@ public class PaymentActions
             .ToList();
     }
 
+    protected ActionResponse DeleteExecution(int id)
+    {
+        using var db = new AppDbContext();
+
+        var payment = db.Payments.FirstOrDefault(p => p.Id == id);
+        if (payment == null)
+            return new ActionResponse { IsSuccess = false, Message = "Payment not found." };
+
+        // daca apartamentul exista si e ocupat de acest renter, verifica daca trebuie eliberat
+        if (payment.ApartmentId.HasValue && payment.RenterId.HasValue)
+        {
+            var apartment = db.Apartments.FirstOrDefault(a => a.Id == payment.ApartmentId.Value);
+            if (apartment != null && apartment.RenterId == payment.RenterId)
+            {
+                var now = DateTime.UtcNow;
+                // verifica daca mai exista alt payment activ pentru acelasi apartament
+                var hasOtherActive = db.Payments.Any(p =>
+                    p.Id != id &&
+                    p.ApartmentId == payment.ApartmentId &&
+                    p.RenterId.HasValue &&
+                    (p.EndDate == null || p.EndDate > now));
+
+                if (!hasOtherActive)
+                    apartment.RenterId = null;
+            }
+        }
+
+        db.Payments.Remove(payment);
+        db.SaveChanges();
+        return new ActionResponse { IsSuccess = true, Message = "Payment deleted." };
+    }
+
+    protected ActionResponse ReleaseExpiredExecution()
+    {
+        using var db = new AppDbContext();
+
+        var now = DateTime.UtcNow;
+
+        // toate apartamentele care au RenterId setat
+        var occupiedApartments = db.Apartments
+            .Where(a => a.RenterId != null)
+            .ToList();
+
+        var released = 0;
+        foreach (var apartment in occupiedApartments)
+        {
+            // apartamentul ramane ocupat doar daca exista un payment activ sau viitor
+            var hasActivePayment = db.Payments.Any(p =>
+                p.ApartmentId == apartment.Id &&
+                p.RenterId.HasValue &&
+                (p.EndDate == null || p.EndDate > now));
+
+            if (!hasActivePayment)
+            {
+                apartment.RenterId = null;
+                released++;
+            }
+        }
+
+        if (released > 0)
+            db.SaveChanges();
+
+        return new ActionResponse { IsSuccess = true, Message = $"{released} apartment(s) released." };
+    }
+
     private static PaymentDto MapToDto(Payment p) => new PaymentDto
     {
         Id          = p.Id,

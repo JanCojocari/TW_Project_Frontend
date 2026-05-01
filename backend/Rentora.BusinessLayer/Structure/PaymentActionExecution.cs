@@ -30,4 +30,10 @@ public class PaymentActionExecution : PaymentActions, IPaymentAction
 
     public List<BookedPeriodDto> GetBookedPeriods(int apartmentId)
         => GetBookedPeriodsExecution(apartmentId);
+
+    public ActionResponse Delete(int id)
+        => DeleteExecution(id);
+
+    public ActionResponse ReleaseExpired()
+        => ReleaseExpiredExecution();
 }
