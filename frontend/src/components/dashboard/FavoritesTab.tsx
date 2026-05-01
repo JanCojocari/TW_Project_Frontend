@@ -23,7 +23,7 @@ export default function FavoritesTab({ favoriteApartments, favoriteIds, onToggle
     );
 
     return (
-        <Box sx={{ display: "grid", gap: 4, gridTemplateColumns: { xs: "1fr", sm: "repeat(2,1fr)", md: "repeat(3,1fr)" } }}>
+        <Box sx={{ display: "grid", gap: 3, gridTemplateColumns: { xs: "1fr", sm: "repeat(2,1fr)", md: "repeat(3,1fr)", xl: "repeat(4,1fr)" } }}>
             {favoriteApartments.map((apt) => (
                 <ApartmentCard
                     key={apt.Id_Apartment}

@@ -9,7 +9,7 @@ function getRaw(mode: PaletteMode) {
     const isDark = mode === 'dark';
     return {
         bgDefault:   isDark ? '#0F1724' : '#F8F9FB',
-        bgPaper:     isDark ? '#172033' : '#FFFFFF',
+        bgPaper:     isDark ? '#192940' : '#fffcfc',
         bgAlternate: isDark ? '#1C2A40' : '#EAE7E1',
 
         primaryMain:  '#7096BE',
