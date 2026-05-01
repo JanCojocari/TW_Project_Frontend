@@ -254,6 +254,7 @@ export default {
         },
         recentViewed: {
             empty:     "Nu ai vizualizat niciun apartament inca.",
+            noResults:  "Niciun apartament inca.",
             clearAll:  "Sterge istoricul",
             clearing:  "Se sterge...",
             viewedOn:  "Vizualizat pe",

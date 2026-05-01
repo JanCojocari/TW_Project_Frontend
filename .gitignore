@@ -48,3 +48,5 @@ yarn-error.log*
 
 appsettings.json
 .env
+
+wwwroot/uploads

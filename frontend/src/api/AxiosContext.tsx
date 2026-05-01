@@ -7,15 +7,19 @@ const AxiosContext = createContext<AxiosInstance>(axiosInstance);
 
 export const AxiosProvider = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
+        // Restaureaza Authorization header la mount (dupa refresh)
+        const savedToken = tokenStore.get();
+        if (savedToken) {
+            axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${savedToken}`;
+        }
+
         const requestInterceptor = axiosInstance.interceptors.request.use(
             (config) => {
                 const token = tokenStore.get();
-
                 if (token) {
                     config.headers = config.headers || {};
                     config.headers.Authorization = `Bearer ${token}`;
                 }
-
                 return config;
             },
             (error) => Promise.reject(error)
@@ -28,7 +32,7 @@ export const AxiosProvider = ({ children }: { children: React.ReactNode }) => {
 
                 if (status === 401) {
                     tokenStore.clear();
-                    sessionStorage.removeItem("rentora_user");
+                    localStorage.removeItem("rentora_user"); // consistent cu AuthContext
                     window.dispatchEvent(new Event("rentora:unauthorized"));
                 }
 
