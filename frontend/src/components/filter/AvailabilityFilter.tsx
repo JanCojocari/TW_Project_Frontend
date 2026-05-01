@@ -9,9 +9,8 @@ interface Props {
 }
 
 const OPTIONS = [
-    { value: "ALL",       label: "Toate"      },
+    { value: "ALL",       label: "Toate"       },
     { value: "available", label: "Disponibile" },
-    { value: "occupied",  label: "Ocupate"    },
 ] as const;
 
 export default function AvailabilityFilter({ value, onChange }: Props) {

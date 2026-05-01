@@ -47,6 +47,7 @@ export function mapUserApiToUser(dto: UserApiDto): User {
         Birthday:     dto.birthday.split("T")[0],
         Gender:       dto.gender ?? "",
         Account_sold: Number(dto.accountBalance),
+        AvatarUrl:    dto.avatarUrl ?? null,
     };
 }
 

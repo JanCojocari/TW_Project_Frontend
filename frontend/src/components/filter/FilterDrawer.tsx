@@ -7,7 +7,6 @@ import { Close as CloseIcon, FilterList as FilterListIcon,
     RestartAlt as ResetIcon } from "@mui/icons-material";
 import { gradients, colors } from "../../theme/gradients";
 import type { FilterState }       from "../../types/filterTypes";
-import AvailabilityFilter         from "./AvailabilityFilter";
 import CurrencyIntervalFilter     from "./CurrencyIntervalFilter";
 import PriceFilter                from "./PriceFilter";
 import LocationDateFilter         from "./LocationDateFilter";
@@ -82,7 +81,6 @@ export default function FilterDrawer({ open, onClose, filters, onChange, onApply
 
             {/* Conținut scrollabil */}
             <Box sx={{ flex: 1, overflowY: "auto", px: 3, py: 3 }}>
-                <AvailabilityFilter value={filters.availability} onChange={(v) => set("availability", v)} />
                 <CurrencyIntervalFilter currency={filters.currency} interval={filters.interval} onChange={patch} />
                 <PriceFilter currency={filters.currency} priceRange={filters.priceRange} onChange={(r) => set("priceRange", r)} />
                 <LocationDateFilter city={filters.city} checkIn={filters.checkIn} checkOut={filters.checkOut} onChange={patch} />

@@ -64,6 +64,38 @@ const STATUS_MAP: Record<ApartmentStatusApi, ApartmentStatus> = {
     [ApartmentStatusApi.Declined]: "declined",
 };
 
+// Backend-ul poate returna enum-urile ca string ("Approved") sau ca numar (1).
+// Aceste functii accepta ambele formate.
+function parseStatus(raw: unknown): ApartmentStatus {
+    if (typeof raw === "number") return STATUS_MAP[raw as ApartmentStatusApi] ?? "pending";
+    if (typeof raw === "string") {
+        const lower = raw.toLowerCase();
+        if (lower === "approved" || lower === "declined" || lower === "pending")
+            return lower as ApartmentStatus;
+    }
+    return "pending";
+}
+
+function parseInterval(raw: unknown): Apartment["Interval"] {
+    if (typeof raw === "number") return INTERVAL_MAP[raw as RentIntervalApi] ?? "month";
+    if (typeof raw === "string") {
+        const lower = raw.toLowerCase();
+        if (lower === "hour" || lower === "day" || lower === "month")
+            return lower as Apartment["Interval"];
+    }
+    return "month";
+}
+
+function parseCurrency(raw: unknown): Apartment["Currency"] {
+    if (typeof raw === "number") return CURRENCY_MAP[raw as CurrencyApi] ?? "EUR";
+    if (typeof raw === "string") {
+        const upper = raw.toUpperCase();
+        if (upper === "USD" || upper === "EUR" || upper === "MDL")
+            return upper as Apartment["Currency"];
+    }
+    return "EUR";
+}
+
 // ── Mapper facilități API → tip frontend ─────────────────────────────────────
 
 function mapFacilities(f: FacilitiesApiDto | null) {
@@ -106,10 +138,10 @@ export function mapToApartment(dto: ApartmentApiDto): Apartment {
         Address:           dto.address,
         image_url:         dto.imageUrl ?? "",
         image_urls:        parseImageUrls(dto.imageUrl),
-        status:            STATUS_MAP[dto.status] ?? "pending",
+        status:            parseStatus(dto.status),
         Cost_per_interval: dto.costPerInterval,
-        Currency:          CURRENCY_MAP[dto.currency] ?? "EUR",
-        Interval:          INTERVAL_MAP[dto.interval] ?? "month",
+        Currency:          parseCurrency(dto.currency),
+        Interval:          parseInterval(dto.interval),
         location: {
             latitude:   dto.location.lat,
             longitude:  dto.location.lng,

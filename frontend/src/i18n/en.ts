@@ -154,6 +154,7 @@ export default {
         ownApartment: "You cannot rent your own apartment.",
         renter:      "Current Tenant",
         address:     "Address",
+        viewRenterDetails:  "View tenant details",
         price:       "Price",
         rentNow:     "Rent Now",
         unavailable: "Unavailable",
@@ -446,7 +447,7 @@ export default {
             },
         },
         infoPanel: {
-            address: "Address", price: "Price", name: "Name", email: "Email", phone: "Phone",
+            address: "Address", price: "Price", name: "Name", email: "Email", phone: "Phone", contact: "Contact"
         },
         reviews: {
             noReviews:      "No reviews yet.",

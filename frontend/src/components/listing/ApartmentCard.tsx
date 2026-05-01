@@ -250,13 +250,10 @@ const ApartmentCard = ({
                             <Typography sx={{ fontSize: "22px", fontWeight: 800, color: "text.primary", letterSpacing: "-0.03em", lineHeight: 1 }}>
                                 {apartment.Cost_per_interval.toLocaleString()}
                             </Typography>
-                            <Typography sx={{ fontSize: "13px", fontWeight: 600, color: "primary.main", lineHeight: 1 }}>
-                                {apartment.Currency}
+                            <Typography sx={{ fontSize: "15px", fontWeight: 600, color: "primary.main", lineHeight: 1 }}>
+                                {apartment.Currency}  {intervalSuffix}
                             </Typography>
                         </Box>
-                        <Typography sx={{ fontSize: "10px", color: "text.disabled", fontWeight: 500, mt: "2px" }}>
-                            {intervalSuffix}
-                        </Typography>
                     </Box>
 
                     <Button
