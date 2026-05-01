@@ -38,14 +38,15 @@ function getChipStyle(apartment: Apartment): { bg: string; dot: string } {
 }
 
 function computeAverageRating(apartment: Apartment): { avg: number; count: number } | null {
+    // avgRating si reviewCount vin direct din ApartmentDto (backend)
+    if (apartment.reviewCount > 0 && apartment.avgRating > 0)
+        return { avg: Math.round(apartment.avgRating * 10) / 10, count: apartment.reviewCount };
+    // fallback: calculeaza din reviews daca sunt incarcate
     if (!apartment.reviews?.length) return null;
-    let total = 0, count = 0;
-    for (const review of apartment.reviews) {
-        const vals = Object.values(review.ratings as Record<string, number>).filter(v => typeof v === "number");
-        for (const v of vals) { total += v; count++; }
-    }
-    if (count === 0) return null;
-    return { avg: Math.round((total / count) * 10) / 10, count: apartment.reviews.length };
+    const valid = apartment.reviews.filter(r => typeof r.rating === "number");
+    if (valid.length === 0) return null;
+    const sum = valid.reduce((acc, r) => acc + r.rating, 0);
+    return { avg: Math.round((sum / valid.length) * 10) / 10, count: valid.length };
 }
 
 function StarRating({ avg }: { avg: number }) {
@@ -172,8 +173,8 @@ const ApartmentCard = ({
                         position: "absolute", bottom: 12, left: 12,
                         display: "flex", alignItems: "center", gap: "4px",
                         px: 1, py: 0.5, borderRadius: "20px",
-                        bgcolor: "rgba(255,255,255,0.92)", backdropFilter: "blur(8px)",
-                        border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                        bgcolor: "background.paper", backdropFilter: "blur(8px)",
+                        border: `1px solid ${colors.border}`, boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
                     }}>
                         <StarIcon sx={{ fontSize: 12, color: "#f59e0b" }} />
                         <Typography sx={{ fontSize: "12px", fontWeight: 700, color: "text.primary", lineHeight: 1 }}>

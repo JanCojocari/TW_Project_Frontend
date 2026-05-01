@@ -82,17 +82,9 @@ export type Review = {
     Id_Renter:        number;
     renterName:       string;
     renterAvatarUrl?: string;
-    ratings: {
-        overall:        number;
-        cleanliness:    number;
-        location:       number;
-        valueForMoney:  number;
-        comfort:        number;
-        facilities:     number;
-        communication:  number;
-    };
-    comment?:       string;
-    ownerResponse?: string;
-    createdAt:      string;
-    stayDuration?:  number;
+    rating:           number; 
+    comment?:         string;
+    ownerResponse?:   string;
+    createdAt:        string;
+    stayDuration?:    number;
 };
