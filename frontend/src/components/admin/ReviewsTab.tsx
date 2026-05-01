@@ -10,8 +10,7 @@ import DeleteIcon         from "@mui/icons-material/Delete";
 import SearchIcon         from "@mui/icons-material/Search";
 import { useTranslation } from "react-i18next";
 import { adminService, type AdminReview } from "../../services/adminService";
-import { formatDate } from "../../utils/formatDate.ts"
-
+import { formatDate } from "../../utils/formatDate.ts";
 
 export default function ReviewsTab() {
     const { t }                   = useTranslation();
@@ -36,14 +35,14 @@ export default function ReviewsTab() {
 
     useEffect(() => { load(); }, []);
 
-    // filtrare client-side: id, userId (renterId), apartmentId
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
         if (!q) return reviews;
         return reviews.filter(r =>
             String(r.id).includes(q) ||
-            String(r.userId).includes(q) ||
-            String(r.apartmentId).includes(q)
+            `${r.userName ?? ""} ${r.userSurname ?? ""}`.toLowerCase().includes(q) ||
+            String(r.apartmentId).includes(q) ||
+            (r.comment ?? "").toLowerCase().includes(q)
         );
     }, [reviews, query]);
 
@@ -87,7 +86,7 @@ export default function ReviewsTab() {
                         <TableRow sx={{ "& th": { fontWeight: 700, bgcolor: "background.default" } }}>
                             <TableCell>{t("admin.reviews.colId")}</TableCell>
                             <TableCell>{t("admin.reviews.colApartment")}</TableCell>
-                            <TableCell>{t("admin.reviews.colUserId")}</TableCell>
+                            <TableCell>{t("admin.reviews.colUser")}</TableCell>
                             <TableCell>{t("admin.reviews.colRating")}</TableCell>
                             <TableCell>{t("admin.reviews.colComment")}</TableCell>
                             <TableCell>{t("admin.reviews.colCreated")}</TableCell>
@@ -99,7 +98,20 @@ export default function ReviewsTab() {
                             <TableRow key={review.id} hover>
                                 <TableCell>{review.id}</TableCell>
                                 <TableCell>#{review.apartmentId}</TableCell>
-                                <TableCell>{review.userId}</TableCell>
+                                <TableCell>
+                                    {review.userName || review.userSurname
+                                        ? (
+                                            <Typography variant="body2" fontWeight={500}>
+                                                {review.userName} {review.userSurname}
+                                            </Typography>
+                                        )
+                                        : (
+                                            <Typography variant="body2" color="text.secondary">
+                                                #{review.userId}
+                                            </Typography>
+                                        )
+                                    }
+                                </TableCell>
                                 <TableCell>
                                     <Rating value={review.rating} readOnly size="small" />
                                 </TableCell>
@@ -131,7 +143,12 @@ export default function ReviewsTab() {
                 <DialogTitle fontWeight={700}>{t("admin.reviews.deleteTitle")}</DialogTitle>
                 <DialogContent>
                     <Typography>
-                        {t("admin.reviews.deleteDesc", { id: confirmDelete?.id, userId: confirmDelete?.userId })}
+                        {t("admin.reviews.deleteDesc", {
+                            id: confirmDelete?.id,
+                            user: confirmDelete?.userName
+                                ? `${confirmDelete.userName} ${confirmDelete.userSurname ?? ""}`.trim()
+                                : `#${confirmDelete?.userId}`,
+                        })}
                     </Typography>
                 </DialogContent>
                 <DialogActions>
