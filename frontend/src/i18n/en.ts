@@ -528,6 +528,27 @@ export default {
         },
     },
     admin: {
+        // Sidebar navigation
+        title:          "Admin Dashboard",
+        titleModerator: "Moderator Dashboard",
+        roleAdmin:      "Administrator",
+        roleModerator:  "Moderator",
+        version:        "Rentora v1.0",
+        nav: {
+            dashboard:     "Dashboard",
+            listings:      "Listings",
+            users:         "Users",
+            payments:      "Payments",
+            reviews:       "Reviews",
+            support:       "Support",
+            descDashboard: "Platform statistics and metrics",
+            descListings:  "Manage listings",
+            descUsers:     "Manage users",
+            descPayments:  "Transaction history",
+            descReviews:   "User reviews",
+            descSupport:   "Support requests",
+            menuTitle:     "Main Menu",
+        },
         users: {
             searchPlaceholder: "Search by ID, name, surname or email...",
             noResults:         "No users match your search.",
@@ -556,7 +577,7 @@ export default {
             makeModerator:     "Make Moderator",
             removeAdmin:       "Remove Admin",
             removeModerator:   "Remove Moderator"
-            
+
         },
         listings: {
             searchPlaceholder: "Search by ID, address, owner name or email...",
@@ -583,17 +604,15 @@ export default {
             errorDelete:       "Failed to delete apartment.",
         },
         payments: {
-            searchPlaceholder: "Search by ID, owner ID, renter ID or apartment ID...",
+            searchPlaceholder: "Search by ID, renter, owner or apartment address...",
             noResults:         "No payments match your search.",
             colId:             "ID",
             colApartment:      "Apartment",
-            colOwnerId:        "Owner ID",
-            colRenterId:       "Renter ID",
+            colOwner:          "Owner",
+            colRenter:         "Renter",
             colAmount:         "Amount",
-            colDate:           "Date",
-            colInvoice:        "Invoice",
-            invoiceView:       "View",
-            invoiceNone:       "N/A",
+            colPeriod:         "Period",
+            colDate:           "Payment Date",
             errorLoad:         "Failed to load payments.",
         },
         reviews: {
@@ -602,13 +621,13 @@ export default {
             noComment:         "No comment",
             colId:             "ID",
             colApartment:      "Apartment",
-            colUserId:         "User ID",
+            colUser:           "User",
             colRating:         "Rating",
             colComment:        "Comment",
             colCreated:        "Created",
             colActions:        "Actions",
             deleteTitle:       "Delete Review",
-            deleteDesc:        "Delete review #{{id}} by user {{userId}}? This cannot be undone.",
+            deleteDesc:        "Delete review #{{id}} by {{user}}? This cannot be undone.",
             errorLoad:         "Failed to load reviews.",
             errorDelete:       "Failed to delete review.",
         },
@@ -638,7 +657,7 @@ export default {
             delete:  "Delete",
         },
     },
-    
+
     notifications: {
         title:       "Notifications",
         unread:      "unread",

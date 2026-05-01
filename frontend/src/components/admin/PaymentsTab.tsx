@@ -8,8 +8,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import { adminService, type AdminPayment } from "../../services/adminService";
 import { formatDate } from "../../utils/formatDate.ts";
 
-const CURRENCY_MAP: Record<number, string> = { 0: "USD", 1: "EUR", 2: "MDL" };
-
 export default function PaymentsTab() {
     const [payments, setPayments] = useState<AdminPayment[]>([]);
     const [loading, setLoading]   = useState(true);
@@ -28,8 +26,10 @@ export default function PaymentsTab() {
         if (!q) return payments;
         return payments.filter(p =>
             String(p.id).includes(q) ||
-            String(p.renterId).includes(q) ||
-            String(p.ownerId).includes(q) ||
+            `${p.renterName} ${p.renterSurname}`.toLowerCase().includes(q) ||
+            p.renterEmail.toLowerCase().includes(q) ||
+            p.ownerName.toLowerCase().includes(q) ||
+            p.apartmentAddress.toLowerCase().includes(q) ||
             String(p.apartmentId).includes(q)
         );
     }, [payments, query]);
@@ -41,7 +41,7 @@ export default function PaymentsTab() {
         <>
             <TextField
                 fullWidth size="small"
-                placeholder="Cauta dupa ID plata, renter, owner sau apartament..."
+                placeholder="Cauta dupa ID, renter, owner sau adresa apartament..."
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 sx={{ mb: 2 }}
@@ -60,8 +60,8 @@ export default function PaymentsTab() {
                         <TableRow sx={{ "& th": { fontWeight: 700, bgcolor: "background.default" } }}>
                             <TableCell>ID</TableCell>
                             <TableCell>Apartament</TableCell>
-                            <TableCell>Renter ID</TableCell>
-                            <TableCell>Owner ID</TableCell>
+                            <TableCell>Chirias</TableCell>
+                            <TableCell>Proprietar</TableCell>
                             <TableCell>Total</TableCell>
                             <TableCell>Perioada</TableCell>
                             <TableCell>Data platii</TableCell>
@@ -71,12 +71,27 @@ export default function PaymentsTab() {
                         {filtered.map(p => (
                             <TableRow key={p.id} hover>
                                 <TableCell>{p.id}</TableCell>
-                                <TableCell>#{p.apartmentId}</TableCell>
-                                <TableCell>{p.renterId}</TableCell>
-                                <TableCell>{p.ownerId}</TableCell>
+                                <TableCell>
+                                    <Typography variant="body2" noWrap sx={{ maxWidth: 160 }}>
+                                        {p.apartmentAddress || `#${p.apartmentId}`}
+                                    </Typography>
+                                </TableCell>
+                                <TableCell>
+                                    <Typography variant="body2" fontWeight={500}>
+                                        {p.renterName} {p.renterSurname}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                        {p.renterEmail}
+                                    </Typography>
+                                </TableCell>
+                                <TableCell>
+                                    <Typography variant="body2">
+                                        {p.ownerName || `#${p.ownerId}`}
+                                    </Typography>
+                                </TableCell>
                                 <TableCell>
                                     <Chip
-                                        label={`${CURRENCY_MAP[p.currency] ?? "?"} ${p.totalCost.toFixed(2)}`}
+                                        label={`${p.currency} ${p.totalCost.toFixed(2)}`}
                                         size="small"
                                         color="success"
                                         variant="outlined"

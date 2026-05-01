@@ -13,7 +13,7 @@ export interface AdminUser {
     birthday: string;
     gender: string | null;
     accountBalance: number;
-    role: number; // 0=Admin, 1=Owner, 2=Renter
+    role: number; // 0=Admin, 1=Owner, 2=Renter, 3=Moderator
     avatarUrl?: string | null;
 }
 
@@ -49,6 +49,9 @@ export interface AdminReview {
     id: number;
     apartmentId: number;
     userId: number;
+    userName: string | null;
+    userSurname: string | null;
+    userAvatarUrl: string | null;
     comment: string | null;
     ownerResponse: string | null;
     rating: number;
@@ -61,11 +64,16 @@ export interface AdminPayment {
     renterId: number;
     apartmentId: number;
     totalCost: number;
-    currency: number;
+    currency: string; // "USD", "EUR", "MDL" — backend returneaza string
     createdAt: string;
     startDate: string | null;
     endDate: string | null;
     invoiceUrl: string | null;
+    apartmentAddress: string;
+    renterName: string;
+    renterSurname: string;
+    renterEmail: string;
+    ownerName: string;
 }
 
 export interface AdminStats {
