@@ -1,3 +1,4 @@
+// Rentora.BusinessLayer/Core/PaymentActions.cs
 namespace Rentora.BusinessLayer.Core;
 
 using Rentora.DataAccess;
@@ -15,7 +16,8 @@ public class PaymentActions
         return db.Payments
             .Where(p => p.RenterId == userId || p.OwnerId == userId)
             .OrderByDescending(p => p.CreatedAt)
-            .Select(p => MapToDto(p))
+            .ToList()
+            .Select(p => MapToDto(p, db))
             .ToList();
     }
 
@@ -25,7 +27,8 @@ public class PaymentActions
         return db.Payments
             .Where(p => p.OwnerId == ownerId)
             .OrderByDescending(p => p.CreatedAt)
-            .Select(p => MapToDto(p))
+            .ToList()
+            .Select(p => MapToDto(p, db))
             .ToList();
     }
 
@@ -35,7 +38,8 @@ public class PaymentActions
         return db.Payments
             .Where(p => p.RenterId == renterId)
             .OrderByDescending(p => p.CreatedAt)
-            .Select(p => MapToDto(p))
+            .ToList()
+            .Select(p => MapToDto(p, db))
             .ToList();
     }
 
@@ -45,7 +49,8 @@ public class PaymentActions
         return db.Payments
             .Where(p => p.ApartmentId == apartmentId)
             .OrderByDescending(p => p.CreatedAt)
-            .Select(p => MapToDto(p))
+            .ToList()
+            .Select(p => MapToDto(p, db))
             .ToList();
     }
 
@@ -54,7 +59,7 @@ public class PaymentActions
         using var db = new AppDbContext();
         var payment = db.Payments.FirstOrDefault(p => p.Id == id);
         if (payment == null) return null;
-        return MapToDto(payment);
+        return MapToDto(payment, db);
     }
 
     protected ActionResponse CreateExecution(int renterId, PaymentCreateDto data)
@@ -106,14 +111,11 @@ public class PaymentActions
                 CreatedAt   = DateTime.UtcNow
             });
 
-            // marcheaza apartamentul ca ocupat
             apartment.RenterId = renterId;
-
             db.SaveChanges();
             return new ActionResponse { IsSuccess = true, Message = "Payment recorded." };
         }
 
-        // interval orar — fara date calendaristice
         db.Payments.Add(new Payment
         {
             OwnerId     = apartment.OwnedId,
@@ -126,9 +128,7 @@ public class PaymentActions
             CreatedAt   = DateTime.UtcNow
         });
 
-        // marcheaza apartamentul ca ocupat
         apartment.RenterId = renterId;
-
         db.SaveChanges();
         return new ActionResponse { IsSuccess = true, Message = "Payment recorded." };
     }
@@ -152,7 +152,8 @@ public class PaymentActions
         using var db = new AppDbContext();
         return db.Payments
             .OrderByDescending(p => p.CreatedAt)
-            .Select(p => MapToDto(p))
+            .ToList()
+            .Select(p => MapToDto(p, db))
             .ToList();
     }
 
@@ -164,14 +165,12 @@ public class PaymentActions
         if (payment == null)
             return new ActionResponse { IsSuccess = false, Message = "Payment not found." };
 
-        // daca apartamentul exista si e ocupat de acest renter, verifica daca trebuie eliberat
         if (payment.ApartmentId.HasValue && payment.RenterId.HasValue)
         {
             var apartment = db.Apartments.FirstOrDefault(a => a.Id == payment.ApartmentId.Value);
             if (apartment != null && apartment.RenterId == payment.RenterId)
             {
                 var now = DateTime.UtcNow;
-                // verifica daca mai exista alt payment activ pentru acelasi apartament
                 var hasOtherActive = db.Payments.Any(p =>
                     p.Id != id &&
                     p.ApartmentId == payment.ApartmentId &&
@@ -193,8 +192,6 @@ public class PaymentActions
         using var db = new AppDbContext();
 
         var now = DateTime.UtcNow;
-
-        // toate apartamentele care au RenterId setat
         var occupiedApartments = db.Apartments
             .Where(a => a.RenterId != null)
             .ToList();
@@ -202,7 +199,6 @@ public class PaymentActions
         var released = 0;
         foreach (var apartment in occupiedApartments)
         {
-            // apartamentul ramane ocupat doar daca exista un payment activ sau viitor
             var hasActivePayment = db.Payments.Any(p =>
                 p.ApartmentId == apartment.Id &&
                 p.RenterId.HasValue &&
@@ -221,17 +217,30 @@ public class PaymentActions
         return new ActionResponse { IsSuccess = true, Message = $"{released} apartment(s) released." };
     }
 
-    private static PaymentDto MapToDto(Payment p) => new PaymentDto
+    // join cu Users si Apartments pentru a popula campurile facturii
+    private static PaymentDto MapToDto(Payment p, AppDbContext db)
     {
-        Id          = p.Id,
-        OwnerId     = p.OwnerId ?? 0,
-        RenterId    = p.RenterId ?? 0,
-        ApartmentId = p.ApartmentId ?? 0,
-        StartDate   = p.StartDate,
-        EndDate     = p.EndDate,
-        TotalCost   = p.TotalCost,
-        Currency    = p.Currency,
-        CreatedAt   = p.CreatedAt,
-        InvoiceUrl  = p.InvoiceUrl
-    };
+        var apartment = db.Apartments.FirstOrDefault(a => a.Id == p.ApartmentId);
+        var renter    = db.Users.FirstOrDefault(u => u.Id == p.RenterId);
+        var owner     = db.Users.FirstOrDefault(u => u.Id == p.OwnerId);
+
+        return new PaymentDto
+        {
+            Id               = p.Id,
+            OwnerId          = p.OwnerId     ?? 0,
+            RenterId         = p.RenterId    ?? 0,
+            ApartmentId      = p.ApartmentId ?? 0,
+            StartDate        = p.StartDate,
+            EndDate          = p.EndDate,
+            TotalCost        = p.TotalCost,
+            Currency         = p.Currency.ToString(),
+            CreatedAt        = p.CreatedAt,
+            InvoiceUrl       = p.InvoiceUrl,
+            ApartmentAddress = apartment?.Address ?? "",
+            RenterName       = renter?.Name       ?? "",
+            RenterSurname    = renter?.Surname    ?? "",
+            RenterEmail      = renter?.Email      ?? "",
+            OwnerName        = owner != null ? $"{owner.Name} {owner.Surname}" : "Proprietar",
+        };
+    }
 }
