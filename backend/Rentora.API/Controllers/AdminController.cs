@@ -12,7 +12,7 @@ using Rentora.Domain.Models.User;
 
 [Route("api/admin")]
 [ApiController]
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin,Moderator")]
 public class AdminController : ControllerBase
 {
     private readonly BusinessLogic _bl;
@@ -25,6 +25,7 @@ public class AdminController : ControllerBase
     // ── STATS ────────────────────────────────────────────────────────────────
 
     [HttpGet("stats")]
+    [Authorize(Roles = "Admin")]
     public IActionResult GetStats()
     {
         using var db = new AppDbContext();
@@ -42,9 +43,10 @@ public class AdminController : ControllerBase
         });
     }
 
-    // ── USER MANAGEMENT ──────────────────────────────────────────────────────
+    // ── USER MANAGEMENT — doar Admin ─────────────────────────────────────────
 
     [HttpGet("users")]
+    [Authorize(Roles = "Admin")]
     public IActionResult GetAllUsers()
     {
         var users = _bl.UserAction().GetAll();
@@ -52,6 +54,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpGet("users/{id}")]
+    [Authorize(Roles = "Admin")]
     public IActionResult GetUserById(int id)
     {
         var user = _bl.UserAction().GetById(id);
@@ -60,6 +63,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpPut("users/{id}")]
+    [Authorize(Roles = "Admin")]
     public IActionResult UpdateUser(int id, [FromBody] UserUpdateDto data)
     {
         var result = _bl.UserAction().Update(id, data);
@@ -68,6 +72,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpDelete("users/{id}")]
+    [Authorize(Roles = "Admin")]
     public IActionResult DeleteUser(int id)
     {
         var result = _bl.UserAction().Delete(id);
@@ -76,6 +81,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpPatch("users/{id}/role")]
+    [Authorize(Roles = "Admin")]
     public IActionResult UpdateUserRole(int id, [FromBody] int role)
     {
         var result = _bl.UserAction().UpdateRole(id, role);
@@ -83,9 +89,10 @@ public class AdminController : ControllerBase
         return Ok(result.Message);
     }
 
-    // ── LISTING MANAGEMENT ───────────────────────────────────────────────────
+    // ── LISTING MANAGEMENT — doar Admin ──────────────────────────────────────
 
     [HttpGet("apartments")]
+    [Authorize(Roles = "Admin")]
     public IActionResult GetAllApartments()
     {
         using var db = new AppDbContext();
@@ -105,6 +112,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpGet("apartments/pending")]
+    [Authorize(Roles = "Admin")]
     public IActionResult GetPendingApartments()
     {
         var apartments = _bl.ApartmentAction().GetPending();
@@ -112,6 +120,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpGet("apartments/{id}")]
+    [Authorize(Roles = "Admin")]
     public IActionResult GetApartmentById(int id)
     {
         var apartment = _bl.ApartmentAction().GetById(id);
@@ -120,6 +129,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpPut("apartments/{id}")]
+    [Authorize(Roles = "Admin")]
     public IActionResult UpdateApartment([FromBody] ApartmentUpdateDto data)
     {
         var result = _bl.ApartmentAction().Update(data);
@@ -128,6 +138,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpDelete("apartments/{id}")]
+    [Authorize(Roles = "Admin")]
     public IActionResult DeleteApartment(int id)
     {
         var result = _bl.ApartmentAction().Delete(id);
@@ -136,6 +147,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpPatch("apartments/{id}/approve")]
+    [Authorize(Roles = "Admin")]
     public IActionResult ApproveApartment(int id)
     {
         var result = _bl.ApartmentAction().Approve(id);
@@ -144,6 +156,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpPatch("apartments/{id}/decline")]
+    [Authorize(Roles = "Admin")]
     public IActionResult DeclineApartment(int id)
     {
         var result = _bl.ApartmentAction().Decline(id);
@@ -151,7 +164,7 @@ public class AdminController : ControllerBase
         return Ok(result.Message);
     }
 
-    // ── SUPPORT MANAGEMENT ───────────────────────────────────────────────────
+    // ── SUPPORT MANAGEMENT — Admin + Moderator ────────────────────────────────
 
     [HttpGet("support")]
     public IActionResult GetAllSupport()
@@ -184,7 +197,7 @@ public class AdminController : ControllerBase
         return Ok(result.Message);
     }
 
-    // ── REVIEW MANAGEMENT ────────────────────────────────────────────────────
+    // ── REVIEW MANAGEMENT — Admin + Moderator ─────────────────────────────────
 
     [HttpGet("reviews")]
     public IActionResult GetAllReviews()
@@ -201,9 +214,10 @@ public class AdminController : ControllerBase
         return Ok(result.Message);
     }
 
-    // ── PAYMENT MANAGEMENT ───────────────────────────────────────────────────
+    // ── PAYMENT MANAGEMENT — doar Admin ──────────────────────────────────────
 
     [HttpGet("payments")]
+    [Authorize(Roles = "Admin")]
     public IActionResult GetAllPayments()
     {
         var payments = _bl.PaymentAction().GetAll();
@@ -211,6 +225,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpGet("payments/owner/{ownerId}")]
+    [Authorize(Roles = "Admin")]
     public IActionResult GetPaymentsByOwner(int ownerId)
     {
         var payments = _bl.PaymentAction().GetByOwner(ownerId);
@@ -218,6 +233,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpGet("payments/renter/{renterId}")]
+    [Authorize(Roles = "Admin")]
     public IActionResult GetPaymentsByRenter(int renterId)
     {
         var payments = _bl.PaymentAction().GetByRenter(renterId);
@@ -225,14 +241,15 @@ public class AdminController : ControllerBase
     }
 
     [HttpGet("payments/apartment/{apartmentId}")]
+    [Authorize(Roles = "Admin")]
     public IActionResult GetPaymentsByApartment(int apartmentId)
     {
         var payments = _bl.PaymentAction().GetByApartment(apartmentId);
         return Ok(payments);
     }
 
-    // elibereaza manual apartamentele cu EndDate expirat (util pentru debug/fix rapid)
     [HttpPost("payments/release-expired")]
+    [Authorize(Roles = "Admin")]
     public IActionResult ReleaseExpiredApartments()
     {
         var result = _bl.PaymentAction().ReleaseExpired();

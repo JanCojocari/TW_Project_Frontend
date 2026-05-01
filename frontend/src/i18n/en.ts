@@ -551,6 +551,11 @@ export default {
             errorLoad:         "Failed to load users.",
             errorDelete:       "Failed to delete user.",
             errorRole:         "Failed to update role.",
+            roleModerator:     "Moderator",
+            makeModerator:     "Make Moderator",
+            removeAdmin:       "Remove Admin",
+            removeModerator:   "Remove Moderator"
+            
         },
         listings: {
             searchPlaceholder: "Search by ID, address, owner name or email...",

@@ -567,6 +567,10 @@ export default {
             errorLoad:         "Eroare la incarcarea utilizatorilor.",
             errorDelete:       "Eroare la stergerea utilizatorului.",
             errorRole:         "Eroare la actualizarea rolului.",
+            roleModerator:     "Moderator",
+            makeModerator:     "Fa Moderator",
+            removeAdmin:       "Elimina Admin",
+            removeModerator:   "Elimina Moderator"
         },
         listings: {
             searchPlaceholder: "Cauta dupa ID, adresa, nume sau email proprietar...",

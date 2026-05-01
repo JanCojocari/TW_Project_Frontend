@@ -8,6 +8,8 @@ import {
 } from "@mui/material";
 import DeleteIcon              from "@mui/icons-material/Delete";
 import AdminPanelSettingsIcon  from "@mui/icons-material/AdminPanelSettings";
+import SupervisorAccountIcon   from "@mui/icons-material/SupervisorAccount";
+import PersonOffIcon           from "@mui/icons-material/PersonOff";
 import PersonIcon              from "@mui/icons-material/Person";
 import SearchIcon              from "@mui/icons-material/Search";
 import { useTranslation }      from "react-i18next";
@@ -15,10 +17,19 @@ import { adminService, type AdminUser } from "../../services/adminService";
 import { useAuth }             from "../../auth/AuthContext";
 import { resolveMediaUrl }     from "../../utils/mediaUrl";
 
+// 0=Admin, 1=Owner, 2=Renter, 3=Moderator
 const roleLabel = (role: number, t: (k: string) => string) => {
-    if (role === 0) return { label: t("admin.users.roleAdmin"),  color: "warning" as const };
-    if (role === 1) return { label: t("admin.users.roleOwner"),  color: "info"    as const };
-    return             { label: t("admin.users.roleRenter"), color: "default" as const };
+    if (role === 0) return { label: t("admin.users.roleAdmin"),     color: "warning"  as const };
+    if (role === 1) return { label: t("admin.users.roleOwner"),     color: "info"     as const };
+    if (role === 3) return { label: t("admin.users.roleModerator"), color: "secondary" as const };
+    return             { label: t("admin.users.roleRenter"),    color: "default"  as const };
+};
+
+// Descriere actiune pentru dialogul de confirmare
+const actionLabel = (newRole: number, t: (k: string) => string) => {
+    if (newRole === 0) return t("admin.users.roleAdmin");
+    if (newRole === 3) return t("admin.users.roleModerator");
+    return t("admin.users.roleRenter");
 };
 
 export default function UsersTab() {
@@ -145,19 +156,54 @@ export default function UsersTab() {
                                     <TableCell>${user.accountBalance.toFixed(2)}</TableCell>
                                     <TableCell align="right">
                                         <Box sx={{ display: "flex", gap: 0.5, justifyContent: "flex-end" }}>
-                                            {user.role !== 0 ? (
+
+                                            {/* Make Admin — vizibil daca userul NU e deja Admin */}
+                                            {user.role !== 0 && (
                                                 <Tooltip title={t("admin.users.makeAdmin")}>
-                                                    <IconButton size="small" color="warning" onClick={() => setConfirmRole({ user, newRole: 0 })}>
+                                                    <IconButton
+                                                        size="small"
+                                                        color="warning"
+                                                        onClick={() => setConfirmRole({ user, newRole: 0 })}
+                                                    >
                                                         <AdminPanelSettingsIcon fontSize="small" />
                                                     </IconButton>
                                                 </Tooltip>
-                                            ) : (
-                                                <Tooltip title={t("admin.users.makeRenter")}>
-                                                    <IconButton size="small" color="default" disabled={isSelf} onClick={() => setConfirmRole({ user, newRole: 2 })}>
-                                                        <PersonIcon fontSize="small" />
+                                            )}
+
+                                            {/* Make Moderator — vizibil daca userul NU e deja Moderator */}
+                                            {user.role !== 3 && (
+                                                <Tooltip title={t("admin.users.makeModerator")}>
+                                                    <IconButton
+                                                        size="small"
+                                                        color="secondary"
+                                                        onClick={() => setConfirmRole({ user, newRole: 3 })}
+                                                    >
+                                                        <SupervisorAccountIcon fontSize="small" />
                                                     </IconButton>
                                                 </Tooltip>
                                             )}
+
+                                            {/* Remove Admin / Remove Moderator — afiseaza "retrage rol" daca e Admin sau Moderator */}
+                                            {(user.role === 0 || user.role === 3) && (
+                                                <Tooltip title={
+                                                    user.role === 0
+                                                        ? t("admin.users.removeAdmin")
+                                                        : t("admin.users.removeModerator")
+                                                }>
+                                                    <span>
+                                                        <IconButton
+                                                            size="small"
+                                                            color="default"
+                                                            disabled={isSelf}
+                                                            onClick={() => setConfirmRole({ user, newRole: 2 })}
+                                                        >
+                                                            <PersonOffIcon fontSize="small" />
+                                                        </IconButton>
+                                                    </span>
+                                                </Tooltip>
+                                            )}
+
+                                            {/* Delete user */}
                                             <Tooltip title={isSelf ? t("admin.users.cannotDeleteSelf") : t("admin.users.deleteUser")}>
                                                 <span>
                                                     <IconButton size="small" color="error" disabled={isSelf} onClick={() => setConfirmDelete(user)}>
@@ -181,6 +227,7 @@ export default function UsersTab() {
                 </Table>
             </TableContainer>
 
+            {/* Dialog confirmare stergere */}
             <Dialog open={!!confirmDelete} onClose={() => setConfirmDelete(null)}>
                 <DialogTitle fontWeight={700}>{t("admin.users.deleteTitle")}</DialogTitle>
                 <DialogContent>
@@ -196,13 +243,14 @@ export default function UsersTab() {
                 </DialogActions>
             </Dialog>
 
+            {/* Dialog confirmare schimbare rol */}
             <Dialog open={!!confirmRole} onClose={() => setConfirmRole(null)}>
                 <DialogTitle fontWeight={700}>{t("admin.users.roleTitle")}</DialogTitle>
                 <DialogContent>
                     <Typography>
                         {t("admin.users.roleDesc", {
                             name: `${confirmRole?.user.name} ${confirmRole?.user.surname}`,
-                            role: confirmRole?.newRole === 0 ? t("admin.users.roleAdmin") : t("admin.users.roleRenter"),
+                            role: actionLabel(confirmRole?.newRole ?? 2, t),
                         })}
                     </Typography>
                 </DialogContent>
