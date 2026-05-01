@@ -5,16 +5,22 @@ import type { PaymentDto } from "../utils/pdf/buildInvoiceData";
 const BASE = "/payments";
 
 export interface PaymentApiDto {
-    id:          number;
-    ownerId:     number;
-    renterId:    number;
-    apartmentId: number;
-    totalCost:   number;
-    currency:    number;
-    createdAt:   string;
-    startDate?:  string | null;
-    endDate?:    string | null;
-    invoiceUrl?: string | null;
+    id:               number;
+    ownerId:          number;
+    renterId:         number;
+    apartmentId:      number;
+    totalCost:        number;
+    currency:         string;   // backend returneaza acum string ("EUR", "USD", "MDL")
+    createdAt:        string;
+    startDate?:       string | null;
+    endDate?:         string | null;
+    invoiceUrl?:      string | null;
+    // campuri noi populate de backend
+    apartmentAddress: string;
+    renterName:       string;
+    renterSurname:    string;
+    renterEmail:      string;
+    ownerName:        string;
 }
 
 export interface BookedPeriodDto {
@@ -22,24 +28,19 @@ export interface BookedPeriodDto {
     endDate:   string;
 }
 
-const CURRENCY_MAP: Record<number, "USD" | "EUR" | "MDL"> = {
-    0: "USD",
-    1: "EUR",
-    2: "MDL",
-};
-
 export function mapToPaymentDto(api: PaymentApiDto): PaymentDto {
     return {
         id:               api.id,
         apartmentId:      api.apartmentId,
         ownerId:          api.ownerId,
         renterId:         api.renterId,
-        apartmentAddress: `Apartment #${api.apartmentId}`,
-        renterName:       "User",
-        renterSurname:    `#${api.renterId}`,
-        renterEmail:      "",
+        apartmentAddress: api.apartmentAddress,
+        renterName:       api.renterName,
+        renterSurname:    api.renterSurname,
+        renterEmail:      api.renterEmail,
+        ownerName:        api.ownerName,
         totalCost:        api.totalCost,
-        currency:         CURRENCY_MAP[api.currency] ?? "EUR",
+        currency:         (api.currency as "EUR" | "USD" | "MDL") ?? "EUR",
         createdAt:        api.createdAt,
         rentedFrom:       api.startDate ?? undefined,
         rentedTo:         api.endDate   ?? undefined,

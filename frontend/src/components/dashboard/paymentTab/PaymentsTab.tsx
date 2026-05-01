@@ -1,8 +1,8 @@
 // components/dashboard/paymentTab/PaymentsTab.tsx
 import { useEffect, useState }     from "react";
 import {
-    Alert, Box, Snackbar, Stack,
-    ToggleButton, ToggleButtonGroup, Typography,
+    Alert, Backdrop, Box, CircularProgress,
+    Snackbar, Stack, ToggleButton, ToggleButtonGroup, Typography,
 } from "@mui/material";
 import CallMadeIcon     from "@mui/icons-material/CallMade";
 import CallReceivedIcon from "@mui/icons-material/CallReceived";
@@ -13,9 +13,7 @@ import { paymentHistoryService }   from "../../../services/paymentHistoryService
 import type { PaymentDto }         from "../../../utils/pdf/buildInvoiceData";
 import PaymentRow                  from "./paymentRow.tsx";
 
-// Role enum: Admin=0, Owner=1, Renter=2
 const RENTER_ROLE = 2;
-
 type PaymentView = "sent" | "received";
 
 export default function PaymentsTab() {
@@ -33,7 +31,6 @@ export default function PaymentsTab() {
         if (!userId) return;
 
         setLoading(true);
-        // un singur request — filtrare locala dupa ownerId/renterId
         paymentHistoryService.getByUser(userId)
             .then(setAllPayments)
             .catch(() => setAllPayments([]))
@@ -42,8 +39,6 @@ export default function PaymentsTab() {
 
     const userId = currentUser?.id ?? 0;
 
-    // sent  = platile unde userul curent e renter (a platit el)
-    // received = platile unde userul curent e owner (a primit bani)
     const payments: PaymentDto[] = isRenter
         ? allPayments.filter(p => p.renterId === userId)
         : view === "sent"
@@ -54,8 +49,21 @@ export default function PaymentsTab() {
         token: localStorage.getItem("token") ?? "",
     });
 
+    const isGenerating = loadingId !== null;
+
     return (
         <Stack spacing={4}>
+
+            {/* Overlay peste tot ecranul cat timp se genereaza PDF-ul */}
+            <Backdrop
+                open={isGenerating}
+                sx={{ zIndex: 9999, flexDirection: "column", gap: 2, color: "#fff" }}
+            >
+                <CircularProgress color="inherit" size={48} />
+                <Typography fontWeight={700} sx={{ fontSize: 16 }}>
+                    {t("dashboard.payments.generating")}...
+                </Typography>
+            </Backdrop>
 
             <Box sx={{
                 display: "flex",
@@ -69,7 +77,6 @@ export default function PaymentsTab() {
                     {t("dashboard.payments.title")}
                 </Typography>
 
-                {/* Toggle sent/received — vizibil doar pentru Owner si Admin */}
                 {!isRenter && (
                     <ToggleButtonGroup
                         value={view}
