@@ -13,13 +13,12 @@ export type FilterState = {
     checkOut:     string;
     minRating:    number | null;
     minReviews:   number | null;
-    availability: "ALL" | "available" | "occupied";
 };
 
 export const defaultFilters: FilterState = {
     currency: "ALL", priceRange: [0, 50000], interval: "ALL",
     facilities: {}, city: "", checkIn: "", checkOut: "",
-    minRating: null, minReviews: null, availability: "ALL",
+    minRating: null, minReviews: null,
 };
 
 export const priceConfig: Record<string, { min: number; max: number; step: number; symbol: string }> = {

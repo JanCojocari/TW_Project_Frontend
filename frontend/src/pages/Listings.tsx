@@ -10,7 +10,8 @@ import SearchBar             from "../components/listing/SearchBar.tsx";
 import FilterDrawer          from "../components/filter/FilterDrawer.tsx";
 import { defaultFilters, type FilterState } from "../types//filterTypes.ts";
 import { gradients, colors } from "../theme/gradients.ts";
-import { apartmentService }  from "../services/apartmentService.ts";
+import { apartmentService }       from "../services/apartmentService.ts";
+import { paymentHistoryService }   from "../services/paymentHistoryService.ts";
 import { favoriteService }    from "../services/favoriteService.ts";
 import { useAuth }            from "../auth/AuthContext";
 import { paths }              from "../app/paths.ts";
@@ -47,6 +48,8 @@ const Listings = () => {
     const [pendingFilters, setPendingFilters] = useState<FilterState>(defaultFilters);
     const [appliedFilters, setAppliedFilters] = useState<FilterState>(defaultFilters);
     const [currentPage, setCurrentPage]      = useState(1);
+    // Set cu ID-urile apartamentelor ocupate in intervalul checkIn-checkOut selectat
+    const [bookedApartmentIds, setBookedApartmentIds] = useState<Set<number>>(new Set());
 
     useEffect(() => {
         apartmentService.getAll().then(setApartments).catch(() => setApartments([]));
@@ -82,7 +85,6 @@ const Listings = () => {
         let count = 0;
         if (filters.currency !== "ALL")     count++;
         if (filters.interval !== "ALL")     count++;
-        if (filters.availability !== "ALL") count++;
         if (filters.city)                   count++;
         if (filters.checkIn)                count++;
         if (filters.checkOut)               count++;
@@ -107,8 +109,6 @@ const Listings = () => {
                 const query = searchQuery.toLowerCase();
                 if (!apt.Address.toLowerCase().includes(query) && !apt.Cost_per_interval.toString().includes(searchQuery)) return false;
             }
-            if (filters.availability === "available" && apt.Id_Renter !== null) return false;
-            if (filters.availability === "occupied"  && apt.Id_Renter === null)  return false;
             if (filters.currency !== "ALL" && apt.Currency !== filters.currency) return false;
             if (filters.interval !== "ALL" && apt.Interval !== filters.interval) return false;
             if (apt.Cost_per_interval < filters.priceRange[0] || apt.Cost_per_interval > filters.priceRange[1]) return false;
@@ -125,9 +125,11 @@ const Listings = () => {
                 if (apt.reviewCount === 0)         return false;
                 if (apt.avgRating < filters.minRating) return false;
             }
+            // Filtrare pe interval date: exclude apartamentele cu payments suprapuse
+            if (bookedApartmentIds.size > 0 && bookedApartmentIds.has(apt.Id_Apartment)) return false;
             return true;
         });
-    }, [searchQuery, appliedFilters, apartments]);
+    }, [searchQuery, appliedFilters, apartments, bookedApartmentIds]);
 
     // ── Pagination ───────────────────────────────────────────────────────────
     const totalPages = Math.ceil(filteredApartments.length / LISTINGS_PER_PAGE);
@@ -153,7 +155,40 @@ const Listings = () => {
     const resetToFirstPage = () => setCurrentPage(1);
 
     const handleSearch = (query: string) => { setSearchQuery(query); resetToFirstPage(); };
-    const handleApply  = () => { setAppliedFilters(pendingFilters); resetToFirstPage(); };
+    const handleApply = async () => {
+        setAppliedFilters(pendingFilters);
+        resetToFirstPage();
+
+        // Daca sunt date selectate, verifica ce apartamente sunt ocupate in acel interval
+        if (pendingFilters.checkIn && pendingFilters.checkOut) {
+            const checkIn  = new Date(pendingFilters.checkIn);
+            const checkOut = new Date(pendingFilters.checkOut);
+
+            // Fetch payments pentru fiecare apartament si verifica suprapunerea
+            const results = await Promise.allSettled(
+                apartments.map(async (apt) => {
+                    const payments = await paymentHistoryService.getByApartment(apt.Id_Apartment);
+                    const isBooked = payments.some((p) => {
+                        if (!p.rentedFrom || !p.rentedTo) return false;
+                        const pStart = new Date(p.rentedFrom);
+                        const pEnd   = new Date(p.rentedTo);
+                        // suprapunere: intervalele se intersecteaza
+                        return pStart < checkOut && pEnd > checkIn;
+                    });
+                    return { id: apt.Id_Apartment, isBooked };
+                })
+            );
+
+            const booked = new Set<number>();
+            results.forEach((r) => {
+                if (r.status === "fulfilled" && r.value.isBooked) booked.add(r.value.id);
+            });
+            setBookedApartmentIds(booked);
+        } else {
+            // Fara filtru de date — reseteaza setul
+            setBookedApartmentIds(new Set());
+        }
+    };
     const handleReset  = () => { setPendingFilters(defaultFilters); setAppliedFilters(defaultFilters); resetToFirstPage(); };
     const handleResetAll = () => { setSearchQuery(""); setAppliedFilters(defaultFilters); setPendingFilters(defaultFilters); resetToFirstPage(); };
 

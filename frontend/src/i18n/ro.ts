@@ -161,6 +161,7 @@ export default {
         owner:       "Proprietar",
         ownApartment: "Nu îți poți închiria propriul apartament.",
         renter:      "Chiriaș Curent",
+        viewRenterDetails:  "Vezi detalii chiriaș",
         address:     "Adresă",
         price:       "Preț",
         rentNow:     "Închiriează Acum",
@@ -462,7 +463,7 @@ export default {
             },
         },
         infoPanel: {
-            address: "Adresă", price: "Preț", name: "Nume", email: "Email", phone: "Telefon",
+            address: "Adresă", price: "Preț", name: "Nume", email: "Email", phone: "Telefon", contact: "Contact",
         },
         reviews: {
             noReviews:      "Nu există recenzii încă.",

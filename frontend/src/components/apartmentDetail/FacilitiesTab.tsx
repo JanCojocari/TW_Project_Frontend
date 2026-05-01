@@ -1,13 +1,21 @@
 ﻿// components/apartmentDetail/FacilitiesTab.tsx
 import { Box, Paper, Typography } from "@mui/material";
-import { Check as CheckIcon, Close as CloseIcon, Wifi as WifiIcon, LocalParking as ParkingIcon, AcUnit as AcIcon, LocalFireDepartment as HeatingIcon, LocalLaundryService as WasherIcon, DryCleaningOutlined as DryerIcon, Kitchen as KitchenIcon, Tv as TvIcon, Balcony as BalconyIcon, Pool as PoolIcon, FitnessCenter as GymIcon, Elevator as ElevatorIcon, Pets as PetsIcon, SmokingRooms as SmokingIcon, Security as SecurityIcon, Lock as LockIcon } from "@mui/icons-material";
+import {
+    Wifi as WifiIcon, LocalParking as ParkingIcon, AcUnit as AcIcon,
+    LocalFireDepartment as HeatingIcon, LocalLaundryService as WasherIcon,
+    DryCleaningOutlined as DryerIcon, Kitchen as KitchenIcon, Tv as TvIcon,
+    Balcony as BalconyIcon, Pool as PoolIcon, FitnessCenter as GymIcon,
+    Elevator as ElevatorIcon, Pets as PetsIcon, SmokingRooms as SmokingIcon,
+    Security as SecurityIcon, Lock as LockIcon,
+} from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
-import { colors }         from "../../theme/gradients.ts";
+import { colors } from "../../theme/gradients.ts";
 import type { Facilities } from "../../types/apartment.types";
 
-
-
-const GROUPS: { titleKey: string; items: { key: keyof Facilities; labelKey: string; icon: React.ReactNode }[] }[] = [
+const GROUPS: {
+    titleKey: string;
+    items: { key: keyof Facilities; labelKey: string; icon: React.ReactNode }[];
+}[] = [
     { titleKey: "g.internet", items: [
             { key: "wifi",        labelKey: "f.wifi",        icon: <WifiIcon /> },
             { key: "parking",     labelKey: "f.parking",     icon: <ParkingIcon /> },
@@ -46,12 +54,10 @@ const GROUPS: { titleKey: string; items: { key: keyof Facilities; labelKey: stri
         ]},
 ];
 
-// Traduceri inline pentru facilități (folosesc cheile din filterTypes dar mapate aici)
 const FacilitiesTab = ({ facilities }: { facilities: Facilities }) => {
     const { i18n } = useTranslation();
     const isEn = i18n.language === "en";
 
-    // Titluri grupuri
     const groupTitles: Record<string, string> = isEn ? {
         "g.internet":   "Internet & Parking",
         "g.climate":    "Climate",
@@ -68,12 +74,12 @@ const FacilitiesTab = ({ facilities }: { facilities: Facilities }) => {
         "g.security":   "Securitate",
     };
 
-    // Etichete facilități
     const facilityLabels: Record<string, string> = isEn ? {
         "f.wifi": "Free Wi-Fi", "f.parking": "Parking", "f.parkingFree": "Free parking",
         "f.ac": "Air conditioning", "f.heating": "Heating",
         "f.washer": "Washing machine", "f.dryer": "Dryer", "f.dishwasher": "Dishwasher",
-        "f.fridge": "Refrigerator", "f.microwave": "Microwave", "f.oven": "Oven", "f.stove": "Stove", "f.tv": "TV",
+        "f.fridge": "Refrigerator", "f.microwave": "Microwave", "f.oven": "Oven",
+        "f.stove": "Stove", "f.tv": "TV",
         "f.balcony": "Balcony", "f.terrace": "Terrace", "f.garden": "Garden",
         "f.pool": "Pool", "f.gym": "Gym", "f.elevator": "Elevator",
         "f.pets": "Pets allowed", "f.smoking": "Smoking allowed",
@@ -82,7 +88,8 @@ const FacilitiesTab = ({ facilities }: { facilities: Facilities }) => {
         "f.wifi": "Wi-Fi gratuit", "f.parking": "Parcare", "f.parkingFree": "Parcare gratuită",
         "f.ac": "Aer condiționat", "f.heating": "Încălzire",
         "f.washer": "Mașină de spălat", "f.dryer": "Uscător", "f.dishwasher": "Mașină de vase",
-        "f.fridge": "Frigider", "f.microwave": "Cuptor microunde", "f.oven": "Cuptor", "f.stove": "Plită", "f.tv": "TV",
+        "f.fridge": "Frigider", "f.microwave": "Cuptor microunde", "f.oven": "Cuptor",
+        "f.stove": "Plită", "f.tv": "TV",
         "f.balcony": "Balcon", "f.terrace": "Terasă", "f.garden": "Grădină",
         "f.pool": "Piscină", "f.gym": "Sală fitness", "f.elevator": "Ascensor",
         "f.pets": "Animale acceptate", "f.smoking": "Fumat permis",
@@ -90,24 +97,88 @@ const FacilitiesTab = ({ facilities }: { facilities: Facilities }) => {
     };
 
     return (
-        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 3 }}>
+        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2.5 }}>
             {GROUPS.map((group) => (
-                <Paper key={group.titleKey} variant="outlined" sx={{ p: 2.5, borderRadius: 3, border: `1px solid ${colors.border}`, bgcolor: "background.paper" }}>
-                    <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2, color: "primary.main" }}>
+                <Paper
+                    key={group.titleKey}
+                    variant="outlined"
+                    sx={{
+                        p: 2.5, borderRadius: "14px",
+                        border: `1px solid ${colors.border}`,
+                        bgcolor: "background.paper",
+                    }}
+                >
+                    <Typography
+                        variant="overline"
+                        fontWeight={700}
+                        sx={{
+                            display: "block", mb: 2,
+                            color: "text.secondary",
+                            letterSpacing: "0.8px",
+                            fontSize: 11,
+                        }}
+                    >
                         {groupTitles[group.titleKey]}
                     </Typography>
+
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                         {group.items.map((item) => {
                             const active = facilities[item.key];
                             return (
-                                <Box key={item.key} sx={{ display: "flex", alignItems: "center", gap: 1.5, opacity: active ? 1 : 0.45 }}>
-                                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: 2, bgcolor: active ? colors.primaryAlpha10 : "action.hover", color: active ? "primary.main" : "text.disabled", "& svg": { fontSize: 18 } }}>
+                                <Box
+                                    key={item.key}
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 1.5,
+                                        py: 0.5,
+                                        px: 1,
+                                        borderRadius: "8px",
+                                        // Active: tenta verde Rentora (success)
+                                        bgcolor: active
+                                            ? colors.successAlpha15
+                                            : "transparent",
+                                        transition: "background-color 0.15s ease",
+                                    }}
+                                >
+                                    {/* Icon badge */}
+                                    <Box sx={{
+                                        display: "flex", alignItems: "center", justifyContent: "center",
+                                        width: 32, height: 32, borderRadius: "8px", flexShrink: 0,
+                                        bgcolor: active
+                                            ? colors.successAlpha15
+                                            : "action.hover",
+                                        color: active ? colors.successDark : "text.disabled",
+                                        "& svg": { fontSize: 17 },
+                                        transition: "all 0.15s ease",
+                                    }}>
                                         {item.icon}
                                     </Box>
-                                    <Typography variant="body2" fontWeight={active ? 600 : 400} sx={{ color: active ? "text.primary" : "text.disabled", flex: 1 }}>
+
+                                    {/* Label */}
+                                    <Typography
+                                        variant="body2"
+                                        sx={{
+                                            flex: 1,
+                                            fontWeight: active ? 600 : 400,
+                                            color: active ? "text.primary" : "text.disabled",
+                                            // Inactive: strikethrough subtil
+                                            textDecoration: active ? "none" : "line-through",
+                                            textDecorationColor: "rgba(0,0,0,0.18)",
+                                            textDecorationThickness: "1px",
+                                        }}
+                                    >
                                         {facilityLabels[item.labelKey]}
                                     </Typography>
-                                    {active ? <CheckIcon sx={{ fontSize: 16, color: "success.main" }} /> : <CloseIcon sx={{ fontSize: 16, color: "text.disabled" }} />}
+
+                                    {/* Dot verde Rentora pentru facilitate activa */}
+                                    {active && (
+                                        <Box sx={{
+                                            width: 8, height: 8, borderRadius: "50%",
+                                            bgcolor: colors.successDark,
+                                            flexShrink: 0,
+                                        }} />
+                                    )}
                                 </Box>
                             );
                         })}
