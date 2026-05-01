@@ -245,6 +245,7 @@ export default {
         },
         recentViewed: {
             empty:     "You haven't viewed any apartments yet.",
+            noResults: "No apartments viewed in this period.",
             clearAll:  "Clear history",
             clearing:  "Clearing...",
             viewedOn:  "Viewed on",
