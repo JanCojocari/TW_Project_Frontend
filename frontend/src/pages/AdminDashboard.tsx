@@ -28,21 +28,30 @@ const BOTTOM_NAV_H = 64;
 
 type NavKey = "dashboard" | "listings" | "users" | "payments" | "reviews" | "support";
 
-const NAV: { key: NavKey; label: string; icon: React.ReactNode; desc: string }[] = [
-    { key: "dashboard", label: "Dashboard", icon: <DashboardIcon sx={{ fontSize: 20 }} />, desc: "Statistici si metrici platforma" },
-    { key: "listings",  label: "Listings",  icon: <ApartmentIcon sx={{ fontSize: 20 }} />, desc: "Gestioneaza anunturile" },
-    { key: "users",     label: "Users",     icon: <PeopleIcon    sx={{ fontSize: 20 }} />, desc: "Gestioneaza utilizatorii" },
-    { key: "payments",  label: "Payments",  icon: <PaymentIcon   sx={{ fontSize: 20 }} />, desc: "Istoric tranzactii" },
+const ALL_NAV: { key: NavKey; label: string; icon: React.ReactNode; desc: string; adminOnly?: boolean }[] = [
+    { key: "dashboard", label: "Dashboard", icon: <DashboardIcon sx={{ fontSize: 20 }} />, desc: "Statistici si metrici platforma", adminOnly: true },
+    { key: "listings",  label: "Listings",  icon: <ApartmentIcon sx={{ fontSize: 20 }} />, desc: "Gestioneaza anunturile", adminOnly: true },
+    { key: "users",     label: "Users",     icon: <PeopleIcon    sx={{ fontSize: 20 }} />, desc: "Gestioneaza utilizatorii", adminOnly: true },
+    { key: "payments",  label: "Payments",  icon: <PaymentIcon   sx={{ fontSize: 20 }} />, desc: "Istoric tranzactii", adminOnly: true },
     { key: "reviews",   label: "Reviews",   icon: <StarIcon      sx={{ fontSize: 20 }} />, desc: "Recenzii utilizatori" },
     { key: "support",   label: "Support",   icon: <SupportIcon   sx={{ fontSize: 20 }} />, desc: "Cereri de suport" },
 ];
 
 export default function AdminDashboard() {
-    const [active, setActive] = useState<NavKey>("dashboard");
-    const current = NAV.find(n => n.key === active)!;
-    const { currentUser } = useAuth();
+    const { currentUser, isAdmin, isModerator } = useAuth();
     const theme    = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
+    // Moderatorul vede doar reviews si support
+    const NAV = isAdmin ? ALL_NAV : ALL_NAV.filter(n => !n.adminOnly);
+
+    // Moderatorul porneste pe primul tab disponibil (reviews)
+    const [active, setActive] = useState<NavKey>(isAdmin ? "dashboard" : "reviews");
+    const current = NAV.find(n => n.key === active) ?? NAV[0];
+
+    // Titlu sidebar/header diferit pentru moderator
+    const roleLabel = isModerator ? "Moderator" : "Administrator";
+    const dashboardTitle = isModerator ? "Moderator Dashboard" : "Admin Dashboard";
 
     return (
         <Box sx={{
@@ -91,7 +100,7 @@ export default function AdminDashboard() {
                                 {currentUser?.name} {currentUser?.surname}
                             </Typography>
                             <Typography fontSize={11} color="text.secondary" lineHeight={1.4}>
-                                Administrator
+                                {roleLabel}
                             </Typography>
                         </Box>
                     </Box>
@@ -164,7 +173,7 @@ export default function AdminDashboard() {
                     <Divider sx={{ borderColor: colors.border, mx: 2 }} />
                     <Box sx={{ py: 2, textAlign: "center" }}>
                         <Typography fontSize={11} color="text.disabled">
-                            Rentora Admin v1.0
+                            Rentora {roleLabel} v1.0
                         </Typography>
                     </Box>
                 </Box>
@@ -207,9 +216,9 @@ export default function AdminDashboard() {
                             <Link
                                 underline="hover"
                                 sx={{ fontSize: 12, color: "text.secondary", cursor: "pointer", fontWeight: 500 }}
-                                onClick={() => setActive("dashboard")}
+                                onClick={() => setActive(NAV[0].key)}
                             >
-                                Admin
+                                {dashboardTitle}
                             </Link>
                             <Typography sx={{ fontSize: 12, fontWeight: 600, color: "text.primary" }}>
                                 {current.label}
@@ -241,10 +250,10 @@ export default function AdminDashboard() {
 
                 {/* Continut tab */}
                 <Box sx={{ p: { xs: 2, md: 4 }, flex: 1, overflowX: "auto" }}>
-                    {active === "dashboard" && <PlatformTab />}
-                    {active === "listings"  && <ListingsTab />}
-                    {active === "users"     && <UsersTab />}
-                    {active === "payments"  && <PaymentsTab />}
+                    {active === "dashboard" && isAdmin && <PlatformTab />}
+                    {active === "listings"  && isAdmin && <ListingsTab />}
+                    {active === "users"     && isAdmin && <UsersTab />}
+                    {active === "payments"  && isAdmin && <PaymentsTab />}
                     {active === "reviews"   && <ReviewsTab />}
                     {active === "support"   && <SupportTab />}
                 </Box>
@@ -270,7 +279,6 @@ export default function AdminDashboard() {
                             height: BOTTOM_NAV_H,
                             bgcolor: "background.paper",
                             "& .Mui-selected": { color: "primary.main !important" },
-                            // scroll orizontal daca sunt prea multe iconite
                             overflowX: "auto",
                             "&::-webkit-scrollbar": { display: "none" },
                         }}

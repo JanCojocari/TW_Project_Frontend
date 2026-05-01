@@ -10,6 +10,7 @@ const STORAGE_KEY = "rentora_user";
 type AuthContextType = {
     isAuthenticated:   boolean;
     isAdmin:           boolean;
+    isModerator:       boolean;
     currentUser:       UserApiDto | null;
     login:             (email: string, password: string) => Promise<void>;
     logout:            () => void;
@@ -76,6 +77,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             value={{
                 isAuthenticated: !!currentUser,
                 isAdmin:         currentUser?.role === 0,
+                isModerator:     currentUser?.role === 3,
                 currentUser,
                 login,
                 logout,

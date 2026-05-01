@@ -3,27 +3,28 @@ import {
     Avatar, Box, Divider, IconButton, ListItemIcon,
     Menu, MenuItem, Typography,
 } from "@mui/material";
-import DashboardIcon      from "@mui/icons-material/Dashboard";
-import AddHomeIcon        from "@mui/icons-material/AddHome";
-import SettingsIcon       from "@mui/icons-material/Settings";
-import SupportAgentIcon  from "@mui/icons-material/SupportAgent";
-import LogoutIcon         from "@mui/icons-material/Logout";
+import DashboardIcon         from "@mui/icons-material/Dashboard";
+import AddHomeIcon           from "@mui/icons-material/AddHome";
+import SettingsIcon          from "@mui/icons-material/Settings";
+import SupportAgentIcon      from "@mui/icons-material/SupportAgent";
+import LogoutIcon            from "@mui/icons-material/Logout";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
-import { useNavigate }    from "react-router-dom";
-import { useState }       from "react";
-import { useTranslation } from "react-i18next";
-import { useAuth }        from "../../auth/AuthContext";
-import { paths }          from "../../app/paths";
-import { resolveMediaUrl } from "../../utils/mediaUrl";
+import SupervisorAccountIcon  from "@mui/icons-material/SupervisorAccount";
+import { useNavigate }       from "react-router-dom";
+import { useState }          from "react";
+import { useTranslation }    from "react-i18next";
+import { useAuth }           from "../../auth/AuthContext";
+import { paths }             from "../../app/paths";
+import { resolveMediaUrl }   from "../../utils/mediaUrl";
 
 const UserMenu = () => {
-    const navigate             = useNavigate();
-    const { currentUser, isAdmin, logout } = useAuth();
+    const navigate                                = useNavigate();
+    const { currentUser, isAdmin, isModerator, logout } = useAuth();
     const isRenter = currentUser?.role === 2;
-    const { t }                = useTranslation();
-    const [anchor, setAnchor]  = useState<null | HTMLElement>(null);
+    const { t }                                   = useTranslation();
+    const [anchor, setAnchor]                     = useState<null | HTMLElement>(null);
 
-    const open      = Boolean(anchor);
+    const open        = Boolean(anchor);
     const handleOpen  = (e: React.MouseEvent<HTMLElement>) => setAnchor(e.currentTarget);
     const handleClose = () => setAnchor(null);
 
@@ -45,7 +46,6 @@ const UserMenu = () => {
                         transition: "border-color 0.2s ease",
                     }}
                 >
-                    {/* fallback cu initiala */}
                     {!currentUser?.avatarUrl && currentUser?.name?.[0]?.toUpperCase()}
                 </Avatar>
             </IconButton>
@@ -64,7 +64,6 @@ const UserMenu = () => {
                             minWidth: 220,
                             borderRadius: 2,
                             overflow: "visible",
-                            // sageata decorativa
                             "&::before": {
                                 content: '""',
                                 display: "block",
@@ -82,7 +81,7 @@ const UserMenu = () => {
                     },
                 }}
             >
-                {/* Sectiunea cu informatii user */}
+                {/* Informatii user */}
                 <Box sx={{ px: 2, pt: 1.5, pb: 1 }}>
                     <Typography fontWeight={700} noWrap>{fullName}</Typography>
                     <Typography variant="body2" color="text.secondary" noWrap>
@@ -92,12 +91,23 @@ const UserMenu = () => {
 
                 <Divider />
 
+                {/* Link Admin Dashboard — doar pentru Admin */}
                 {isAdmin && (
                     <MenuItem onClick={() => go(paths.admin)}>
                         <ListItemIcon>
                             <AdminPanelSettingsIcon fontSize="small" sx={{ color: "warning.main" }} />
                         </ListItemIcon>
                         <Typography fontWeight={600} color="warning.main">Admin</Typography>
+                    </MenuItem>
+                )}
+
+                {/* Link Moderator Dashboard — doar pentru Moderator */}
+                {isModerator && (
+                    <MenuItem onClick={() => go(paths.admin)}>
+                        <ListItemIcon>
+                            <SupervisorAccountIcon fontSize="small" sx={{ color: "secondary.main" }} />
+                        </ListItemIcon>
+                        <Typography fontWeight={600} color="secondary.main">Moderator</Typography>
                     </MenuItem>
                 )}
 
