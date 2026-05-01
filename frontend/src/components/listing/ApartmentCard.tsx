@@ -1,12 +1,22 @@
 ﻿// components/listing/ApartmentCard.tsx
-import { Box, Card, Typography, Button, Chip } from "@mui/material";
-import { LocationOn as LocationOnIcon, FavoriteBorder as FavoriteBorderIcon, Favorite as FavoriteIcon, Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
-import { memo }              from "react";
-import { useNavigate }       from "react-router-dom";
-import { useTranslation }    from "react-i18next";
-import type { Apartment }    from "../../types/apartment.types.ts";
-import { paths }             from "../../app/paths.ts";
-import { colors }            from "../../theme/gradients.ts";
+import { Box, Card, Typography, Button, IconButton } from "@mui/material";
+import {
+    LocationOn     as LocationOnIcon,
+    FavoriteBorder as FavoriteBorderIcon,
+    Favorite       as FavoriteIcon,
+    Edit           as EditIcon,
+    Delete         as DeleteIcon,
+    Star           as StarIcon,
+    StarHalf       as StarHalfIcon,
+    StarBorder     as StarBorderIcon,
+    TrendingUp     as TrendingUpIcon,
+} from "@mui/icons-material";
+import { memo }           from "react";
+import { useNavigate }    from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import type { Apartment } from "../../types/apartment.types.ts";
+import { paths }          from "../../app/paths.ts";
+import { colors }         from "../../theme/gradients.ts";
 
 interface Props {
     apartment:      Apartment;
@@ -17,139 +27,250 @@ interface Props {
     isOwner?:       boolean;
     onEdit?:        (apartment: Apartment) => void;
     onDelete?:      (apartment: Apartment) => void;
+    viewsLast24h?:  number;
 }
 
-// Culoarea chip-ului in functie de status si ocupare
-function getChipColor(apartment: Apartment): string {
-    if (apartment.status === "pending")  return "#b45309"; // portocaliu
-    if (apartment.status === "declined") return "#dc2626"; // rosu
-    if (apartment.Id_Renter !== null)    return "#dc2626"; // rosu — ocupat
-    return "#16a34a";                                      // verde — disponibil
+function getChipStyle(apartment: Apartment): { bg: string; dot: string } {
+    if (apartment.status === "pending")  return { bg: "rgba(180,83,9,0.92)",  dot: "#fcd34d" };
+    if (apartment.status === "declined") return { bg: "rgba(220,38,38,0.92)", dot: "#fca5a5" };
+    if (apartment.Id_Renter !== null)    return { bg: "rgba(220,38,38,0.92)", dot: "#fca5a5" };
+    return                                      { bg: "rgba(22,163,74,0.92)",  dot: "#86efac" };
 }
 
-const ApartmentCard = ({ apartment, favorites, toggleFavorite, getUserName, getStatus, isOwner = false, onEdit, onDelete }: Props) => {
+function computeAverageRating(apartment: Apartment): { avg: number; count: number } | null {
+    if (!apartment.reviews?.length) return null;
+    let total = 0, count = 0;
+    for (const review of apartment.reviews) {
+        const vals = Object.values(review.ratings as Record<string, number>).filter(v => typeof v === "number");
+        for (const v of vals) { total += v; count++; }
+    }
+    if (count === 0) return null;
+    return { avg: Math.round((total / count) * 10) / 10, count: apartment.reviews.length };
+}
+
+function StarRating({ avg }: { avg: number }) {
+    return <>
+        {[1,2,3,4,5].map(i =>
+            avg >= i
+                ? <StarIcon      key={i} sx={{ fontSize: 13, color: "#f59e0b" }} />
+                : avg >= i - 0.5
+                    ? <StarHalfIcon  key={i} sx={{ fontSize: 13, color: "#f59e0b" }} />
+                    : <StarBorderIcon key={i} sx={{ fontSize: 13, color: "#f59e0b" }} />
+        )}
+    </>;
+}
+
+const ApartmentCard = ({
+                           apartment, favorites, toggleFavorite, getUserName,
+                           getStatus, isOwner = false, onEdit, onDelete, viewsLast24h,
+                       }: Props) => {
     const navigate    = useNavigate();
     const { t, i18n } = useTranslation();
     const isFav       = favorites.includes(apartment.Id_Apartment);
     const isOccupied  = apartment.Id_Renter !== null;
-
-    // owner-ul poate vedea detaliile indiferent de status; altii doar daca e approved
     const canViewDetails = apartment.status === "approved" || isOwner;
 
     const intervalLabelMap: Record<string, string> = i18n.language === "en"
-        ? { hour: "Hourly cost", day: "Daily cost",  month: "Monthly cost" }
-        : { hour: "Cost orar",   day: "Cost zilnic", month: "Cost lunar"   };
-    const costLabel = intervalLabelMap[apartment.Interval] ?? (i18n.language === "en" ? "Monthly cost" : "Cost lunar");
+        ? { hour: "/ hr", day: "/ day", month: "/ mo" }
+        : { hour: "/ ora", day: "/ zi", month: "/ luna" };
+    const intervalSuffix = intervalLabelMap[apartment.Interval] ?? "/ mo";
 
-    // Imaginea de afisat pe card — prima din array sau fallback la image_url
-    const cardImage = apartment.image_urls[0] ?? apartment.image_url;
+    const cardImage  = apartment.image_urls?.[0] ?? apartment.image_url;
+    const chip       = getChipStyle(apartment);
+    const ratingData = computeAverageRating(apartment);
 
     return (
-        <Card sx={{ borderRadius: 4, overflow: "hidden", height: "100%", display: "flex", flexDirection: "column", position: "relative", "&:hover": { transform: "translateY(-10px)" } }}>
+        <Card sx={{
+            borderRadius: "32px",
+            overflow: "hidden",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            border: `1px solid ${colors.border}`,
+            boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+            transition: "transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease",
+            cursor: "pointer",
+            // bgcolor vine din tema
+            "&:hover": {
+                transform: "translateY(-8px)",
+                boxShadow: "0 20px 40px rgba(78,122,166,0.18)",
+                "& .card-img": { transform: "scale(1.06)" },
+                "& .card-overlay": { opacity: 1 },
+            },
+        }}>
 
-            {/* Image */}
-            <Box sx={{ position: "relative", height: 240, overflow: "hidden", bgcolor: "background.default" }}>
-                <img src={cardImage} alt={apartment.Address}
-                     style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1)" }} />
+            {/* ── Imagine — padding-top 58% = ~170px pe coloana de 290px ── */}
+            <Box sx={{ position: "relative", paddingTop: "58%", overflow: "hidden", bgcolor: "background.default", flexShrink: 0, borderRadius: "32px 32px 0 0" }}>
+                <Box
+                    className="card-img"
+                    component="img"
+                    src={cardImage}
+                    alt={apartment.Address}
+                    sx={{
+                        position: "absolute", inset: 0,
+                        width: "100%", height: "100%",
+                        objectFit: "cover",
+                        transition: "transform 0.5s cubic-bezier(0.165,0.84,0.44,1)",
+                    }}
+                />
 
-                {/* Favorite */}
-                <Button onClick={() => toggleFavorite(apartment.Id_Apartment)}
-                        sx={{ position: "absolute", top: 14, right: 14, minWidth: "auto", width: 42, height: 42, borderRadius: "50%", bgcolor: "background.paper", color: isFav ? "error.main" : "text.secondary", border: `1px solid ${colors.border}`, backdropFilter: "blur(8px)", boxShadow: 1, "&:hover": { bgcolor: "background.paper", color: "error.main", transform: "scale(1.1)", boxShadow: 2 } }}>
-                    {isFav ? <FavoriteIcon sx={{ fontSize: 22 }} /> : <FavoriteBorderIcon sx={{ fontSize: 22 }} />}
-                </Button>
+                {/* Gradient jos */}
+                <Box className="card-overlay" sx={{
+                    position: "absolute", inset: 0,
+                    background: "linear-gradient(to top, rgba(10,20,40,0.55) 0%, rgba(10,20,40,0.08) 45%, transparent 100%)",
+                    opacity: 0.65, transition: "opacity 0.3s ease", pointerEvents: "none",
+                }} />
 
-                {/* Status chip */}
-                <Box sx={{ position: "absolute", bottom: 16, left: 16 }}>
-                    <Chip label={getStatus(apartment)} size="small"
-                          sx={{ fontWeight: 800, fontSize: "11px", textTransform: "uppercase",
-                              letterSpacing: "0.5px", backdropFilter: "blur(8px)",
-                              bgcolor: getChipColor(apartment), color: "white" }} />
+                {/* Status badge — stanga sus */}
+                <Box sx={{
+                    position: "absolute", top: 12, left: 12,
+                    display: "inline-flex", alignItems: "center", gap: "5px",
+                    px: 1.2, py: 0.5, borderRadius: "20px",
+                    bgcolor: chip.bg, backdropFilter: "blur(12px)",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                }}>
+                    <Box sx={{ width: 6, height: 6, borderRadius: "50%", bgcolor: chip.dot, flexShrink: 0 }} />
+                    <Typography sx={{ color: "#fff", fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.7px", lineHeight: 1 }}>
+                        {getStatus(apartment)}
+                    </Typography>
                 </Box>
 
-                {/* Owner actions — Edit + Delete (lower right corner) */}
+                {/* Favorite — dreapta sus */}
+                <IconButton
+                    onClick={(e) => { e.stopPropagation(); toggleFavorite(apartment.Id_Apartment); }}
+                    size="small"
+                    sx={{
+                        position: "absolute", top: 10, right: 10,
+                        width: 36, height: 36,
+                        bgcolor: "rgba(255,255,255,0.92)", backdropFilter: "blur(8px)",
+                        color: isFav ? "#ef4444" : "#9ca3af",
+                        border: "1px solid rgba(255,255,255,0.6)",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
+                        "&:hover": { transform: "scale(1.15)", color: "#ef4444", bgcolor: "rgba(255,255,255,0.98)" },
+                    }}
+                >
+                    {isFav ? <FavoriteIcon sx={{ fontSize: 18 }} /> : <FavoriteBorderIcon sx={{ fontSize: 18 }} />}
+                </IconButton>
+
+                {/* Edit + Delete — dreapta jos, doar owner */}
                 {isOwner && (
-                    <Box sx={{ position: "absolute", bottom: 12, right: 12, display: "flex", flexDirection: "column", gap: 0.8 }}>
-                        <Button
-                            onClick={(e) => { e.stopPropagation(); onEdit?.(apartment); }}
-                            sx={{ minWidth: "auto", width: 36, height: 36, borderRadius: "50%",
-                                bgcolor: "background.paper", color: "primary.main",
-                                border: `1px solid ${colors.border}`, backdropFilter: "blur(8px)",
-                                boxShadow: 1, p: 0,
-                                "&:hover": { bgcolor: "background.paper", color: colors.primaryDark, transform: "scale(1.1)", boxShadow: 2 },
-                            }}
-                        >
-                            <EditIcon sx={{ fontSize: 16 }} />
-                        </Button>
-                        <Button
-                            onClick={(e) => { e.stopPropagation(); onDelete?.(apartment); }}
-                            sx={{ minWidth: "auto", width: 36, height: 36, borderRadius: "50%",
-                                bgcolor: "background.paper", color: "error.main",
-                                border: `1px solid ${colors.border}`, backdropFilter: "blur(8px)",
-                                boxShadow: 1, p: 0,
-                                "&:hover": { bgcolor: "background.paper", color: "error.dark", transform: "scale(1.1)", boxShadow: 2 },
-                            }}
-                        >
-                            <DeleteIcon sx={{ fontSize: 16 }} />
-                        </Button>
+                    <Box sx={{ position: "absolute", bottom: 10, right: 10, display: "flex", gap: "6px" }}>
+                        <IconButton size="small" onClick={(e) => { e.stopPropagation(); onEdit?.(apartment); }}
+                                    sx={{ width: 32, height: 32, bgcolor: "rgba(255,255,255,0.92)", backdropFilter: "blur(8px)", color: colors.primary, border: "1px solid rgba(255,255,255,0.6)", boxShadow: "0 2px 6px rgba(0,0,0,0.1)", "&:hover": { bgcolor: "#fff", color: colors.primaryDark, transform: "scale(1.12)" } }}>
+                            <EditIcon sx={{ fontSize: 15 }} />
+                        </IconButton>
+                        <IconButton size="small" onClick={(e) => { e.stopPropagation(); onDelete?.(apartment); }}
+                                    sx={{ width: 32, height: 32, bgcolor: "rgba(255,255,255,0.92)", backdropFilter: "blur(8px)", color: "#ef4444", border: "1px solid rgba(255,255,255,0.6)", boxShadow: "0 2px 6px rgba(0,0,0,0.1)", "&:hover": { bgcolor: "#fff", color: "#dc2626", transform: "scale(1.12)" } }}>
+                            <DeleteIcon sx={{ fontSize: 15 }} />
+                        </IconButton>
+                    </Box>
+                )}
+
+                {/* Rating pill — stanga jos pe imagine */}
+                {ratingData && (
+                    <Box sx={{
+                        position: "absolute", bottom: 12, left: 12,
+                        display: "flex", alignItems: "center", gap: "4px",
+                        px: 1, py: 0.5, borderRadius: "20px",
+                        bgcolor: "rgba(255,255,255,0.92)", backdropFilter: "blur(8px)",
+                        border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                    }}>
+                        <StarIcon sx={{ fontSize: 12, color: "#f59e0b" }} />
+                        <Typography sx={{ fontSize: "12px", fontWeight: 700, color: "text.primary", lineHeight: 1 }}>
+                            {ratingData.avg}
+                        </Typography>
+                        <Typography sx={{ fontSize: "11px", color: "text.secondary", lineHeight: 1 }}>
+                            ({ratingData.count})
+                        </Typography>
                     </Box>
                 )}
             </Box>
 
-            {/* Content */}
-            <Box sx={{ p: 3, flex: 1, display: "flex", flexDirection: "column", gap: 2.5 }}>
-                {/* Address */}
-                <Box sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}>
-                    <Box sx={{ background: colors.primaryAlpha10, p: 1.2, borderRadius: 1.5, border: `1px solid ${colors.primaryAlpha25}` }}>
-                        <LocationOnIcon sx={{ color: "primary.main", fontSize: 20 }} />
-                    </Box>
-                    <Typography sx={{ fontWeight: 700, color: "text.primary", fontSize: "15px", lineHeight: 1.4 }}>
+            {/* ── Body — padding ca in referinta ── */}
+            <Box sx={{ p: "14px 16px 12px", flex: 1, display: "flex", flexDirection: "column", gap: "9px" }}>
+
+                {/* Adresa */}
+                <Box sx={{ display: "flex", alignItems: "flex-start", gap: "5px" }}>
+                    <LocationOnIcon sx={{ fontSize: 15, color: "primary.main", mt: "2px", flexShrink: 0 }} />
+                    <Typography sx={{
+                        fontSize: "14px", fontWeight: 700, color: "text.primary",
+                        lineHeight: 1.35, letterSpacing: "-0.01em",
+                        display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
+                    }}>
                         {apartment.Address}
                     </Typography>
                 </Box>
 
-                {/* Owner / Renter */}
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5, p: 2, bgcolor: "background.default", borderRadius: 2, border: `1px solid ${colors.border}` }}>
-                    <Box>
-                        <Typography sx={{ color: "text.disabled", fontSize: "10px", textTransform: "uppercase", fontWeight: 800, letterSpacing: "1px", mb: 0.5 }}>
-                            {t("apartment.owner")}
-                        </Typography>
-                        <Typography sx={{ color: "text.primary", fontWeight: 700, fontSize: "14px" }}>
-                            {getUserName(apartment.Id_Owner)}
-                        </Typography>
-                    </Box>
-                    {apartment.Id_Renter && (
-                        <Box sx={{ pt: 1, borderTop: `1px solid ${colors.border}` }}>
-                            <Typography sx={{ color: "text.disabled", fontSize: "10px", textTransform: "uppercase", fontWeight: 800, letterSpacing: "1px", mb: 0.5 }}>
-                                {t("apartment.renter")}
+                {/* Descriere */}
+                {apartment.additionalInfo?.description && (
+                    <Typography sx={{
+                        fontSize: "12px", color: "text.secondary", lineHeight: 1.55,
+                        display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
+                    }}>
+                        {apartment.additionalInfo.description}
+                    </Typography>
+                )}
+
+                {/* Meta: rating text + vizualizari */}
+                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
+                    {ratingData ? (
+                        <Box sx={{ display: "flex", alignItems: "center", gap: "3px" }}>
+                            <StarRating avg={ratingData.avg} />
+                            <Typography sx={{ fontSize: "12px", fontWeight: 600, color: "text.primary", ml: "2px" }}>
+                                {ratingData.avg}
                             </Typography>
-                            <Typography sx={{ color: "text.primary", fontWeight: 700, fontSize: "14px" }}>
-                                {getUserName(apartment.Id_Renter)}
+                            <Typography sx={{ fontSize: "11px", color: "text.disabled" }}>
+                                &middot; {ratingData.count} {i18n.language === "en" ? "reviews" : "recenzii"}
+                            </Typography>
+                        </Box>
+                    ) : (
+                        <Typography sx={{ fontSize: "11px", color: "text.disabled", fontStyle: "italic" }}>
+                            {i18n.language === "en" ? "No reviews yet" : "Fara recenzii"}
+                        </Typography>
+                    )}
+
+                    {!!viewsLast24h && (
+                        <Box sx={{ display: "flex", alignItems: "center", gap: "4px", flexShrink: 0 }}>
+                            <TrendingUpIcon sx={{ fontSize: 13, color: colors.secondary }} />
+                            <Typography sx={{ fontSize: "11px", fontWeight: 600, color: colors.secondary, whiteSpace: "nowrap" }}>
+                                {viewsLast24h} {i18n.language === "en" ? "today" : "azi"}
                             </Typography>
                         </Box>
                     )}
                 </Box>
 
-                {/* Price + Button */}
-                <Box sx={{ mt: "auto", pt: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                {/* Divider */}
+                <Box sx={{ height: "1px", bgcolor: colors.border }} />
+
+                {/* Pret + buton */}
+                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1, mt: "auto" }}>
                     <Box>
-                        <Typography sx={{ color: "text.disabled", fontSize: "10px", textTransform: "uppercase", fontWeight: 800, letterSpacing: "1px" }}>
-                            {costLabel}
-                        </Typography>
-                        <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.5 }}>
-                            <Typography sx={{ color: "primary.main", fontWeight: 900, fontSize: "24px" }}>
-                                {apartment.Cost_per_interval}
+                        <Box sx={{ display: "flex", alignItems: "baseline", gap: "3px", lineHeight: 1 }}>
+                            <Typography sx={{ fontSize: "22px", fontWeight: 800, color: "text.primary", letterSpacing: "-0.03em", lineHeight: 1 }}>
+                                {apartment.Cost_per_interval.toLocaleString()}
                             </Typography>
-                            <Typography sx={{ color: "text.secondary", fontWeight: 700, fontSize: "14px" }}>
+                            <Typography sx={{ fontSize: "13px", fontWeight: 600, color: "primary.main", lineHeight: 1 }}>
                                 {apartment.Currency}
                             </Typography>
                         </Box>
+                        <Typography sx={{ fontSize: "10px", color: "text.disabled", fontWeight: 500, mt: "2px" }}>
+                            {intervalSuffix}
+                        </Typography>
                     </Box>
-                    <Button variant="contained"
-                            disabled={!canViewDetails}
-                            onClick={() => navigate(paths.apartmentDetail(apartment.Id_Apartment))}
-                            sx={{ px: 3, color: !canViewDetails ? "#071A1D" : "#FFF", fontWeight: 800, textTransform: "none", borderRadius: 2,
-                                boxShadow: !canViewDetails ? "none" : "0 0 12px rgba(0,224,198,0.3)",
-                                "&:hover": { boxShadow: "0 0 20px rgba(0,224,198,0.4)" } }}>
+
+                    <Button
+                        variant="contained"
+                        disabled={!canViewDetails}
+                        onClick={(e) => { e.stopPropagation(); navigate(paths.apartmentDetail(apartment.Id_Apartment)); }}
+                        disableElevation
+                        sx={{
+                            px: 2.2, py: 0.9, borderRadius: "10px",
+                            fontWeight: 700, fontSize: "13px", textTransform: "none",
+                            minWidth: 0, whiteSpace: "nowrap",
+                            "&:hover": canViewDetails ? { boxShadow: "0 6px 18px rgba(78,122,166,0.38)", transform: "translateY(-1px)" } : {},
+                            "&:active": { transform: "translateY(0)" },
+                        }}
+                    >
                         {isOccupied ? t("listings.occupied") : t("listings.details")}
                     </Button>
                 </Box>
