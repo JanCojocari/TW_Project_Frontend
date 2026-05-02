@@ -615,6 +615,9 @@ export default {
             colPeriod:         "Period",
             colDate:           "Payment Date",
             errorLoad:         "Failed to load payments.",
+            exportXlsx:        "Export .xlsx",
+            exportCsv:         "Export .csv",
+            exportFileName:    "rentora_payments",
         },
         reviews: {
             searchPlaceholder: "Search by ID, user ID or apartment ID...",

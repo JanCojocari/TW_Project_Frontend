@@ -630,6 +630,9 @@ export default {
             colPeriod:         "Perioada",
             colDate:           "Data platii",
             errorLoad:         "Eroare la incarcarea platilor.",
+            exportXlsx:        "Export .xlsx",
+            exportCsv:         "Export .csv",
+            exportFileName:    "plati_rentora",
         },
         reviews: {
             searchPlaceholder: "Cauta dupa ID, ID utilizator sau ID apartament...",
