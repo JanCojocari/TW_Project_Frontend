@@ -16,6 +16,8 @@
     "@mui/material": "^7.3.7",
     "@mui/x-date-pickers": "^8.27.2",
     "@paypal/react-paypal-js": "^9.1.1",
+    "@stripe/react-stripe-js": "^6.3.0",
+    "@stripe/stripe-js": "^9.4.0",
     "@tailwindcss/vite": "^4.1.18",
     "axios": "^1.13.6",
     "dayjs": "^1.11.20",

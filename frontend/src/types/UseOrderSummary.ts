@@ -2,8 +2,7 @@
 import { apartmentService } from "../services/apartmentService";
 import { SERVICE_FEE_RATE } from "./paymentPageConfig";
 import type { OrderSummary } from "./paymentPageConfig";
-
-const intervalLabels: Record<string, string> = { hour: "oră", day: "zi", month: "lună" };
+import { useTranslation } from "react-i18next";
 
 // calculeaza nr de intervale intre doua date
 function calcIntervals(start: Date, end: Date, interval: string): number {
@@ -22,9 +21,10 @@ export const useOrderSummary = (
     endDate:     Date | null,
     hours?:      number,
 ): OrderSummary => {
+    const { t } = useTranslation();
+
     const [summary, setSummary] = useState<OrderSummary>(
         summaryProp ?? { items: [], subtotal: 0, serviceFee: 0, discount: 0, total: 0, currency: "EUR" }
-        
     );
 
     useEffect(() => {
@@ -34,6 +34,12 @@ export const useOrderSummary = (
         apartmentService.getById(Number(apartmentId)).then(apt => {
             if (!apt) return;
 
+            const intervalLabels: Record<string, string> = {
+                hour:  t("payment.intervalHour"),
+                day:   t("payment.intervalDay"),
+                month: t("payment.intervalMonth"),
+            };
+
             const intervals = hours
                 ? hours
                 : (startDate && endDate)
@@ -42,15 +48,16 @@ export const useOrderSummary = (
 
             const subtotal   = Math.round(apt.Cost_per_interval * intervals * 100) / 100;
             const serviceFee = Math.round(subtotal * SERVICE_FEE_RATE * 100) / 100;
+            const intervalLabel = intervalLabels[apt.Interval] ?? apt.Interval;
 
             setSummary({
                 currency: apt.Currency as OrderSummary["currency"],
                 items: [{
-                    id:        String(apt.Id_Apartment),
-                    title:     `Apartament – ${apt.Address}`,
-                    subtitle:  startDate && endDate
-                        ? `${intervals} ${intervalLabels[apt.Interval] ?? apt.Interval}(e)`
-                        : `Chirie / ${intervalLabels[apt.Interval] ?? apt.Interval}`,
+                    id:       String(apt.Id_Apartment),
+                    title:    `${t("payment.itemTitle")} – ${apt.Address}`,
+                    subtitle: startDate && endDate
+                        ? `${intervals} ${intervalLabel}${t("payment.intervalPlural")}`
+                        : `${t("payment.itemSubtitleRent")} / ${intervalLabel}`,
                     quantity:  intervals,
                     unitPrice: apt.Cost_per_interval,
                 }],
@@ -60,7 +67,7 @@ export const useOrderSummary = (
                 total: subtotal + serviceFee,
             });
         }).catch(() => {});
-    }, [summaryProp, apartmentId, startDate, endDate, hours]);
+    }, [summaryProp, apartmentId, startDate, endDate, hours, t]);
 
     return summary;
 };

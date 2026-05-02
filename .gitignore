@@ -46,7 +46,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-appsettings.json
+**/appsettings.Development.json
 .env
 
 wwwroot/uploads

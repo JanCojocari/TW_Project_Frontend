@@ -69,6 +69,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IPayPalLogic, PayPalLogicExecution>();
+builder.Services.AddScoped<IStripeLogic, StripeLogicExecution>();
 
 // elibereaza automat apartamentele cu EndDate expirat, la fiecare ora
 builder.Services.AddHostedService<ReleaseExpiredService>();

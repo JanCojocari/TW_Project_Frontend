@@ -14,8 +14,6 @@ public class PayPalLogicActions
     private readonly string _clientSecret;
     private const string BaseUrl = "https://api-m.sandbox.paypal.com";
 
-    protected readonly AppDbContext db = new AppDbContext();
-
     public PayPalLogicActions(IHttpClientFactory httpClientFactory, IConfiguration config)
     {
         _httpClientFactory = httpClientFactory;
@@ -64,9 +62,11 @@ public class PayPalLogicActions
     }
 
     protected async Task<string> CaptureOrderCoreAsync(
-        string paypalOrderId, int apartmentId, int renterId, decimal amount, string currency)
+        string paypalOrderId, int apartmentId, int renterId,
+        decimal amount, string currency,
+        DateTime? startDate, DateTime? endDate)
     {
-        // 1. captura la PayPal
+        // 1. captureaza la PayPal
         var token  = await GetAccessTokenAsync();
         var client = _httpClientFactory.CreateClient();
         client.DefaultRequestHeaders.Authorization =
@@ -83,10 +83,11 @@ public class PayPalLogicActions
             throw new Exception($"PayPal capture status neasteptat: {status}");
 
         // 2. ia ownerId din apartament
+        using var db = new AppDbContext();
         var apartment = db.Apartments.Find(apartmentId)
             ?? throw new Exception("Apartamentul nu a fost gasit.");
 
-        // 3. salveaza in Payments
+        // 3. salveaza in Payments cu StartDate/EndDate
         var payment = new Payment
         {
             ApartmentId   = apartmentId,
@@ -96,8 +97,14 @@ public class PayPalLogicActions
             Currency      = Enum.Parse<Rentora.Domain.Enums.Currency>(currency, ignoreCase: true),
             TransactionId = paypalOrderId,
             PaymentMethod = "paypal",
-            CreatedAt     = DateTime.UtcNow
+            StartDate     = startDate,
+            EndDate       = endDate,
+            CreatedAt     = DateTime.UtcNow,
         };
+
+        if (startDate.HasValue && endDate.HasValue)
+            apartment.RenterId = renterId;
+
         db.Payments.Add(payment);
         await db.SaveChangesAsync();
 
