@@ -6,21 +6,21 @@ using System.Security.Claims;
 namespace Rentora.API.Controllers;
 
 [ApiController]
-[Route("api/paypal")]
+[Route("api/stripe")]
 [Authorize]
-public class PayPalController : ControllerBase
+public class StripeController : ControllerBase
 {
-    private readonly IPayPalLogic _paypal;
+    private readonly IStripeLogic _stripe;
 
-    public PayPalController(IPayPalLogic paypal) => _paypal = paypal;
+    public StripeController(IStripeLogic stripe) => _stripe = stripe;
 
-    [HttpPost("create-order")]
-    public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequest req)
+    [HttpPost("create-intent")]
+    public async Task<IActionResult> CreateIntent([FromBody] StripeCreateIntentRequest req)
     {
         try
         {
-            var orderId = await _paypal.CreateOrderAsync(req.Amount, req.Currency);
-            return Ok(new { orderId });
+            var clientSecret = await _stripe.CreatePaymentIntentAsync(req.Amount, req.Currency);
+            return Ok(new { clientSecret });
         }
         catch (Exception ex)
         {
@@ -28,9 +28,8 @@ public class PayPalController : ControllerBase
         }
     }
 
-    [HttpPost("capture-order/{paypalOrderId}")]
-    public async Task<IActionResult> CaptureOrder(
-        string paypalOrderId, [FromBody] CaptureOrderRequest req)
+    [HttpPost("confirm")]
+    public async Task<IActionResult> Confirm([FromBody] StripeConfirmRequest req)
     {
         try
         {
@@ -39,8 +38,8 @@ public class PayPalController : ControllerBase
             if (!int.TryParse(renterIdClaim, out var renterId))
                 return Unauthorized();
 
-            var transactionId = await _paypal.CaptureOrderAsync(
-                paypalOrderId, req.ApartmentId, renterId,
+            var transactionId = await _stripe.ConfirmPaymentAsync(
+                req.PaymentIntentId, req.ApartmentId, renterId,
                 req.Amount, req.Currency,
                 req.StartDate, req.EndDate);
 
@@ -53,8 +52,9 @@ public class PayPalController : ControllerBase
     }
 }
 
-public record CreateOrderRequest(decimal Amount, string Currency);
-public record CaptureOrderRequest(
+public record StripeCreateIntentRequest(decimal Amount, string Currency);
+public record StripeConfirmRequest(
+    string PaymentIntentId,
     int ApartmentId,
     decimal Amount,
     string Currency,

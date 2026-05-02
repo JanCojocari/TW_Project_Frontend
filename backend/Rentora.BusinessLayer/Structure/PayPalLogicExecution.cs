@@ -13,6 +13,10 @@ public class PayPalLogicExecution : PayPalLogicActions, IPayPalLogic
         => await CreateOrderCoreAsync(amount, currency);
 
     public async Task<string> CaptureOrderAsync(
-        string paypalOrderId, int apartmentId, int renterId, decimal amount, string currency)
-        => await CaptureOrderCoreAsync(paypalOrderId, apartmentId, renterId, amount, currency);
+        string paypalOrderId, int apartmentId, int renterId,
+        decimal amount, string currency,
+        DateTime? startDate, DateTime? endDate)
+        => await CaptureOrderCoreAsync(
+            paypalOrderId, apartmentId, renterId,
+            amount, currency, startDate, endDate);
 }

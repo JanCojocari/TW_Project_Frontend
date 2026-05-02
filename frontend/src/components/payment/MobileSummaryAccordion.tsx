@@ -1,9 +1,10 @@
 ﻿import { Box, Paper, Typography, Chip, Divider, Collapse } from "@mui/material";
 import { ExpandMore as ExpandMoreIcon, ExpandLess as ExpandLessIcon } from "@mui/icons-material";
 import { gradients } from "../../theme/gradients.ts";
-import { LABELS, CURRENCY_SYMBOLS } from "../../types/paymentPageConfig";
+import { CURRENCY_SYMBOLS } from "../../types/paymentPageConfig";
 import SummaryCard from "./SummaryCard.tsx";
 import type { OrderSummary } from "../../types/paymentPageConfig";
+import { useTranslation } from "react-i18next";
 
 interface SummaryCardProps {
     summary:       OrderSummary;
@@ -26,6 +27,7 @@ interface Props {
 }
 
 const MobileSummaryAccordion = ({ open, onToggle, effectiveTotal, currency, summaryCardProps }: Props) => {
+    const { t } = useTranslation();
     const sym = CURRENCY_SYMBOLS[currency as keyof typeof CURRENCY_SYMBOLS] ?? currency;
 
     return (
@@ -35,7 +37,7 @@ const MobileSummaryAccordion = ({ open, onToggle, effectiveTotal, currency, summ
                      onKeyDown={(e) => e.key === "Enter" && onToggle()}
                      sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", p: 2, cursor: "pointer", userSelect: "none" }}>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Typography variant="body2" fontWeight={700}>{LABELS.orderSummary}</Typography>
+                        <Typography variant="body2" fontWeight={700}>{t("payment.orderSummary")}</Typography>
                         <Chip label={`${sym} ${effectiveTotal}`} size="small"
                               sx={{ background: gradients.primary, color: "#fff", fontWeight: 700, fontSize: 12 }} />
                     </Box>
