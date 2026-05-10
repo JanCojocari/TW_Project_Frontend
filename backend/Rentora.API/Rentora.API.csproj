@@ -19,7 +19,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Rentora.BusinessLayer\Rentora.BusinessLayer.csproj" />
-    <ProjectReference Include="..\Rentora.DataAccess\Rentora.DataAccess.csproj" />
   </ItemGroup>
 
 </Project>

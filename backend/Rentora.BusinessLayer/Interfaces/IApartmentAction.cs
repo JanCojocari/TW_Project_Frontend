@@ -1,6 +1,7 @@
 using Rentora.Domain.Models;
-using Rentora.Domain.Models.Apartment;
 using Rentora.Domain.Models.Responses;
+using Rentora.Domain.Models.Apartment;
+using Rentora.Domain.Models.Admin;
 
 namespace Rentora.BusinessLayer.Interfaces
 {
@@ -19,6 +20,8 @@ namespace Rentora.BusinessLayer.Interfaces
         ActionResponse Approve(int id);
         ActionResponse Decline(int id);
         List<ApartmentDto> GetAllForAdmin();
+        AdminStatsDto GetStats();
+        List<AdminApartmentDto> GetAllWithOwner();
 
     }
 }
