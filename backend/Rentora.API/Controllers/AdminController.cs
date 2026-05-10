@@ -3,10 +3,7 @@ namespace Rentora.API.Controllers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Rentora.BusinessLayer;
-using Rentora.DataAccess;
-using Rentora.Domain.Enums;
 using Rentora.Domain.Models.Apartment;
 using Rentora.Domain.Models.User;
 
@@ -28,19 +25,8 @@ public class AdminController : ControllerBase
     [Authorize(Roles = "Admin")]
     public IActionResult GetStats()
     {
-        using var db = new AppDbContext();
-        return Ok(new
-        {
-            TotalUsers             = db.Users.Count(),
-            TotalApartments        = db.Apartments.Count(),
-            PendingApartments      = db.Apartments.Count(a => a.Status == ApartmentStatus.Pending),
-            ApprovedApartments     = db.Apartments.Count(a => a.Status == ApartmentStatus.Approved),
-            DeclinedApartments     = db.Apartments.Count(a => a.Status == ApartmentStatus.Declined),
-            TotalPayments          = db.Payments.Count(),
-            TotalReviews           = db.Reviews.Count(),
-            TotalSupportRequests   = db.SupportRequests.Count(),
-            OpenSupportRequests    = db.SupportRequests.Count(s => s.Status == SupportStatus.Open),
-        });
+        var stats = _bl.ApartmentAction().GetStats();
+        return Ok(stats);
     }
 
     // ── USER MANAGEMENT — doar Admin ─────────────────────────────────────────
@@ -95,19 +81,7 @@ public class AdminController : ControllerBase
     [Authorize(Roles = "Admin")]
     public IActionResult GetAllApartments()
     {
-        using var db = new AppDbContext();
-        var apartments = db.Apartments
-            .Include(a => a.Owner)
-            .OrderByDescending(a => a.Id)
-            .ToList()
-            .Select(a => new {
-                a.Id, a.OwnedId, a.RenterId, a.Address, a.ImageUrl,
-                a.Interval, a.CostPerInterval, a.Currency, a.RentMode, a.Status,
-                a.Location, a.AdditionlaInfo,
-                OwnerName    = a.Owner?.Name    ?? string.Empty,
-                OwnerSurname = a.Owner?.Surname ?? string.Empty,
-                OwnerEmail   = a.Owner?.Email   ?? string.Empty,
-            });
+        var apartments = _bl.ApartmentAction().GetAllWithOwner();
         return Ok(apartments);
     }
 

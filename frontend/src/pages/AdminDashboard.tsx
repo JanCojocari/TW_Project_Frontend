@@ -2,7 +2,7 @@
 import { useState } from "react";
 import {
     Box, Typography, Avatar, Breadcrumbs, Link,
-    List, ListItemButton, ListItemIcon, ListItemText, Divider,
+    List, ListItemButton, ListItemIcon, ListItemText,
     BottomNavigation, BottomNavigationAction, Paper,
     useMediaQuery, useTheme,
 } from "@mui/material";
@@ -168,13 +168,6 @@ export default function AdminDashboard() {
                             );
                         })}
                     </List>
-
-                    <Divider sx={{ borderColor: colors.border, mx: 2 }} />
-                    <Box sx={{ py: 2, textAlign: "center" }}>
-                        <Typography fontSize={11} color="text.disabled">
-                            {t("admin.version")} — {roleLabel}
-                        </Typography>
-                    </Box>
                 </Box>
             )}
 

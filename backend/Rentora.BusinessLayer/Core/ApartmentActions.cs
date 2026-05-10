@@ -3,10 +3,11 @@ namespace Rentora.BusinessLayer.Core;
 using Microsoft.EntityFrameworkCore;
 using Rentora.DataAccess;
 using Rentora.Domain.Entities;
+using Rentora.Domain.Models;
 using Rentora.Domain.Models.Apartment;
 using Rentora.Domain.Models.Facilities;
 using Rentora.Domain.Models.Responses;
-using Rentora.Domain.Models;
+using Rentora.Domain.Models.Admin;
 using Rentora.Domain.OwnedTypes;
 using Rentora.Domain.Enums;
 
@@ -460,6 +461,55 @@ public class ApartmentActions
             TotalCount = totalCount,
             Page       = page,
             PageSize   = pageSize,
+        };
+    }
+
+    protected AdminStatsDto GetStatsExecution()
+    {
+        using (var db = new AppDbContext())
+        {
+            return new AdminStatsDto()
+            {
+                TotalUsers = db.Users.Count(),
+                TotalApartments = db.Apartments.Count(),
+                PendingApartments = db.Apartments.Count(a => a.Status == ApartmentStatus.Pending),
+                ApprovedApartments = db.Apartments.Count(a => a.Status == ApartmentStatus.Approved),
+                DeclinedApartments = db.Apartments.Count(a => a.Status == ApartmentStatus.Declined),
+                TotalPayments = db.Payments.Count(),
+                TotalReviews = db.Reviews.Count(),
+                TotalSupportRequests = db.SupportRequests.Count(),
+                OpenSupportRequests = db.SupportRequests.Count(s => s.Status == SupportStatus.Open),
+            };
+        }
+    }
+    
+    protected List<AdminApartmentDto> GetAllWithOwnerExecution()
+    {
+        using (var db = new AppDbContext())
+        {
+            return db.Apartments
+                .Include(a => a.Owner)
+                .OrderByDescending(a => a.Id)
+                .ToList()
+                .Select(a => new AdminApartmentDto
+                {
+                    Id              = a.Id,
+                    OwnedId         = a.OwnedId,
+                    RenterId        = a.RenterId,
+                    Address         = a.Address,
+                    ImageUrl        = a.ImageUrl,
+                    Interval        = a.Interval,
+                    CostPerInterval = a.CostPerInterval,
+                    Currency        = a.Currency,
+                    RentMode        = a.RentMode,
+                    Status          = a.Status,
+                    Location        = a.Location,
+                    AdditionalInfo  = a.AdditionlaInfo,
+                    OwnerName       = a.Owner?.Name    ?? string.Empty,
+                    OwnerSurname    = a.Owner?.Surname ?? string.Empty,
+                    OwnerEmail      = a.Owner?.Email   ?? string.Empty,
+                })
+                .ToList();
         };
     }
 }

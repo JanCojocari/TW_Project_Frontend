@@ -3,6 +3,7 @@ namespace Rentora.BusinessLayer.Structure;
 using Rentora.BusinessLayer.Core;
 using Rentora.BusinessLayer.Interfaces;
 using Rentora.Domain.Models;
+using Rentora.Domain.Models.Admin;
 using Rentora.Domain.Models.Apartment;
 using Rentora.Domain.Models.Responses;
 
@@ -46,4 +47,10 @@ public class ApartmentActionExecution : ApartmentActions, IApartmentAction
     
     public List<ApartmentDto> GetAllForAdmin()
         => GetAllForAdminExecution();
+    
+    public AdminStatsDto GetStats()
+        => GetStatsExecution();
+
+    public List<AdminApartmentDto> GetAllWithOwner()
+        => GetAllWithOwnerExecution();
 }
