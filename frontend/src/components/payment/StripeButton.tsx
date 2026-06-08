@@ -5,6 +5,7 @@ import { Box, Button, CircularProgress, Alert, Typography, useTheme } from "@mui
 import { Lock as LockIcon } from "@mui/icons-material";
 import axiosInstance from "../../api/axiosInstance";
 import { useTranslation } from "react-i18next";
+import { getApiErrorMessage } from "../../utils/errorUtils";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string);
 
@@ -73,9 +74,8 @@ const StripeForm = ({ amount, currency, apartmentId, startDate, endDate, disable
             } else {
                 setCardError(t("stripe.errorConfirmBackend"));
             }
-        } catch (err: any) {
-            const msg = err?.response?.data?.error ?? t("stripe.errorUnexpected");
-            setCardError(msg);
+        } catch (err: unknown) {
+            setCardError(getApiErrorMessage(err, t("stripe.errorUnexpected")));
         } finally {
             setLoading(false);
         }

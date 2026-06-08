@@ -24,11 +24,19 @@ export function useStayExpiryCheck() {
     const { addNotification, notifications } = useNotifications();
     const checked = useRef(false);
 
+    // Refs so the effect always sees the latest values without needing them in deps
+    const addNotificationRef = useRef(addNotification);
+    addNotificationRef.current = addNotification;
+    const notificationsRef = useRef(notifications);
+    notificationsRef.current = notifications;
+
     useEffect(() => {
         if (!currentUser || checked.current) return;
         checked.current = true;
 
-        const role = currentUser.role;
+        const role          = currentUser.role;
+        const addNotif      = addNotificationRef.current;
+        const notifs        = notificationsRef.current;
 
         // Admin: importa notificarile din coada globala
         if (role === 0) {
@@ -46,7 +54,7 @@ export function useStayExpiryCheck() {
                 .then(payments => {
                     payments.forEach(p => {
                         if (!isTomorrow(p.endDate)) return;
-                        const alreadySent = notifications.some(
+                        const alreadySent = notifs.some(
                             n => n.type === "renter_stay_expiring" &&
                                 p.endDate && n.message.includes(p.endDate.slice(0, 10)),
                         );
@@ -54,7 +62,7 @@ export function useStayExpiryCheck() {
                         apartmentService.getById(p.apartmentId).then(apt => {
                             if (!apt) return;
                             renterNotifications.stayExpiring(
-                                addNotification, apt.Address, new Date(p.endDate!),
+                                addNotif, apt.Address, new Date(p.endDate!),
                             );
                         }).catch(() => {});
                     });
@@ -74,19 +82,18 @@ export function useStayExpiryCheck() {
                                     p => p.rentedTo && isTomorrow(p.rentedTo),
                                 );
                                 if (!active?.rentedTo) return;
-                                const alreadySent = notifications.some(
+                                const alreadySent = notifs.some(
                                     n => n.type === "owner_stay_expiring" &&
                                         active.rentedTo && n.message.includes(active.rentedTo.slice(0, 10)),
                                 );
                                 if (!alreadySent) {
                                     ownerNotifications.stayExpiring(
-                                        addNotification, apt.Address, new Date(active.rentedTo),
+                                        addNotif, apt.Address, new Date(active.rentedTo),
                                     );
                                 }
                             }).catch(() => {});
                     });
             }).catch(() => {});
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentUser?.id]);
 }

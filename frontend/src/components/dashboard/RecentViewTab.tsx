@@ -167,7 +167,6 @@ export default function RecentViewTab() {
                         apartment={apartment}
                         favorites={[]}
                         toggleFavorite={() => {}}
-                        getUserName={(id: number) => `User #${id}`}
                         getStatus={(apt: Apartment) => apt.Id_Renter
                             ? t("listings.occupied")
                             : t("listings.available")}

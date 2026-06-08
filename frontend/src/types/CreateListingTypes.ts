@@ -1,4 +1,33 @@
 ﻿import type { Currency, RentInterval, Facilities, AdditionalInfo } from "./apartment.types.ts";
+import {
+    Home as HomeIcon,
+    PhotoCamera as CameraIcon,
+    LocationOn as LocationIcon,
+    Star as FacilitiesIcon,
+    MeetingRoom as SpaceIcon,
+    Description as DescIcon,
+} from "@mui/icons-material";
+import type { ReactNode } from "react";
+import { createElement } from "react";
+
+export const NAVBAR_H  = 64;
+export const SIDEBAR_W = 220;
+
+export interface StepMeta {
+    key:      string;
+    labelKey: string;
+    icon:     ReactNode;
+    descKey:  string;
+}
+
+export const STEPS: StepMeta[] = [
+    { key: "basic",       labelKey: "createListing.steps.basic.title",       icon: createElement(HomeIcon,       { sx: { fontSize: 20 } }), descKey: "createListing.steps.basic.subtitle"       },
+    { key: "photos",      labelKey: "createListing.steps.photos.title",      icon: createElement(CameraIcon,     { sx: { fontSize: 20 } }), descKey: "createListing.steps.photos.subtitle"      },
+    { key: "location",    labelKey: "createListing.steps.location.title",    icon: createElement(LocationIcon,   { sx: { fontSize: 20 } }), descKey: "createListing.steps.location.subtitle"    },
+    { key: "facilities",  labelKey: "createListing.steps.facilities.title",  icon: createElement(FacilitiesIcon, { sx: { fontSize: 20 } }), descKey: "createListing.steps.facilities.subtitle"  },
+    { key: "space",       labelKey: "createListing.steps.space.title",       icon: createElement(SpaceIcon,      { sx: { fontSize: 20 } }), descKey: "createListing.steps.space.subtitle"       },
+    { key: "description", labelKey: "createListing.steps.description.title", icon: createElement(DescIcon,       { sx: { fontSize: 20 } }), descKey: "createListing.steps.description.subtitle" },
+];
 
 export type FormState = {
     address: string;

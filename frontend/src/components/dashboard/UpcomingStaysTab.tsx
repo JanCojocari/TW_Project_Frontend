@@ -11,37 +11,11 @@ import { apartmentService }  from "../../services/apartmentService";
 import type { Apartment }    from "../../types/apartment.types";
 import { formatDate }        from "../../utils/formatDate";
 import { colors, gradients } from "../../theme/gradients";
-import axiosInstance         from "../../api/axiosInstance";
 import { paths }             from "../../app/paths";
-
-/* ─── types ───────────────────────────────────────────────────────────── */
-interface RenterPayment {
-    id: number; apartmentId: number; renterId: number; ownerId: number;
-    totalCost: number; currency: number; createdAt: string;
-    startDate: string | null; endDate: string | null; invoiceUrl: string | null;
-}
-interface StayEntry { apartment: Apartment; startDate: Date; endDate: Date }
-
-async function fetchRenterPayments(renterId: number): Promise<RenterPayment[]> {
-    return axiosInstance.get<RenterPayment[]>(`/payments/renter/${renterId}`).then(r => r.data);
-}
-
-/* ─── helpers ─────────────────────────────────────────────────────────── */
-function stayProgress(start: Date, end: Date): number {
-    const now = Date.now();
-    if (now <= start.getTime()) return 0;
-    if (now >= end.getTime())   return 100;
-    return Math.round(((now - start.getTime()) / (end.getTime() - start.getTime())) * 100);
-}
-
-function nightsCount(start: Date, end: Date): number {
-    return Math.max(1, Math.round((end.getTime() - start.getTime()) / 86_400_000));
-}
-
-function isActive(start: Date, end: Date): boolean {
-    const now = Date.now();
-    return now >= start.getTime() && now <= end.getTime();
-}
+import {
+    type RenterPayment, type StayEntry,
+    fetchRenterPayments, nightsCount, stayProgress, isActive,
+} from "./stayHelpers";
 
 /* ─── StayProgressBar — overlay pe imaginea cardului ─────────────────── */
 function StayProgressBar({ startDate, endDate }: { startDate: Date; endDate: Date }) {

@@ -8,10 +8,9 @@ interface Props {
     favoriteApartments: Apartment[];
     favoriteIds:        number[];
     onToggleFavorite:   (id: number) => void;
-    getUserName:        (id: number) => string;
 }
 
-export default function FavoritesTab({ favoriteApartments, favoriteIds, onToggleFavorite, getUserName }: Props) {
+export default function FavoritesTab({ favoriteApartments, favoriteIds, onToggleFavorite }: Props) {
     const { t } = useTranslation();
 
     if (favoriteApartments.length === 0) return (
@@ -30,7 +29,6 @@ export default function FavoritesTab({ favoriteApartments, favoriteIds, onToggle
                     apartment={apt}
                     favorites={favoriteIds}
                     toggleFavorite={onToggleFavorite}
-                    getUserName={getUserName}
                     getStatus={(apartment: Apartment) => apartment.Id_Renter
                         ? t("listings.occupied")
                         : t("listings.available")}

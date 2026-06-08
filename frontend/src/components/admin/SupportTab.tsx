@@ -1,5 +1,6 @@
 // components/admin/SupportTab.tsx
 import { useEffect, useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import {
     Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     Paper, IconButton, Tooltip, Dialog, DialogTitle, DialogContent,
@@ -10,13 +11,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
 import { adminService, type AdminSupportRequest } from "../../services/adminService";
 import { formatDate } from "../../utils/formatDate.ts";
-
-const STATUS_LABELS: Record<number, string> = {
-    0: "Open",
-    1: "In Progress",
-    2: "Resolved",
-    3: "Closed",
-};
 
 const STATUS_COLORS: Record<number, "warning" | "info" | "success" | "default"> = {
     0: "warning",
@@ -33,6 +27,15 @@ const STATUS_API_VALUES: Record<number, string> = {
 };
 
 export default function SupportTab() {
+    const { t } = useTranslation();
+
+    const STATUS_LABELS: Record<number, string> = {
+        0: t("admin.support.statusOpen"),
+        1: t("admin.support.statusInProgress"),
+        2: t("admin.support.statusResolved"),
+        3: t("admin.support.statusClosed"),
+    };
+
     const [requests, setRequests]       = useState<AdminSupportRequest[]>([]);
     const [loading, setLoading]         = useState(true);
     const [error, setError]             = useState<string | null>(null);
@@ -43,7 +46,7 @@ export default function SupportTab() {
     useEffect(() => {
         adminService.getSupportRequests()
             .then(setRequests)
-            .catch(() => setError("Nu s-au putut incarca cererile de suport."))
+            .catch(() => setError(t("admin.support.errorLoad")))
             .finally(() => setLoading(false));
     }, []);
 
@@ -62,7 +65,7 @@ export default function SupportTab() {
             await adminService.updateSupportStatus(id, STATUS_API_VALUES[newStatus]);
             setRequests(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r));
         } catch {
-            setError("Eroare la actualizarea statusului.");
+            setError(t("admin.support.errorStatus"));
         }
     };
 
@@ -73,7 +76,7 @@ export default function SupportTab() {
             await adminService.deleteSupport(confirmDelete.id);
             setRequests(prev => prev.filter(r => r.id !== confirmDelete.id));
         } catch {
-            setError("Eroare la stergerea cererii.");
+            setError(t("admin.support.errorDelete"));
         } finally {
             setBusy(false);
             setConfirmDelete(null);
@@ -87,7 +90,7 @@ export default function SupportTab() {
         <>
             <TextField
                 fullWidth size="small"
-                placeholder="Cauta dupa ID, email sau subiect..."
+                placeholder={t("admin.support.searchPlaceholder")}
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 sx={{ mb: 2 }}
@@ -104,12 +107,12 @@ export default function SupportTab() {
                 <Table size="small">
                     <TableHead>
                         <TableRow sx={{ "& th": { fontWeight: 700, bgcolor: "background.default" } }}>
-                            <TableCell>ID</TableCell>
-                            <TableCell>Email</TableCell>
-                            <TableCell>Subiect</TableCell>
-                            <TableCell>Status</TableCell>
-                            <TableCell>Data</TableCell>
-                            <TableCell align="right">Actiuni</TableCell>
+                            <TableCell>{t("admin.support.colId")}</TableCell>
+                            <TableCell>{t("admin.support.colEmail")}</TableCell>
+                            <TableCell>{t("admin.support.colSubject")}</TableCell>
+                            <TableCell>{t("admin.support.colStatus")}</TableCell>
+                            <TableCell>{t("admin.support.colDate")}</TableCell>
+                            <TableCell align="right">{t("admin.support.colActions")}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -141,7 +144,7 @@ export default function SupportTab() {
                                 </TableCell>
                                 <TableCell>{formatDate(req.createdAt)}</TableCell>
                                 <TableCell align="right">
-                                    <Tooltip title="Sterge">
+                                    <Tooltip title={t("admin.support.tooltipDelete")}>
                                         <IconButton size="small" color="error" onClick={() => setConfirmDelete(req)}>
                                             <DeleteIcon fontSize="small" />
                                         </IconButton>
@@ -152,7 +155,7 @@ export default function SupportTab() {
                         {filtered.length === 0 && (
                             <TableRow>
                                 <TableCell colSpan={6} align="center" sx={{ py: 4, color: "text.disabled" }}>
-                                    <Typography variant="body2">Nicio cerere de suport gasita.</Typography>
+                                    <Typography variant="body2">{t("admin.support.empty")}</Typography>
                                 </TableCell>
                             </TableRow>
                         )}
@@ -161,16 +164,16 @@ export default function SupportTab() {
             </TableContainer>
 
             <Dialog open={!!confirmDelete} onClose={() => setConfirmDelete(null)}>
-                <DialogTitle fontWeight={700}>Sterge cererea de suport</DialogTitle>
+                <DialogTitle fontWeight={700}>{t("admin.support.deleteTitle")}</DialogTitle>
                 <DialogContent>
                     <Typography>
-                        Sigur vrei sa stergi cererea #{confirmDelete?.id} de la {confirmDelete?.email}?
+                        {t("admin.support.deleteDesc", { id: confirmDelete?.id, email: confirmDelete?.email })}
                     </Typography>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setConfirmDelete(null)} disabled={busy}>Anuleaza</Button>
+                    <Button onClick={() => setConfirmDelete(null)} disabled={busy}>{t("admin.common.cancel")}</Button>
                     <Button onClick={handleDelete} color="error" variant="contained" disabled={busy}>
-                        {busy ? <CircularProgress size={16} /> : "Sterge"}
+                        {busy ? <CircularProgress size={16} /> : t("admin.common.delete")}
                     </Button>
                 </DialogActions>
             </Dialog>

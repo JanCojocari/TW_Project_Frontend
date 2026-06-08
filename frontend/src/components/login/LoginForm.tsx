@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useAuth }       from "../../auth/AuthContext.tsx";
 import { useState }      from "react";
 import { gradients, colors } from "../../theme/gradients.ts";
+import { getApiErrorMessage } from "../../utils/errorUtils";
 
 const LoginForm = () => {
     const navigate    = useNavigate();
@@ -41,11 +42,8 @@ const LoginForm = () => {
         try {
             await login(email, password);
             navigate("/listings");
-        } catch (err: any) {
-            const message =
-                err.response?.data?.message ||
-                "Authentication failed. Please check the data entered.";
-            setApiError(message);
+        } catch (err: unknown) {
+            setApiError(getApiErrorMessage(err, "Authentication failed. Please check the data entered."));
         } finally {
             setLoading(false);
         }

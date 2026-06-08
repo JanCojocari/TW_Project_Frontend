@@ -1,6 +1,7 @@
 namespace Rentora.BusinessLayer.Core;
 
 using Microsoft.EntityFrameworkCore;
+using Rentora.BusinessLayer.Mappers;
 using Rentora.DataAccess;
 using Rentora.Domain.Entities;
 using Rentora.Domain.Models;
@@ -34,7 +35,7 @@ public class ApartmentActions
             .ToDictionary(x => x.ApartmentId);
 
         return apartments.Select(a => {
-            var dto = MapToDto(a);
+            var dto = ApartmentMapper.ToDto(a);
             if (reviewStats.TryGetValue(a.Id, out var stats)) {
                 dto.ReviewCount = stats.Count;
                 dto.AvgRating   = Math.Round(stats.Avg, 1);
@@ -43,14 +44,6 @@ public class ApartmentActions
         }).ToList();
     }
     
-    protected List<ApartmentDto> GetAllForAdminExecution()
-    {
-        using var db = new AppDbContext();
-        return db.Apartments
-            .Select(a => MapToDto(a))
-            .ToList();
-    }
-
     protected ApartmentDto? GetByIdExecution(int id)
     {
         using var db = new AppDbContext();
@@ -60,7 +53,7 @@ public class ApartmentActions
             .FirstOrDefault(a => a.Id == id);
         if (apartment == null) return null;
 
-        var dto = MapToDto(apartment);
+        var dto = ApartmentMapper.ToDto(apartment);
 
         var ratings = db.Reviews
             .Where(r => r.ApartmentId == id)
@@ -80,7 +73,7 @@ public class ApartmentActions
             .Include(a => a.Facilities)
             .Where(a => a.OwnedId == ownerId)
             .ToList()
-            .Select(a => MapToDto(a))
+            .Select(a => ApartmentMapper.ToDto(a))
             .ToList();
     }
 
@@ -280,7 +273,7 @@ public class ApartmentActions
         using var db = new AppDbContext();
         return db.Apartments
             .Where(a => a.Status == Rentora.Domain.Enums.ApartmentStatus.Pending)
-            .Select(a => MapToDto(a))
+            .Select(a => ApartmentMapper.ToDto(a))
             .ToList();
     }
 
@@ -309,51 +302,6 @@ public class ApartmentActions
         db.SaveChanges();
         return new ActionResponse { IsSuccess = true, Message = "Apartment declined." };
     }
-
-    private static ApartmentDto MapToDto(Apartment a) => new ApartmentDto
-    {
-        Id              = a.Id,
-        OwnedId         = a.OwnedId,
-        RenterId        = a.RenterId,
-        Address         = a.Address,
-        ImageUrl        = a.ImageUrl,
-        Interval        = a.Interval,
-        CostPerInterval = a.CostPerInterval,
-        Currency        = a.Currency,
-        RentMode        = a.RentMode,
-        Status          = a.Status,
-        Location        = a.Location,
-        AdditionalInfo  = a.AdditionlaInfo,
-        Facilities      = a.Facilities != null ? new FacilitiesDto
-        {
-            ApartmentId     = a.Facilities.ApartmentId,
-            Wifi            = a.Facilities.Wifi,
-            Parking         = a.Facilities.Parking,
-            ParkingFree     = a.Facilities.ParkingFree,
-            AirConditioning = a.Facilities.AirConditioning,
-            Heating         = a.Facilities.Heating,
-            Washer          = a.Facilities.Washer,
-            Dryer           = a.Facilities.Dryer,
-            Dishwasher      = a.Facilities.Dishwasher,
-            Refrigerator    = a.Facilities.Refrigerator,
-            Microwave       = a.Facilities.Microwave,
-            Oven            = a.Facilities.Oven,
-            Stove           = a.Facilities.Stove,
-            Kitchen         = a.Facilities.Kitchen,
-            Tv              = a.Facilities.TV,
-            Balcony         = a.Facilities.Balcony,
-            Terrace         = a.Facilities.Terrace,
-            Garden          = a.Facilities.Garden,
-            Pool            = a.Facilities.Pool,
-            Gym             = a.Facilities.Gym,
-            Elevator        = a.Facilities.Elevator,
-            PetsAllowed     = a.Facilities.PetsAllowed,
-            SmokingAllowed  = a.Facilities.SmokingAllowed,
-            SecurityCamera  = a.Facilities.SecurityCamera,
-            KeypadEntry     = a.Facilities.KeypadEntry,
-            Safe            = a.Facilities.Safe,
-        } : null,
-    };
 
     protected PagedResult<ApartmentDto> GetPagedExecution(ApartmentQueryParams p)
     {
@@ -450,7 +398,7 @@ public class ApartmentActions
         return new PagedResult<ApartmentDto>
         {
             Items = apartments.Select(a => {
-                var dto = MapToDto(a);
+                var dto = ApartmentMapper.ToDto(a);
                 if (reviewStats.TryGetValue(a.Id, out var stats))
                 {
                     dto.ReviewCount = stats.Count;

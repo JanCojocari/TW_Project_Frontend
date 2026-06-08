@@ -33,9 +33,9 @@ const Listings = () => {
         try {
             await apartmentService.delete(deleteTarget.Id_Apartment);
             setApartments(prev => prev.filter(a => a.Id_Apartment !== deleteTarget.Id_Apartment));
-            setSnack({ msg: "Anunțul a fost șters.", sev: "success" });
+            setSnack({ msg: t("listings.deleteSuccess"), sev: "success" });
         } catch {
-            setSnack({ msg: "Eroare la ștergere. Încearcă din nou.", sev: "error" });
+            setSnack({ msg: t("listings.deleteError"), sev: "error" });
         } finally {
             setDeleteBusy(false);
             setDeleteTarget(null);
@@ -268,7 +268,6 @@ const Listings = () => {
                                     toggleFavorite={toggleFavorite}
                                     favorites={favorites}
                                     getStatus={getStatus}
-                                    getUserName={(id: number) => `User #${id}`}
                                     isOwner={currentUser?.id === apt.Id_Owner}
                                     onEdit={(a) => navigate(paths.editListing, { state: { apartment: a } })}
                                     onDelete={(a) => setDeleteTarget(a)}
@@ -315,18 +314,18 @@ const Listings = () => {
 
             {/* ── Dialog confirmare delete ─────────────────────────────── */}
             <Dialog open={!!deleteTarget} onClose={() => !deleteBusy && setDeleteTarget(null)}>
-                <DialogTitle fontWeight={700}>Stergi anuntul?</DialogTitle>
+                <DialogTitle fontWeight={700}>{t("listings.deleteDialog.title")}</DialogTitle>
                 <DialogContent>
                     <Typography>
-                        Esti sigur ca vrei sa stergi anuntul <strong>{deleteTarget?.Address}</strong>? Aceasta actiune este ireversibila.
+                        {t("listings.deleteDialog.body", { address: deleteTarget?.Address ?? "" })}
                     </Typography>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setDeleteTarget(null)} disabled={deleteBusy}>
-                        Anuleaza
+                        {t("listings.deleteDialog.cancel")}
                     </Button>
                     <Button onClick={handleDeleteConfirm} color="error" variant="contained" disabled={deleteBusy}>
-                        {deleteBusy ? <CircularProgress size={16} /> : "Sterge"}
+                        {deleteBusy ? <CircularProgress size={16} /> : t("listings.deleteDialog.confirm")}
                     </Button>
                 </DialogActions>
             </Dialog>
