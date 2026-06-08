@@ -44,14 +44,6 @@ public class ApartmentActions
         }).ToList();
     }
     
-    protected List<ApartmentDto> GetAllForAdminExecution()
-    {
-        using var db = new AppDbContext();
-        return db.Apartments
-            .Select(a => ApartmentMapper.ToDto(a))
-            .ToList();
-    }
-
     protected ApartmentDto? GetByIdExecution(int id)
     {
         using var db = new AppDbContext();

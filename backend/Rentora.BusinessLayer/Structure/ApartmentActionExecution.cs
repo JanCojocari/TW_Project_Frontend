@@ -45,9 +45,6 @@ public class ApartmentActionExecution : ApartmentActions, IApartmentAction
     public ActionResponse Decline(int id)
         => DeclineExecution(id);
     
-    public List<ApartmentDto> GetAllForAdmin()
-        => GetAllForAdminExecution();
-    
     public AdminStatsDto GetStats()
         => GetStatsExecution();
 
