@@ -16,7 +16,8 @@ import {
 
 // ── Helpers imagini ───────────────────────────────────────────────────────────
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace("/api", "") ?? "http://localhost:5231";
+const BASE_URL           = import.meta.env.VITE_API_BASE_URL?.replace("/api", "") ?? "http://localhost:5231";
+const DEFAULT_COUNTRY    = "Moldova";
 
 function parseImageUrls(raw: string | null): string[] {
     if (!raw) return [];
@@ -201,7 +202,7 @@ export function buildCreatePayload(form: FormState, imageUrls: string[]): Apartm
             lat:         parseFloat(form.latitude)  || 0,
             lng:         parseFloat(form.longitude) || 0,
             city:        form.city,
-            country:     "Moldova",
+            country:     DEFAULT_COUNTRY,
             fullAddress: form.address,
             region:      form.region,
             postalCode:  form.postalCode,

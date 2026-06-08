@@ -5,16 +5,7 @@ import { useTranslation }    from "react-i18next";
 import {
     Avatar, Box, Typography, BottomNavigation, BottomNavigationAction, Paper,
     useMediaQuery, useTheme,
-    Dialog, DialogTitle, DialogContent, DialogActions,
-    Button, CircularProgress, Snackbar, Alert,
 } from "@mui/material";
-import PersonIcon    from "@mui/icons-material/Person";
-import ApartmentIcon from "@mui/icons-material/Apartment";
-import PaymentIcon   from "@mui/icons-material/Payment";
-import FavoriteIcon  from "@mui/icons-material/Favorite";
-import EventIcon     from "@mui/icons-material/Event";
-import HistoryIcon   from "@mui/icons-material/History";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import type { Apartment }    from "../types/apartment.types";
 import { useAuth }           from "../auth/AuthContext";
 import { apartmentService }  from "../services/apartmentService";
@@ -22,9 +13,12 @@ import { favoriteService }   from "../services/favoriteService";
 import { paymentHistoryService } from "../services/paymentHistoryService";
 import { paths }             from "../app/paths";
 import { gradients, colors } from "../theme/gradients";
-import { useNotifications } from "../context/NotificationContext";
+import { useNotifications }  from "../context/NotificationContext";
 import { ownerNotifications } from "../services/notificationService";
 import { resolveMediaUrl }   from "../utils/mediaUrl";
+import SidebarItem, { ALL_NAV, type NavKey } from "../components/dashboard/SidebarItem";
+import PageHeading           from "../components/dashboard/PageHeading";
+import DeleteListingDialog   from "../components/dashboard/DeleteListingDialog";
 import ProfileTab       from "../components/dashboard/ProfileTab";
 import MyListingsTab    from "../components/dashboard/MyListingsTab";
 import PaymentsTab      from "../components/dashboard/paymentTab/PaymentsTab";
@@ -39,88 +33,6 @@ const BOTTOM_NAV_H = 64;
 
 // Role enum: Admin=0, Owner=1, Renter=2
 const RENTER_ROLE = 2;
-
-type NavKey = "profile" | "listings" | "recent" | "favorites" | "upcoming" | "previous" | "payments";
-
-interface NavItem { key: NavKey; labelKey: string; icon: React.ReactNode }
-
-const ALL_NAV: NavItem[] = [
-    { key: "profile",   labelKey: "dashboard.tabs.profile",       icon: <PersonIcon     sx={{ fontSize: 22 }} /> },
-    { key: "listings",  labelKey: "dashboard.tabs.apartments",     icon: <ApartmentIcon  sx={{ fontSize: 22 }} /> },
-    { key: "recent",    labelKey: "dashboard.tabs.recentViewed",   icon: <VisibilityIcon sx={{ fontSize: 22 }} /> },
-    { key: "favorites", labelKey: "dashboard.tabs.favorites",      icon: <FavoriteIcon   sx={{ fontSize: 22 }} /> },
-    { key: "upcoming",  labelKey: "dashboard.tabs.upcomingStays",  icon: <EventIcon      sx={{ fontSize: 22 }} /> },
-    { key: "previous",  labelKey: "dashboard.tabs.previousStays",  icon: <HistoryIcon    sx={{ fontSize: 22 }} /> },
-    { key: "payments",  labelKey: "dashboard.tabs.payments",       icon: <PaymentIcon    sx={{ fontSize: 22 }} /> },
-];
-
-function SidebarItem({ item, isActive, onClick }: { item: NavItem; isActive: boolean; onClick: () => void }) {
-    const { t } = useTranslation();
-    return (
-        <Box
-            component="button"
-            onClick={onClick}
-            sx={{
-                all: "unset",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 0.6,
-                width: "100%",
-                py: 1.5,
-                cursor: "pointer",
-                position: "relative",
-                color: isActive ? "primary.main" : "text.disabled",
-                transition: "color .15s",
-                bgcolor: isActive ? colors.primaryAlpha06 : "transparent",
-                "&:hover": { color: "primary.main", bgcolor: colors.primaryAlpha06 },
-                "&::before": isActive ? {
-                    content: '""',
-                    position: "absolute",
-                    left: 0, top: "20%", bottom: "20%",
-                    width: 3,
-                    borderRadius: "0 4px 4px 0",
-                    background: gradients.primary,
-                } : {},
-            }}
-        >
-            {item.icon}
-            <Typography sx={{
-                fontSize: 11,
-                fontWeight: isActive ? 700 : 500,
-                lineHeight: 1.2,
-                textAlign: "center",
-                color: "inherit",
-            }}>
-                {t(item.labelKey)}
-            </Typography>
-        </Box>
-    );
-}
-
-function PageHeading({ title, subtitle }: { title: string; subtitle?: string }) {
-    return (
-        <Box sx={{ mb: { xs: 2, md: 4 } }}>
-            <Typography sx={{
-                fontSize: { xs: 18, md: 22 },
-                fontWeight: 900,
-                letterSpacing: "-0.5px",
-                lineHeight: 1.1,
-                background: gradients.textPrimary,
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-            }}>
-                {title}
-            </Typography>
-            {subtitle && (
-                <Typography sx={{ fontSize: { xs: 12, md: 13 }, color: "text.secondary", mt: 0.5 }}>
-                    {subtitle}
-                </Typography>
-            )}
-        </Box>
-    );
-}
 
 export default function Dashboard() {
     const { t }           = useTranslation();
@@ -162,9 +74,7 @@ export default function Dashboard() {
             .catch(() => setFavoriteIds([]));
     };
 
-    useEffect(() => {
-        fetchListings();
-    }, [currentUserId]);
+    useEffect(() => { fetchListings(); }, [currentUserId]);
 
     // reseteaza tabul activ daca rolul nu permite "listings"
     useEffect(() => {
@@ -175,12 +85,11 @@ export default function Dashboard() {
     useEffect(() => {
         if ((location.state as { refreshListings?: boolean } | null)?.refreshListings) {
             fetchListings();
-            // curata state-ul ca sa nu re-fetch-uim la fiecare render
             navigate(paths.dashboard, { replace: true, state: {} });
         }
     }, [location.state]);
 
-    // re-fetch cand userul revine pe acest tab (ex: admin a aprobat din alt tab)
+    // re-fetch cand userul revine pe acest tab
     useEffect(() => {
         const handleVisibility = () => {
             if (document.visibilityState === "visible") fetchListings();
@@ -222,14 +131,13 @@ export default function Dashboard() {
         try {
             await apartmentService.delete(deleteTarget.Id_Apartment);
             setMyListings(prev => prev.filter(a => a.Id_Apartment !== deleteTarget.Id_Apartment));
-            // notificare owner: anunt sters
             ownerNotifications.listingDeleted(addNotification, deleteTarget.Address);
             setDeleteTarget(null);
             setSnack({ msg: t("dashboard.myListings.deleteSuccess"), sev: "success" });
-        } catch (err: any) {
-            const data = err?.response?.data;
+        } catch (err: unknown) {
+            const data = (err as { response?: { data?: unknown } })?.response?.data;
             const isActiveBooking =
-                (typeof data === "object" && data?.message?.toLowerCase().includes("booking")) ||
+                (typeof data === "object" && data !== null && (data as { message?: string })?.message?.toLowerCase().includes("booking")) ||
                 (typeof data === "string" && data.toLowerCase().includes("booking"));
             const msg = isActiveBooking
                 ? t("dashboard.myListings.deleteErrorActive")
@@ -243,7 +151,6 @@ export default function Dashboard() {
 
     // ── Edit listing ──────────────────────────────────────────────────────────
     const handleEdit = async (apt: Apartment) => {
-        // verifica daca exista un sejur in desfasurare (startDate < now < endDate)
         try {
             const payments = await paymentHistoryService.getByApartment(apt.Id_Apartment);
             const now = new Date();
@@ -448,35 +355,14 @@ export default function Dashboard() {
                 </Paper>
             )}
 
-            {/* ── Dialog confirmare delete ─────────────────────────────── */}
-            <Dialog open={!!deleteTarget} onClose={() => !deletebusy && setDeleteTarget(null)}>
-                <DialogTitle fontWeight={700}>{t("dashboard.myListings.deleteDialog.title")}</DialogTitle>
-                <DialogContent>
-                    <Typography>
-                        {t("dashboard.myListings.deleteDialog.body", { address: deleteTarget?.Address ?? "" })}
-                    </Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setDeleteTarget(null)} disabled={deletebusy}>
-                        {t("dashboard.myListings.deleteDialog.cancel")}
-                    </Button>
-                    <Button onClick={handleDeleteConfirm} color="error" variant="contained" disabled={deletebusy}>
-                        {deletebusy ? <CircularProgress size={16} /> : t("dashboard.myListings.deleteDialog.confirm")}
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            {/* ── Snackbar notificare ──────────────────────────────────── */}
-            <Snackbar
-                open={!!snack}
-                autoHideDuration={4000}
-                onClose={() => setSnack(null)}
-                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-            >
-                <Alert severity={snack?.sev ?? "success"} onClose={() => setSnack(null)} sx={{ fontWeight: 600 }}>
-                    {snack?.msg}
-                </Alert>
-            </Snackbar>
+            <DeleteListingDialog
+                target={deleteTarget}
+                busy={deletebusy}
+                snack={snack}
+                onClose={() => setDeleteTarget(null)}
+                onConfirm={handleDeleteConfirm}
+                onSnackClose={() => setSnack(null)}
+            />
         </Box>
     );
 }
