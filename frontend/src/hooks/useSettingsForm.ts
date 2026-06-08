@@ -2,6 +2,7 @@
 import { useState }       from "react";
 import { useTranslation } from "react-i18next";
 import { userService }    from "../services/userService";
+import { getResponseData } from "../utils/errorUtils";
 
 export interface UserSettingsDto {
     id:             number;
@@ -72,8 +73,8 @@ export function useSettingsForm(initial: UserSettingsDto) {
                 email: profile.email || undefined,
             });
             setSuccess(t("settings.contact.successMsg"));
-        } catch (err: any) {
-            const msg = err?.response?.data;
+        } catch (err: unknown) {
+            const msg = getResponseData(err);
             setError(
                 typeof msg === "string" && msg.includes("Email")
                     ? t("settings.contact.emailTaken")
@@ -102,8 +103,8 @@ export function useSettingsForm(initial: UserSettingsDto) {
             setPassword(PASSWORD_INITIAL);
             setSuccess(t("settings.security.successMsg"));
             return true;
-        } catch (err: any) {
-            const msg = err?.response?.data;
+        } catch (err: unknown) {
+            const msg = getResponseData(err);
             setError(
                 typeof msg === "string" && msg.includes("incorrect")
                     ? t("settings.security.wrongCurrent")

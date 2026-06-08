@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth }        from "../auth/AuthContext.tsx";
 import { useTranslation } from "react-i18next";
+import { getResponseData } from "../utils/errorUtils";
 import {
     Box, Button, Alert, Typography, LinearProgress, Tooltip,
 } from "@mui/material";
@@ -192,10 +193,10 @@ const CreateListing = () => {
                 } else {
                     setTimeout(() => navigate(paths.dashboard), 1500);
                 }
-            } catch (err: any) {
-                const data = err?.response?.data;
+            } catch (err: unknown) {
+                const data = getResponseData(err);
                 const isActiveBooking =
-                    (typeof data === "object" && data?.message?.toLowerCase().includes("booking")) ||
+                    (typeof data === "object" && data !== null && (data as { message?: string })?.message?.toLowerCase().includes("booking")) ||
                     (typeof data === "string" && data.toLowerCase().includes("booking"));
                 setApiError(
                     isActiveBooking
