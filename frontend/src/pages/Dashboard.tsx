@@ -281,7 +281,6 @@ export default function Dashboard() {
                             myListings={myListings}
                             favoriteIds={favoriteIds}
                             onToggleFavorite={toggleFavorite}
-                            getUserName={(id) => `User #${id}`}
                             onEdit={handleEdit}
                             onDelete={setDeleteTarget}
                         />
@@ -309,7 +308,6 @@ export default function Dashboard() {
                             favoriteApartments={favoriteApartments}
                             favoriteIds={favoriteIds}
                             onToggleFavorite={toggleFavorite}
-                            getUserName={(id) => `User #${id}`}
                         />
                     </>
                 )}

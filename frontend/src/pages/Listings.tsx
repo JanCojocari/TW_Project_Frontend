@@ -268,7 +268,6 @@ const Listings = () => {
                                     toggleFavorite={toggleFavorite}
                                     favorites={favorites}
                                     getStatus={getStatus}
-                                    getUserName={(id: number) => `User #${id}`}
                                     isOwner={currentUser?.id === apt.Id_Owner}
                                     onEdit={(a) => navigate(paths.editListing, { state: { apartment: a } })}
                                     onDelete={(a) => setDeleteTarget(a)}

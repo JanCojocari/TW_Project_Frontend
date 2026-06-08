@@ -22,7 +22,6 @@ interface Props {
     apartment:      Apartment;
     favorites:      number[];
     toggleFavorite: (id: number) => void;
-    getUserName:    (id: number) => string;
     getStatus:      (apartment: Apartment) => string;
     isOwner?:       boolean;
     onEdit?:        (apartment: Apartment) => void;
@@ -62,7 +61,7 @@ function StarRating({ avg }: { avg: number }) {
 }
 
 const ApartmentCard = ({
-                           apartment, favorites, toggleFavorite, getUserName,
+                           apartment, favorites, toggleFavorite,
                            getStatus, isOwner = false, onEdit, onDelete, viewsLast24h,
                        }: Props) => {
     const navigate    = useNavigate();
