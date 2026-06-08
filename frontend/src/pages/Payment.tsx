@@ -124,8 +124,7 @@ const PaymentPage = ({ summary: summaryProp, defaultPaymentMethod = "stripe", on
                 } catch { /* ignore */ }
             }).catch(() => {});
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [submitted]);
+    }, [submitted, summary, apartmentId, addNotification, startDate, endDate]);
 
     const wrappedSubmit = (e: React.FormEvent) => {
         if (!validateDates()) { e.preventDefault(); return; }

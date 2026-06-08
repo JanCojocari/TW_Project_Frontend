@@ -110,8 +110,7 @@ const CreateListing = () => {
         if (editApt.image_urls.length > 0) {
             set("imagePreviewUrls", editApt.image_urls);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [editApt, set]);
 
     const [activeStep, setActiveStep] = useState(0);
     const [visitedSteps, setVisitedSteps] = useState<Set<number>>(new Set([0]));

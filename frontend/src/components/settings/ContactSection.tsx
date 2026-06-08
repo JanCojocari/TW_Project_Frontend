@@ -1,5 +1,5 @@
 ﻿// components/settings/ContactSection.tsx
-import { useState, useMemo }   from "react";
+import { useState, useMemo } from "react";
 import { Button, Grid, InputAdornment, Typography, Select, MenuItem, FormControl } from "@mui/material";
 import { useTranslation }      from "react-i18next";
 import SettingsSectionWrapper  from "./SettingsSectionWraper.tsx";
@@ -44,14 +44,10 @@ export default function ContactSection({ profile, saving, onUpdate, onSave }: Pr
     const [emailError, setEmailError] = useState("");
     const [phoneError, setPhoneError] = useState("");
 
-    // initializeaza prefix si cifre locale din profile.phone
-    const { prefix: initPrefix, local: initLocal } = useMemo(
-        () => splitPhone(profile.phone ?? ""),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [] // doar la mount
+    // initializeaza prefix din profile.phone o singura data (lazy init)
+    const [countryCode, setCountryCode] = useState(
+        () => splitPhone(profile.phone ?? "").prefix
     );
-
-    const [countryCode, setCountryCode] = useState(initPrefix);
 
     const localDigits = useMemo(() => {
         const { prefix, local } = splitPhone(profile.phone ?? "");
