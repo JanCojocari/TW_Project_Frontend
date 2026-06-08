@@ -200,23 +200,17 @@ const Header = () => {
 
                         {/* Desktop nav */}
                         <Stack direction="row" spacing={1} sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", flex: 1, justifyContent: "center" }}>
-                            <Button
-                                sx={{ color: location.pathname === paths.listings ? "primary.main" : "text.secondary",
-                                    fontWeight: 700, fontSize: "15px", px: 2, py: 1, position: "relative",
-                                    "&::after": location.pathname === paths.listings
-                                        ? { content: '""', position: "absolute", bottom: 4, left: 16, right: 16,
-                                            height: "2px", background: gradients.primary, borderRadius: 2 }
-                                        : {},
-                                    "&:hover": { color: "primary.main" } }}
-                                onClick={() => navigate(paths.listings)}>
-                                {t("nav.listings")}
-                            </Button>
-
-                            {!isAuthenticated && [
-                                { label: t("nav.support"), path: paths.support },
-                                { label: t("nav.home"),    path: paths.home    },
-                                { label: t("nav.about"),   path: paths.about   },
-                            ].map((item) => (
+                            {(isAuthenticated ? [
+                                { label: t("nav.listings"),  path: paths.listings  },
+                                { label: t("nav.dashboard"), path: paths.dashboard },
+                                ...(!isRenter ? [{ label: t("nav.createListing"), path: paths.createListing }] : []),
+                                { label: t("nav.support"),   path: paths.support   },
+                            ] : [
+                                { label: t("nav.listings"), path: paths.listings },
+                                { label: t("nav.home"),     path: paths.home     },
+                                { label: t("nav.about"),    path: paths.about    },
+                                { label: t("nav.support"),  path: paths.support  },
+                            ]).map((item) => (
                                 <Button key={item.path}
                                         sx={{ color: location.pathname === item.path ? "primary.main" : "text.secondary",
                                             fontWeight: 700, fontSize: "15px", px: 2, py: 1, position: "relative",

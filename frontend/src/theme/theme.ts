@@ -161,12 +161,13 @@ export function createRentoraTheme(mode: PaletteMode) {
             MuiAppBar: {
                 styleOverrides: {
                     root: {
-                        background:     raw.appBarBg,
-                        borderBottom:   `1px solid ${raw.appBarBorder}`,
-                        backdropFilter: 'blur(12px)',
-                        color:          raw.textPrimary,
-                        boxShadow:      raw.appBarShadow,
-                        borderRadius:   0,
+                        backgroundImage: raw.appBarBg,
+                        backgroundColor: 'transparent',
+                        borderBottom:    `1px solid ${raw.appBarBorder}`,
+                        backdropFilter:  'blur(12px)',
+                        color:           raw.textPrimary,
+                        boxShadow:       raw.appBarShadow,
+                        borderRadius:    0,
                     },
                 },
             },
