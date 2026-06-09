@@ -51,7 +51,7 @@ export default function StayProgressBar({ startDate, endDate }: Props) {
                             ? t("dashboard.upcomingStays.badgeNow")
                             : upcoming
                                 ? t("dashboard.upcomingStays.badgeUpcoming")
-                                : t("dashboard.upcomingStays.badgePast") ?? "Past"}
+                                : t("dashboard.upcomingStays.badgePast")}
                     </Typography>
                 </Box>
 
@@ -79,9 +79,9 @@ export default function StayProgressBar({ startDate, endDate }: Props) {
 
             <Typography sx={{ fontSize: 10, color: "rgba(255,255,255,0.45)", mt: 0.5, textAlign: "center" }}>
                 {nights} {nights === 1
-                    ? (t("dashboard.upcomingStays.night") ?? "night")
-                    : (t("dashboard.upcomingStays.nights") ?? "nights")}
-                {active && pct > 0 && ` · ${pct}% ${t("dashboard.upcomingStays.elapsed") ?? "elapsed"}`}
+                    ? t("dashboard.upcomingStays.night")
+                    : t("dashboard.upcomingStays.nights")}
+                {active && pct > 0 && ` · ${pct}% ${t("dashboard.upcomingStays.elapsed")}`}
             </Typography>
         </Box>
     );

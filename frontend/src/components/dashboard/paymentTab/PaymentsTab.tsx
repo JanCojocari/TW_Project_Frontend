@@ -99,14 +99,14 @@ export default function PaymentsTab() {
 
             {loading && (
                 <Typography color="text.secondary">
-                    {t("common.loading") ?? "Se încarcă..."}
+                    {t("common.loading")}
                 </Typography>
             )}
 
             {!loading && payments.length === 0 && (
                 <Box sx={{ textAlign: "center", py: 10 }}>
                     <Typography color="text.disabled" sx={{ fontSize: "18px", fontStyle: "italic" }}>
-                        {t("dashboard.payments.empty") ?? "Nu există plăți înregistrate."}
+                        {t("dashboard.payments.empty")}
                     </Typography>
                 </Box>
             )}

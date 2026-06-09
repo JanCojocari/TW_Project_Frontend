@@ -73,7 +73,7 @@ export default function UpcomingStaysTab() {
                     fontSize: 13, fontWeight: 800, color: "text.disabled",
                     textTransform: "uppercase", letterSpacing: "1px",
                 }}>
-                    {t("dashboard.upcomingStays.sectionLabel") ?? "Your upcoming stays"}
+                    {t("dashboard.upcomingStays.sectionLabel")}
                 </Typography>
                 <Chip
                     label={stays.length} size="small"

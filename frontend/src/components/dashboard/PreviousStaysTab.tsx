@@ -73,7 +73,7 @@ export default function PreviousStaysTab() {
                     fontSize: 13, fontWeight: 800, color: "text.disabled",
                     textTransform: "uppercase", letterSpacing: "1px",
                 }}>
-                    {t("dashboard.previousStays.sectionLabel") ?? "Your previous stays"}
+                    {t("dashboard.previousStays.sectionLabel")}
                 </Typography>
                 <Chip
                     label={stays.length} size="small"

@@ -65,8 +65,8 @@ export default function PastDateOverlay({ startDate, endDate }: Props) {
 
             <Typography sx={{ fontSize: 10, color: "rgba(255,255,255,0.45)", mt: 0.5, textAlign: "center" }}>
                 {nights} {nights === 1
-                    ? (t("dashboard.previousStays.night") ?? "night")
-                    : (t("dashboard.previousStays.nights") ?? "nights")}
+                    ? t("dashboard.previousStays.night")
+                    : t("dashboard.previousStays.nights")}
             </Typography>
         </Box>
     );
