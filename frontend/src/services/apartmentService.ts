@@ -13,11 +13,11 @@ import {
     type ApartmentCreateApiDto,
     type ApartmentUpdateApiDto,
 } from "../types/ApartmentApiDto";
+import { BACKEND_ORIGIN } from "../api/config";
 
 // ── Helpers imagini ───────────────────────────────────────────────────────────
 
-const BASE_URL           = import.meta.env.VITE_API_BASE_URL?.replace("/api", "") ?? "http://localhost:5231";
-const DEFAULT_COUNTRY    = "Moldova";
+const DEFAULT_COUNTRY = "Moldova";
 
 function parseImageUrls(raw: string | null): string[] {
     if (!raw) return [];
@@ -25,10 +25,10 @@ function parseImageUrls(raw: string | null): string[] {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed))
             return parsed.filter(Boolean).map(url =>
-                url.startsWith("http") ? url : `${BASE_URL}${url}`
+                url.startsWith("http") ? url : `${BACKEND_ORIGIN}${url}`
             );
     } catch {
-        return raw.startsWith("http") ? [raw] : [`${BASE_URL}${raw}`];
+        return raw.startsWith("http") ? [raw] : [`${BACKEND_ORIGIN}${raw}`];
     }
     return [];
 }

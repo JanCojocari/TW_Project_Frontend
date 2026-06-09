@@ -80,7 +80,7 @@ const StayPeriodSelector = ({
         shouldDisableDate: (day: Dayjs) => isDayBooked(day, bookedPeriods),
         slots: { day: BookedDay },
         slotProps: {
-            day: { bookedPeriods, onBookedClick: handleBookedClick } as any,
+            day: { bookedPeriods, onBookedClick: handleBookedClick } as unknown as PickersDayProps<Dayjs>,
         },
     };
 

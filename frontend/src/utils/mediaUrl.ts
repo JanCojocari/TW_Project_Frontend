@@ -3,7 +3,7 @@
 // Browser-ul le rezolva relativ la frontend (localhost:5173), nu la backend (localhost:5231)
 // Aceasta functie le face absolute.
 
-const BACKEND_ORIGIN = "http://localhost:5231";
+import { BACKEND_ORIGIN } from "../api/config";
 
 export function resolveMediaUrl(url: string | null | undefined): string | undefined {
     if (!url) return undefined;

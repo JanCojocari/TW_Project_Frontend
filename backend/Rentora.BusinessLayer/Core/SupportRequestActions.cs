@@ -5,6 +5,7 @@ using Rentora.Domain.Entities;
 using Rentora.Domain.Enums;
 using Rentora.Domain.Models.SupportRequest;
 using Rentora.Domain.Models.Responses;
+using Rentora.BusinessLayer.Mappers;
 
 public class SupportRequestActions
 {
@@ -34,7 +35,7 @@ public class SupportRequestActions
         using var db = new AppDbContext();
 
         return db.SupportRequests
-            .Select(r => MapToDto(r))
+            .Select(r => SupportRequestMapper.ToDto(r))
             .ToList();
     }
 
@@ -45,7 +46,7 @@ public class SupportRequestActions
         var request = db.SupportRequests.FirstOrDefault(r => r.Id == id);
         if (request == null) return null;
 
-        return MapToDto(request);
+        return SupportRequestMapper.ToDto(request);
     }
 
     protected ActionResponse DeleteExecution(int id)
@@ -81,15 +82,4 @@ public class SupportRequestActions
         return new ActionResponse { IsSuccess = true, Message = $"Status updated to {newStatus}." };
     }
 
-    // helper privat
-    private static SupportRequestDto MapToDto(SupportRequest r) => new SupportRequestDto
-    {
-        Id = r.Id,
-        UserId = r.UserId,
-        Email = r.Email,
-        Subject = r.Subject,
-        Message = r.Message,
-        CreatedAt = r.CreatedAt,
-        Status = r.Status
-    };
 }

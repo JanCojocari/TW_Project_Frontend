@@ -1,7 +1,7 @@
 ﻿// components/settings/BalanceSection.tsx
 import { Box, Button, Chip, TextField, Typography } from "@mui/material";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import { useState }             from "react";
+import React, { useState }      from "react";
 import { useTranslation }       from "react-i18next";
 import SettingsSectionWrapper   from "./SettingsSectionWraper.tsx";
 import { colors }               from "../../theme/gradients";
@@ -32,7 +32,7 @@ export default function BalanceSection({ balance, currency }: Props) {
             <Box sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}>
                 <TextField size="small" label={t("settings.balance.addAmount")} type="number"
                            value={amount} onChange={(e) => setAmount(e.target.value)}
-                           inputProps={{ min: 1, onWheel: (e: any) => e.currentTarget.blur() }}
+                           inputProps={{ min: 1, onWheel: (e: React.WheelEvent<HTMLInputElement>) => e.currentTarget.blur() }}
                            sx={{ width: 180 }} />
                 <Button variant="outlined" onClick={() => setAmount("")}
                         disabled={!amount || Number(amount) <= 0}

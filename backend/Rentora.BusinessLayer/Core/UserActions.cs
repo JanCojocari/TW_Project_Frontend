@@ -8,6 +8,7 @@ namespace Rentora.BusinessLayer.Core;
 using Rentora.DataAccess;
 using Rentora.Domain.Entities;
 using Rentora.Domain.Models.User;
+using Rentora.BusinessLayer.Mappers;
 using Rentora.Domain.Models.Responses;
 
 public class UserActions
@@ -63,7 +64,7 @@ public class UserActions
 
         return new AuthResponseDto
         {
-            User        = MapToDto(user),
+            User        = UserMapper.ToDto(user),
             AccessToken = token
         };
     }
@@ -72,13 +73,13 @@ public class UserActions
     {
         using var db = new AppDbContext();
         var user = db.Users.FirstOrDefault(u => u.Id == id);
-        return user == null ? null : MapToDto(user);
+        return user == null ? null : UserMapper.ToDto(user);
     }
 
     protected List<UserDto> GetAllExecution()
     {
         using var db = new AppDbContext();
-        return db.Users.Select(u => MapToDto(u)).ToList();
+        return db.Users.Select(u => UserMapper.ToDto(u)).ToList();
     }
 
     // Patch-style: actualizeaza DOAR campurile non-null din DTO.
@@ -185,20 +186,6 @@ public class UserActions
 
         return new ActionResponse { IsSuccess = true, Message = $"Role updated to {(Rentora.Domain.Enums.Role)role}." };
     }
-
-    private static UserDto MapToDto(User user) => new UserDto
-    {
-        Id             = user.Id,
-        Name           = user.Name,
-        Surname        = user.Surname,
-        Email          = user.Email,
-        Phone          = user.Phone,
-        Birthday       = user.Birthday,
-        Gender         = user.Gender,
-        AccountBalance = user.AccountBalance,
-        Role           = user.Role,
-        AvatarUrl      = user.AvatarUrl
-    };
 
     private static string HashPassword(string password) =>
         Convert.ToBase64String(

@@ -3,6 +3,7 @@ namespace Rentora.BusinessLayer.Mappers;
 using Rentora.Domain.Entities;
 using Rentora.Domain.Models.Apartment;
 using Rentora.Domain.Models.Facilities;
+using Rentora.Domain.OwnedTypes;
 
 public static class ApartmentMapper
 {
@@ -21,6 +22,25 @@ public static class ApartmentMapper
         Location        = a.Location,
         AdditionalInfo  = a.AdditionlaInfo,
         Facilities      = a.Facilities != null ? MapFacilities(a.Facilities) : null,
+    };
+
+    public static AdminApartmentDto ToAdminDto(Apartment a) => new AdminApartmentDto
+    {
+        Id              = a.Id,
+        OwnedId         = a.OwnedId,
+        RenterId        = a.RenterId,
+        Address         = a.Address,
+        ImageUrl        = a.ImageUrl,
+        Interval        = a.Interval,
+        CostPerInterval = a.CostPerInterval,
+        Currency        = a.Currency,
+        RentMode        = a.RentMode,
+        Status          = a.Status,
+        Location        = a.Location        ?? new MapLocation(),
+        AdditionalInfo  = a.AdditionlaInfo  ?? new AdditionalInfo(),
+        OwnerName       = a.Owner?.Name     ?? string.Empty,
+        OwnerSurname    = a.Owner?.Surname  ?? string.Empty,
+        OwnerEmail      = a.Owner?.Email    ?? string.Empty,
     };
 
     private static FacilitiesDto MapFacilities(Facilities f) => new FacilitiesDto

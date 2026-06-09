@@ -439,24 +439,7 @@ public class ApartmentActions
                 .Include(a => a.Owner)
                 .OrderByDescending(a => a.Id)
                 .ToList()
-                .Select(a => new AdminApartmentDto
-                {
-                    Id              = a.Id,
-                    OwnedId         = a.OwnedId,
-                    RenterId        = a.RenterId,
-                    Address         = a.Address,
-                    ImageUrl        = a.ImageUrl,
-                    Interval        = a.Interval,
-                    CostPerInterval = a.CostPerInterval,
-                    Currency        = a.Currency,
-                    RentMode        = a.RentMode,
-                    Status          = a.Status,
-                    Location        = a.Location,
-                    AdditionalInfo  = a.AdditionlaInfo,
-                    OwnerName       = a.Owner?.Name    ?? string.Empty,
-                    OwnerSurname    = a.Owner?.Surname ?? string.Empty,
-                    OwnerEmail      = a.Owner?.Email   ?? string.Empty,
-                })
+                .Select(a => ApartmentMapper.ToAdminDto(a))
                 .ToList();
         };
     }
