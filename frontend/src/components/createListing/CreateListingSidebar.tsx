@@ -45,7 +45,7 @@ export default function CreateListingSidebar({
                         <HomeIcon sx={{ fontSize: 18 }} />
                     </Box>
                     <Typography fontWeight={800} fontSize={15} sx={{ letterSpacing: "-0.3px" }}>
-                        {isEditMode ? "Editare anunț" : t("createListing.title")}
+                        {isEditMode ? t("createListing.editTitle") : t("createListing.title")}
                     </Typography>
                 </Box>
                 <Typography variant="caption" color="text.secondary">

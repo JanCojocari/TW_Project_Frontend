@@ -56,7 +56,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setCurrentUser(user);
         } catch (err) {
             const error = err as AxiosError;
-            console.error("Login failed:", error.response?.data);
             throw error;
         }
     };

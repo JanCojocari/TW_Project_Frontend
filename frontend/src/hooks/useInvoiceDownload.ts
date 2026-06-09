@@ -31,7 +31,6 @@ export function useInvoiceDownload(
             const invoiceData = buildInvoiceData(payment);
             await generateInvoicePdf(invoiceData);
         } catch (err) {
-            console.error("[Rentora] Eroare generare factura:", err);
             setError("Nu s-a putut genera factura. Incearca din nou.");
         } finally {
             setLoadingId(null);

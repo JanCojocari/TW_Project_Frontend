@@ -103,7 +103,7 @@ export default function CreateListingBottomBar({
                         {isSubmitting
                             ? (t("createListing.publishing") ?? "Se publică...")
                             : isEditMode
-                                ? "Salvează modificările"
+                                ? t("createListing.saveChanges")
                                 : t("createListing.publish")
                         }
                     </Button>
