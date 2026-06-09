@@ -4,6 +4,7 @@ using Rentora.DataAccess;
 using Rentora.Domain.Entities;
 using Rentora.Domain.Models.RecentView;
 using Rentora.Domain.Models.Responses;
+using Rentora.BusinessLayer.Mappers;
 
 public class RecentViewActions
 {
@@ -17,7 +18,7 @@ public class RecentViewActions
             .Where(r => r.UserId == userId)
             .OrderByDescending(r => r.ViewedAt)
             .Take(20)
-            .Select(r => MapToDto(r))
+            .Select(r => RecentViewMapper.ToDto(r))
             .ToList();
     }
 
@@ -68,10 +69,4 @@ public class RecentViewActions
         return new ActionResponse { IsSuccess = true, Message = "Recent views cleared." };
     }
 
-    private static RecentViewDto MapToDto(RecentView r) => new RecentViewDto
-    {
-        UserId      = r.UserId,
-        ApartmentId = r.ApartmentId,
-        ViewedAt    = r.ViewedAt
-    };
 }

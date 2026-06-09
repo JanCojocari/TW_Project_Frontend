@@ -5,6 +5,7 @@ using Rentora.DataAccess;
 using Rentora.Domain.Entities;
 using Rentora.Domain.Models.Payment;
 using Rentora.Domain.Models.Responses;
+using Rentora.BusinessLayer.Mappers;
 
 public class PaymentActions
 {
@@ -17,7 +18,7 @@ public class PaymentActions
             .Where(p => p.RenterId == userId || p.OwnerId == userId)
             .OrderByDescending(p => p.CreatedAt)
             .ToList()
-            .Select(p => MapToDto(p, db))
+            .Select(p => PaymentMapper.ToDto(p, db))
             .ToList();
     }
 
@@ -28,7 +29,7 @@ public class PaymentActions
             .Where(p => p.OwnerId == ownerId)
             .OrderByDescending(p => p.CreatedAt)
             .ToList()
-            .Select(p => MapToDto(p, db))
+            .Select(p => PaymentMapper.ToDto(p, db))
             .ToList();
     }
 
@@ -39,7 +40,7 @@ public class PaymentActions
             .Where(p => p.RenterId == renterId)
             .OrderByDescending(p => p.CreatedAt)
             .ToList()
-            .Select(p => MapToDto(p, db))
+            .Select(p => PaymentMapper.ToDto(p, db))
             .ToList();
     }
 
@@ -50,7 +51,7 @@ public class PaymentActions
             .Where(p => p.ApartmentId == apartmentId)
             .OrderByDescending(p => p.CreatedAt)
             .ToList()
-            .Select(p => MapToDto(p, db))
+            .Select(p => PaymentMapper.ToDto(p, db))
             .ToList();
     }
 
@@ -59,7 +60,7 @@ public class PaymentActions
         using var db = new AppDbContext();
         var payment = db.Payments.FirstOrDefault(p => p.Id == id);
         if (payment == null) return null;
-        return MapToDto(payment, db);
+        return PaymentMapper.ToDto(payment, db);
     }
 
     protected ActionResponse CreateExecution(int renterId, PaymentCreateDto data)
@@ -153,7 +154,7 @@ public class PaymentActions
         return db.Payments
             .OrderByDescending(p => p.CreatedAt)
             .ToList()
-            .Select(p => MapToDto(p, db))
+            .Select(p => PaymentMapper.ToDto(p, db))
             .ToList();
     }
 
@@ -215,32 +216,5 @@ public class PaymentActions
             db.SaveChanges();
 
         return new ActionResponse { IsSuccess = true, Message = $"{released} apartment(s) released." };
-    }
-
-    // join cu Users si Apartments pentru a popula campurile facturii
-    private static PaymentDto MapToDto(Payment p, AppDbContext db)
-    {
-        var apartment = db.Apartments.FirstOrDefault(a => a.Id == p.ApartmentId);
-        var renter    = db.Users.FirstOrDefault(u => u.Id == p.RenterId);
-        var owner     = db.Users.FirstOrDefault(u => u.Id == p.OwnerId);
-
-        return new PaymentDto
-        {
-            Id               = p.Id,
-            OwnerId          = p.OwnerId     ?? 0,
-            RenterId         = p.RenterId    ?? 0,
-            ApartmentId      = p.ApartmentId ?? 0,
-            StartDate        = p.StartDate,
-            EndDate          = p.EndDate,
-            TotalCost        = p.TotalCost,
-            Currency         = p.Currency.ToString(),
-            CreatedAt        = p.CreatedAt,
-            InvoiceUrl       = p.InvoiceUrl,
-            ApartmentAddress = apartment?.Address ?? "",
-            RenterName       = renter?.Name       ?? "",
-            RenterSurname    = renter?.Surname    ?? "",
-            RenterEmail      = renter?.Email      ?? "",
-            OwnerName        = owner != null ? $"{owner.Name} {owner.Surname}" : "Proprietar",
-        };
     }
 }

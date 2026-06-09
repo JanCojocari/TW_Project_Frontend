@@ -4,6 +4,7 @@ using Rentora.DataAccess;
 using Rentora.Domain.Entities;
 using Rentora.Domain.Models.Review;
 using Rentora.Domain.Models.Responses;
+using Rentora.BusinessLayer.Mappers;
 using Microsoft.EntityFrameworkCore;
 
 public class ReviewActions
@@ -16,7 +17,7 @@ public class ReviewActions
         return db.Reviews
             .Include(r => r.User)
             .OrderByDescending(r => r.CreatedAt)
-            .Select(r => MapToDto(r))
+            .Select(r => ReviewMapper.ToDto(r))
             .ToList();
     }
 
@@ -58,7 +59,7 @@ public class ReviewActions
         using var db = new AppDbContext();
         var review = db.Reviews.FirstOrDefault(r => r.Id == id);
         if (review == null) return null;
-        return MapToDto(review);
+        return ReviewMapper.ToDto(review);
     }
 
     protected ActionResponse CreateExecution(int userId, ReviewCreateDto data)
@@ -134,17 +135,4 @@ public class ReviewActions
         return new ActionResponse { IsSuccess = true, Message = "Review deleted." };
     }
 
-    private static ReviewDto MapToDto(Review r) => new ReviewDto
-    {
-        Id            = r.Id,
-        ApartmentId   = r.ApartmentId,
-        UserId        = r.UserId ?? 0,
-        UserName      = r.User?.Name,
-        UserSurname   = r.User?.Surname,
-        UserAvatarUrl = r.User?.AvatarUrl,
-        Rating        = r.Rating,
-        Comment       = r.Comment,
-        OwnerResponse = r.OwnerResponse,
-        CreatedAt     = r.CreatedAt
-    };
 }
