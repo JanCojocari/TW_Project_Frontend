@@ -9,6 +9,10 @@ public class PaymentCreateDto
     public int ApartmentId { get; set; }
 
     public Currency Currency { get; set; }
+
+    [Required]
     public DateTime? StartDate { get; set; }
+
+    [Required]
     public DateTime? EndDate { get; set; }
 }
