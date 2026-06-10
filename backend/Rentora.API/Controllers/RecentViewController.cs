@@ -3,6 +3,7 @@ namespace Rentora.API.Controllers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Rentora.BusinessLayer;
 
 [Route("api/recent-views")]
@@ -29,16 +30,22 @@ public class RecentViewController : ControllerBase
     [HttpPost("{userId}/{apartmentId}")]
     public IActionResult Add(int userId, int apartmentId)
     {
+        var callerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        if (userId != callerId)
+            return StatusCode(403, new { message = "Forbidden." });
         var result = _recentViewAction.Add(userId, apartmentId);
         if (!result.IsSuccess)
             return BadRequest(result.Message);
         return Ok(result.Message);
     }
-    
+
     [Authorize]
     [HttpDelete("{userId}")]
     public IActionResult ClearAll(int userId)
     {
+        var callerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        if (userId != callerId)
+            return StatusCode(403, new { message = "Forbidden." });
         var result = _recentViewAction.ClearAll(userId);
         return Ok(result.Message);
     }

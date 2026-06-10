@@ -47,6 +47,9 @@ public class ReviewController : ControllerBase
     [HttpPost("{userId}")]
     public IActionResult Create(int userId, [FromBody] ReviewCreateDto data)
     {
+        var callerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        if (userId != callerId)
+            return StatusCode(403, new { message = "Forbidden." });
         var result = _reviewAction.Create(userId, data);
         if (!result.IsSuccess)
             return BadRequest(result.Message);
@@ -67,6 +70,13 @@ public class ReviewController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
+        var callerId   = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var callerRole = int.Parse(User.FindFirstValue(ClaimTypes.Role) ?? "1");
+        var review     = _reviewAction.GetById(id);
+        if (review == null)
+            return NotFound($"Review with id {id} not found.");
+        if (review.UserId != callerId && callerRole != 0)
+            return StatusCode(403, new { message = "Forbidden." });
         var result = _reviewAction.Delete(id);
         if (!result.IsSuccess)
             return NotFound(result.Message);
