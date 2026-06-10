@@ -3,6 +3,7 @@ namespace Rentora.API.Controllers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Rentora.BusinessLayer;
 using Rentora.Domain.Models.Apartment;
 using Rentora.Domain.Models;
@@ -53,10 +54,12 @@ public class ApartmentController : ControllerBase
     [HttpPost("{ownerId}")]
     public IActionResult Create(int ownerId, [FromBody] ApartmentCreateDto data)
     {
-        var result = _apartmentAction.Create(ownerId, data);
+        var callerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        if (ownerId != callerId)
+            return StatusCode(403, new { message = "Forbidden." });
+        var result = _apartmentAction.Create(callerId, data);
         if (!result.IsSuccess)
             return BadRequest(result.Message);
-        // Returnam ActionResponse complet — frontend-ul are nevoie de result.id
         return Ok(result);
     }
 
@@ -64,9 +67,13 @@ public class ApartmentController : ControllerBase
     [HttpPut]
     public IActionResult Update([FromBody] ApartmentUpdateDto data)
     {
-        var result = _apartmentAction.Update(data);
+        var callerId   = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var callerRole = int.Parse(User.FindFirstValue(ClaimTypes.Role) ?? "1");
+        var result = _apartmentAction.Update(data, callerId, callerRole);
         if (!result.IsSuccess)
         {
+            if (result.Message == "Forbidden.")
+                return StatusCode(403, new { message = result.Message });
             if (result.Message != null && result.Message.Contains("booking"))
                 return BadRequest(new { message = result.Message });
             return NotFound(new { message = result.Message });
@@ -78,10 +85,13 @@ public class ApartmentController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
-        var result = _apartmentAction.Delete(id);
+        var callerId   = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var callerRole = int.Parse(User.FindFirstValue(ClaimTypes.Role) ?? "1");
+        var result = _apartmentAction.Delete(id, callerId, callerRole);
         if (!result.IsSuccess)
         {
-            // apartament inexistent -> 404; booking activ -> 400
+            if (result.Message == "Forbidden.")
+                return StatusCode(403, new { message = result.Message });
             if (result.Message != null && result.Message.Contains("booking"))
                 return BadRequest(new { message = result.Message });
             return NotFound(new { message = result.Message });
