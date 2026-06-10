@@ -70,6 +70,8 @@ public class AdminController : ControllerBase
     [Authorize(Roles = "Admin")]
     public IActionResult UpdateUserRole(int id, [FromBody] int role)
     {
+        if (role < 0 || role > 2)
+            return BadRequest(new { message = "Invalid role. Accepted values: 0 (Admin), 1 (Owner), 2 (Renter)." });
         var result = _bl.UserAction().UpdateRole(id, role);
         if (!result.IsSuccess) return BadRequest(result.Message);
         return Ok(result.Message);
