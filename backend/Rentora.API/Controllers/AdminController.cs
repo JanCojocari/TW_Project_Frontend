@@ -106,7 +106,7 @@ public class AdminController : ControllerBase
     [Authorize(Roles = "Admin")]
     public IActionResult UpdateApartment([FromBody] ApartmentUpdateDto data)
     {
-        var result = _bl.ApartmentAction().Update(data);
+        var result = _bl.ApartmentAction().Update(data, 0, 0);
         if (!result.IsSuccess) return NotFound(result.Message);
         return Ok(result.Message);
     }
@@ -115,7 +115,7 @@ public class AdminController : ControllerBase
     [Authorize(Roles = "Admin")]
     public IActionResult DeleteApartment(int id)
     {
-        var result = _bl.ApartmentAction().Delete(id);
+        var result = _bl.ApartmentAction().Delete(id, 0, 0);
         if (!result.IsSuccess) return NotFound(result.Message);
         return Ok(result.Message);
     }
