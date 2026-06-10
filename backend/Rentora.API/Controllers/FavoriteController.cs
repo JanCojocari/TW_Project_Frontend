@@ -2,6 +2,7 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Rentora.BusinessLayer;
 
 [Route("api/favorites")]
@@ -26,6 +27,9 @@ public class FavoriteController : ControllerBase
     [HttpPost("{userId}/{apartmentId}")]
     public IActionResult Add(int userId, int apartmentId)
     {
+        var callerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        if (userId != callerId)
+            return StatusCode(403, new { message = "Forbidden." });
         var result = _bl.FavoriteAction().Add(userId, apartmentId);
         if (!result.IsSuccess) return BadRequest(result.Message);
         return Ok(result.Message);
@@ -34,6 +38,9 @@ public class FavoriteController : ControllerBase
     [HttpDelete("{userId}/{apartmentId}")]
     public IActionResult Remove(int userId, int apartmentId)
     {
+        var callerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        if (userId != callerId)
+            return StatusCode(403, new { message = "Forbidden." });
         var result = _bl.FavoriteAction().Remove(userId, apartmentId);
         if (!result.IsSuccess) return NotFound(result.Message);
         return Ok(result.Message);

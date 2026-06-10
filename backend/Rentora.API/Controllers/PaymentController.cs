@@ -25,6 +25,10 @@ public class PaymentController : ControllerBase
     [HttpGet("user/{userId}")]
     public IActionResult GetByUser(int userId)
     {
+        var callerId   = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var callerRole = int.Parse(User.FindFirstValue(ClaimTypes.Role) ?? "1");
+        if (userId != callerId && callerRole != 0)
+            return StatusCode(403, new { message = "Forbidden." });
         var payments = _paymentAction.GetByUser(userId);
         return Ok(payments);
     }
@@ -33,6 +37,10 @@ public class PaymentController : ControllerBase
     [HttpGet("renter/{renterId}")]
     public IActionResult GetByRenter(int renterId)
     {
+        var callerId   = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var callerRole = int.Parse(User.FindFirstValue(ClaimTypes.Role) ?? "1");
+        if (renterId != callerId && callerRole != 0)
+            return StatusCode(403, new { message = "Forbidden." });
         var payments = _paymentAction.GetByRenter(renterId);
         return Ok(payments);
     }
@@ -59,6 +67,9 @@ public class PaymentController : ControllerBase
     [HttpPost("{renterId}")]
     public IActionResult Create(int renterId, [FromBody] PaymentCreateDto data)
     {
+        var callerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        if (renterId != callerId)
+            return StatusCode(403, new { message = "Forbidden." });
         var result = _paymentAction.Create(renterId, data);
         if (!result.IsSuccess)
             return BadRequest(result.Message);

@@ -4,6 +4,7 @@ namespace Rentora.API.Controllers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Rentora.BusinessLayer.Structure;
 using Rentora.Domain.Models.User;
 
@@ -49,6 +50,9 @@ public class UserController : ControllerBase
     [HttpPut("{id}")]
     public IActionResult Update(int id, [FromBody] UserUpdateDto data)
     {
+        var callerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        if (id != callerId)
+            return StatusCode(403, new { message = "Forbidden." });
         var result = _userAction.Update(id, data);
         if (!result.IsSuccess)
             return BadRequest(result.Message);
@@ -59,6 +63,9 @@ public class UserController : ControllerBase
     [HttpPut("{id}/password")]
     public IActionResult ChangePassword(int id, [FromBody] UserChangePasswordDto data)
     {
+        var callerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        if (id != callerId)
+            return StatusCode(403, new { message = "Forbidden." });
         var result = _userAction.ChangePassword(id, data);
         if (!result.IsSuccess)
             return BadRequest(result.Message);
@@ -69,6 +76,9 @@ public class UserController : ControllerBase
     [HttpPut("{id}/avatar")]
     public IActionResult UpdateAvatar(int id, [FromBody] UserUpdateAvatarDto data)
     {
+        var callerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        if (id != callerId)
+            return StatusCode(403, new { message = "Forbidden." });
         var result = _userAction.UpdateAvatar(id, data.AvatarUrl);
         if (!result.IsSuccess)
             return BadRequest(result.Message);
@@ -79,6 +89,10 @@ public class UserController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
+        var callerId   = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var callerRole = int.Parse(User.FindFirstValue(ClaimTypes.Role) ?? "1");
+        if (id != callerId && callerRole != 0)
+            return StatusCode(403, new { message = "Forbidden." });
         var result = _userAction.Delete(id);
         if (!result.IsSuccess)
             return NotFound(result.Message);

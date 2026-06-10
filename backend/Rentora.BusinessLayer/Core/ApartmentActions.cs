@@ -138,13 +138,16 @@ public class ApartmentActions
         return new ActionResponse { IsSuccess = true, Message = "Apartment created.", Id = apartment.Id };
     }
 
-    protected ActionResponse UpdateExecution(ApartmentUpdateDto data)
+    protected ActionResponse UpdateExecution(ApartmentUpdateDto data, int callerId, int callerRole)
     {
         using var db = new AppDbContext();
 
         var apartment = db.Apartments.FirstOrDefault(a => a.Id == data.Id);
         if (apartment == null)
             return new ActionResponse { IsSuccess = false, Message = "Apartment not found." };
+
+        if (apartment.OwnedId != callerId && callerRole != 0)
+            return new ActionResponse { IsSuccess = false, Message = "Forbidden." };
 
         // blocheaza editarea daca exista un payment activ (viitor) sau in curs
         var now = DateTime.UtcNow;
@@ -207,13 +210,16 @@ public class ApartmentActions
         return new ActionResponse { IsSuccess = true, Message = "Apartment updated." };
     }
 
-    protected ActionResponse DeleteExecution(int id)
+    protected ActionResponse DeleteExecution(int id, int callerId, int callerRole)
     {
         using var db = new AppDbContext();
 
         var apartment = db.Apartments.FirstOrDefault(a => a.Id == id);
         if (apartment == null)
             return new ActionResponse { IsSuccess = false, Message = "Apartment not found." };
+
+        if (apartment.OwnedId != callerId && callerRole != 0)
+            return new ActionResponse { IsSuccess = false, Message = "Forbidden." };
 
         // blocheaza stergerea daca exista un payment activ (viitor) sau in curs
         var now = DateTime.UtcNow;

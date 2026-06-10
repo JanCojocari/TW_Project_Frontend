@@ -24,11 +24,11 @@ public class ApartmentActionExecution : ApartmentActions, IApartmentAction
     public ActionResponse Create(int ownerId, ApartmentCreateDto data)
         => CreateExecution(ownerId, data);
 
-    public ActionResponse Update(ApartmentUpdateDto data)
-        => UpdateExecution(data);
+    public ActionResponse Update(ApartmentUpdateDto data, int callerId, int callerRole)
+        => UpdateExecution(data, callerId, callerRole);
 
-    public ActionResponse Delete(int id)
-        => DeleteExecution(id);
+    public ActionResponse Delete(int id, int callerId, int callerRole)
+        => DeleteExecution(id, callerId, callerRole);
 
     public ActionResponse AssignRenter(int apartmentId, int renterId)
         => AssignRenterExecution(apartmentId, renterId);
