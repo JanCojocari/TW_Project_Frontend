@@ -8,7 +8,7 @@ import { DatePicker }      from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs }    from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { useState }        from "react";
-import { type Dayjs }      from "dayjs";
+import dayjs, { type Dayjs }      from "dayjs";
 import "dayjs/locale/en-gb";
 import { gradients, colors } from "../theme/gradients.ts";
 import { useAxios }        from "../api/AxiosContext.tsx";
@@ -57,13 +57,30 @@ const Register = () => {
 
     const handleRegister = async () => {
         setError(null);
+        console.log("gender:", formData.gender);
+        const isEmpty =
+            !formData.name.trim()           ||
+            !formData.surname.trim()        ||
+            !formData.email.trim()          ||
+            !formData.password.trim()       ||
+            !formData.confirmPassword.trim()||
+            !formData.phone.trim()          ||
+            !formData.gender                ||
+            !birthday;
 
-        if (formData.password !== formData.confirmPassword) {
-            setError("Parolele nu coincid!");
+        if (isEmpty) {
+            setError(t("auth.register.errorGeneric"));
             return;
         }
-        if (!birthday) {
-            setError("Data nașterii este obligatorie!");
+
+        const age = dayjs().diff(birthday, "year");
+        if (age < 18) {
+            setError(t("auth.register.errorAge"));
+            return;
+        }
+
+        if (formData.password !== formData.confirmPassword) {
+            setError(t("auth.register.errorPasswords"));
             return;
         }
 
@@ -81,12 +98,11 @@ const Register = () => {
         setLoading(true);
         try {
             await axios.post("/auth/register", payload);
-            // Notificare admin: user nou inregistrat
             pushAdminQueueNotif("admin_new_user", `Utilizator nou inregistrat pe platforma.`);
             navigate("/login");
         } catch (err: unknown) {
             const axiosErr = err as import("axios").AxiosError<{ message?: string }>;
-            const message  = axiosErr?.response?.data?.message || axiosErr?.message || "A apărut o eroare la înregistrare";
+            const message  = axiosErr?.response?.data?.message || t("auth.register.errorGeneric");
             setError(message);
         } finally {
             setLoading(false);

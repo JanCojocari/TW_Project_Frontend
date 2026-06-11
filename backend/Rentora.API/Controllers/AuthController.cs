@@ -23,7 +23,7 @@ public class AuthController : ControllerBase
     {
         var result = _userAction.Register(data);
         if (!result.IsSuccess)
-            return BadRequest(result.Message);
+            return BadRequest(new { message = result.Message });
         return Ok(result.Message);
     }
 

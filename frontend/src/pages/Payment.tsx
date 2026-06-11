@@ -136,7 +136,10 @@ const PaymentPage = ({ summary: summaryProp, defaultPaymentMethod = "stripe", on
         setSubmitted(true);
         setSnackOpen(true);
         onSuccess?.({ success: true, transactionId });
-        setTimeout(() => navigate("/dashboard"), 3500);
+        setTimeout(() => {
+            localStorage.setItem("rentora_dash_tab", "upcoming");
+            navigate("/dashboard");
+        }, 3500);
     };
 
     const datesReady = interval === "hour"

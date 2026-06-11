@@ -397,6 +397,10 @@ export default {
             submit:          "Create Account",
             haveAccount:     "Already have an account?",
             loginLink:       "Log in",
+            errorGeneric: "Incomplete or invalid data.",
+            errorBirthday: "Date of birth is required.",
+            errorAge: "You must be at least 18 years old to register.",
+            errorPasswords: "Passwords do not match.",
         },
         login: {
             title:           "Sign In",

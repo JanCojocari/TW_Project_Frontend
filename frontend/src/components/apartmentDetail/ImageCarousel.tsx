@@ -127,8 +127,8 @@ const ImageCarousel = ({ images, altBase, statusChip }: Props) => {
                     }}
                 >
                     {dir === "prev"
-                        ? <ChevronLeftIcon sx={{ color: "text.primary", fontSize: 22 }} />
-                        : <ChevronRightIcon sx={{ color: "text.primary", fontSize: 22 }} />
+                        ? <ChevronLeftIcon sx={{ color: "rgba(0,0,0,0.78)", fontSize: 22 }} />
+                        : <ChevronRightIcon sx={{ color: "rgba(0,0,0,0.78)", fontSize: 22 }} />
                     }
                 </IconButton>
             ))}

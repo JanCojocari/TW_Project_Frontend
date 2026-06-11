@@ -6,9 +6,10 @@ import { useLang }   from "../../context/LanguageContext";
 import { useTranslation } from "react-i18next";
 import { colors }    from "../../theme/gradients";
 
+// SVG din flagcdn.com — randare corecta pe orice OS inclusiv Windows
 const FLAGS: Record<string, string> = {
-    ro: "🇲🇩",
-    en: "🇬🇧",
+    ro: "https://flagcdn.com/md.svg",
+    en: "https://flagcdn.com/gb.svg",
 };
 
 const LANG_LABELS: Record<string, string> = {
@@ -16,14 +17,43 @@ const LANG_LABELS: Record<string, string> = {
     en: "EN",
 };
 
+const FlagCircle = ({ lang, border }: { lang: string; border: string }) => (
+    <Box
+        sx={{
+            width:          22,
+            height:         22,
+            borderRadius:   "50%",
+            overflow:       "hidden",
+            display:        "flex",
+            alignItems:     "center",
+            justifyContent: "center",
+            border:         `1px solid ${border}`,
+            bgcolor:        "background.paper",
+            flexShrink:     0,
+        }}
+    >
+        <Box
+            component="img"
+            src={FLAGS[lang]}
+            alt={lang}
+            sx={{
+                width:      "100%",
+                height:     "100%",
+                objectFit:  "cover",
+                display:    "block",
+            }}
+        />
+    </Box>
+);
+
 export default function LanguageSwitcher() {
     const { lang, toggleLang }  = useLang();
     const { t }                 = useTranslation();
     const [anchor, setAnchor]   = useState<null | HTMLElement>(null);
     const open = Boolean(anchor);
 
-    const handleOpen  = (e: React.MouseEvent<HTMLElement>) => setAnchor(e.currentTarget);
-    const handleClose = () => setAnchor(null);
+    const handleOpen   = (e: React.MouseEvent<HTMLElement>) => setAnchor(e.currentTarget);
+    const handleClose  = () => setAnchor(null);
     const handleSwitch = () => { toggleLang(); handleClose(); };
 
     const otherLang = lang === "ro" ? "en" : "ro";
@@ -49,25 +79,7 @@ export default function LanguageSwitcher() {
                         },
                     }}
                 >
-                    {/* Flag cerculet */}
-                    <Box
-                        sx={{
-                            width:        22,
-                            height:       22,
-                            borderRadius: "50%",
-                            overflow:     "hidden",
-                            display:      "flex",
-                            alignItems:   "center",
-                            justifyContent: "center",
-                            fontSize:     16,
-                            lineHeight:   1,
-                            border:       `1px solid ${colors.border}`,
-                            bgcolor:      "background.paper",
-                            flexShrink:   0,
-                        }}
-                    >
-                        {FLAGS[lang]}
-                    </Box>
+                    <FlagCircle lang={lang} border={colors.border} />
 
                     <Typography fontSize={13} fontWeight={700} color="text.primary">
                         {LANG_LABELS[lang]}
@@ -104,9 +116,7 @@ export default function LanguageSwitcher() {
                 }}
             >
                 <MenuItem onClick={handleSwitch} sx={{ gap: 1.5, py: 1.2 }}>
-                    <Box sx={{ width: 22, height: 22, borderRadius: "50%", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, border: `1px solid ${colors.border}`, bgcolor: "background.default", flexShrink: 0 }}>
-                        {FLAGS[otherLang]}
-                    </Box>
+                    <FlagCircle lang={otherLang} border={colors.border} />
                     <Typography fontSize={13} fontWeight={600}>
                         {t(`lang.${otherLang}`)}
                     </Typography>

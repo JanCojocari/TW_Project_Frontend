@@ -23,15 +23,58 @@ public class UserActions
     {
         using var db = new AppDbContext();
 
-        var existing = db.Users.FirstOrDefault(u => u.Email == data.Email);
+        // Validare Name
+        if (string.IsNullOrWhiteSpace(data.Name) || data.Name.Trim().Length < 2)
+            return new ActionResponse { IsSuccess = false, Message = "Numele trebuie să conțină cel puțin 2 caractere." };
+        if (!System.Text.RegularExpressions.Regex.IsMatch(data.Name.Trim(), @"^[\p{L}\s\-']+$"))
+            return new ActionResponse { IsSuccess = false, Message = "Numele poate conține doar litere." };
+
+        // Validare Surname
+        if (string.IsNullOrWhiteSpace(data.Surname) || data.Surname.Trim().Length < 2)
+            return new ActionResponse { IsSuccess = false, Message = "Prenumele trebuie să conțină cel puțin 2 caractere." };
+        if (!System.Text.RegularExpressions.Regex.IsMatch(data.Surname.Trim(), @"^[\p{L}\s\-']+$"))
+            return new ActionResponse { IsSuccess = false, Message = "Prenumele poate conține doar litere." };
+
+        // Validare Email
+        if (string.IsNullOrWhiteSpace(data.Email) ||
+            !System.Text.RegularExpressions.Regex.IsMatch(data.Email.Trim(), @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            return new ActionResponse { IsSuccess = false, Message = "Adresa de email nu este validă." };
+
+        // Unicitate Email
+        var existing = db.Users.FirstOrDefault(u => u.Email == data.Email.Trim());
         if (existing != null)
-            return new ActionResponse { IsSuccess = false, Message = "Email already in use." };
+            return new ActionResponse { IsSuccess = false, Message = "Această adresă de email este deja folosită." };
+
+        // Validare Password
+        if (string.IsNullOrWhiteSpace(data.Password) || data.Password.Length < 8)
+            return new ActionResponse { IsSuccess = false, Message = "Parola trebuie să conțină cel puțin 8 caractere." };
+        if (!data.Password.Any(char.IsDigit))
+            return new ActionResponse { IsSuccess = false, Message = "Parola trebuie să conțină cel puțin o cifră." };
+
+        // Validare Phone (scoatem toate non-cifrele si verificam lungimea)
+        var phoneDigits = System.Text.RegularExpressions.Regex.Replace(data.Phone ?? "", @"\D", "");
+        if (phoneDigits.Length < 7 || phoneDigits.Length > 15)
+            return new ActionResponse { IsSuccess = false, Message = "Numărul de telefon trebuie să conțină între 7 și 15 cifre." };
+
+        // Validare Birthday (varsta minima 18 ani)
+        if (data.Birthday == default)
+            return new ActionResponse { IsSuccess = false, Message = "Data nașterii este obligatorie." };
+        var today = DateTime.Today;
+        var age = today.Year - data.Birthday.Year;
+        if (data.Birthday.Date > today.AddYears(-age)) age--;
+        if (age < 18)
+            return new ActionResponse { IsSuccess = false, Message = "Trebuie să ai cel puțin 18 ani pentru a te înregistra." };
+
+        // Validare Gender
+        var validGenders = new[] { "male", "female", "other" };
+        if (string.IsNullOrWhiteSpace(data.Gender) || !validGenders.Contains(data.Gender.ToLower()))
+            return new ActionResponse { IsSuccess = false, Message = "Genul selectat nu este valid." };
 
         var user = new User
         {
-            Name         = data.Name,
-            Surname      = data.Surname,
-            Email        = data.Email,
+            Name         = data.Name.Trim(),
+            Surname      = data.Surname.Trim(),
+            Email        = data.Email.Trim(),
             PasswordHash = HashPassword(data.Password),
             Phone        = data.Phone,
             Birthday     = data.Birthday,
@@ -80,10 +123,7 @@ public class UserActions
         using var db = new AppDbContext();
         return db.Users.Select(u => MapToDto(u)).ToList();
     }
-
-    // Patch-style: actualizeaza DOAR campurile non-null din DTO.
-    // ProfileSection trimite { Name, Surname, Birthday, Gender }  → Phone/Email raman neschimbate.
-    // ContactSection trimite { Phone, Email }                     → Name/Surname/etc raman neschimbate.
+    
     protected ActionResponse UpdateExecution(int id, UserUpdateDto data)
     {
         using var db = new AppDbContext();
