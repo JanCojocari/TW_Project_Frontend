@@ -421,7 +421,11 @@ export default {
             submit:          "Creează Contul",
             haveAccount:     "Ai deja un cont activ?",
             loginLink:       "Autentifică-te",
-            loading:         "Se încarcă..."
+            loading:         "Se încarcă...",
+            errorGeneric: "Date incomplete sau incorecte.",
+            errorBirthday: "Data nașterii este obligatorie.",
+            errorAge: "Trebuie să ai cel puțin 18 ani pentru a te înregistra.",
+            errorPasswords: "Parolele nu coincid.",
         },
         login: {
             title:           "Autentificare",
